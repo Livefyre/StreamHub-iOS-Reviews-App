@@ -1,0 +1,54 @@
+PODS:
+  - AFHTTPRequestOperationLogger (2.0.0):
+    - AFNetworking/NSURLConnection (~> 2.0)
+  - AFNetworking (2.2.4):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+    - AFNetworking/UIKit
+  - AFNetworking/NSURLConnection (2.2.4):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.2.4):
+    - AFNetworking/NSURLConnection
+  - AFNetworking/Reachability (2.2.4)
+  - AFNetworking/Security (2.2.4)
+  - AFNetworking/Serialization (2.2.4)
+  - AFNetworking/UIKit (2.2.4):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - Base64 (1.0.1)
+  - JWT (1.0.3):
+    - Base64 (~> 1.0.1)
+  - LFJSONKit (1.6a)
+  - NSString-Hashes (1.2.2)
+  - OHAttributedLabel (3.5.4)
+  - StreamHub-iOS-SDK (0.3.5):
+    - LFJSONKit (~> 1.6a)
+    - StreamHub-iOS-SDK/core
+  - StreamHub-iOS-SDK/core (0.3.5):
+    - AFNetworking (~> 2.2.1)
+    - Base64 (~> 1.0.1)
+    - JWT (~> 1.0.3)
+    - LFJSONKit (~> 1.6a)
+    - NSString-Hashes (~> 1.2.0)
+
+DEPENDENCIES:
+  - AFHTTPRequestOperationLogger (~> 2.0.0)
+  - OHAttributedLabel (~> 3.5.3)
+  - StreamHub-iOS-SDK (~> 0.3.4)
+
+SPEC CHECKSUMS:
+  AFHTTPRequestOperationLogger: b664dc4330b0fdfacead8338551c4ded9a2a8103
+  AFNetworking: ab63e259fe91eef4519b371ef0a4955af0e73e64
+  Base64: c6d74f31f150543b246a07e180ba813c88e59311
+  JWT: c9cc0e2b6046c8fb2c2777a252ac73641554e7d5
+  LFJSONKit: 5852f264c705b6240aec911c1e2dab92905dccf4
+  NSString-Hashes: ddf6e856e93d3c83c5d4ef8fcdea2a96ed77c6bc
+  OHAttributedLabel: fcf1d1245b4c8d2df94da91369b1474901d7fb14
+  StreamHub-iOS-SDK: 567a01be5b3f9495a103a26ad45da1569fadd575
+
+COCOAPODS: 0.33.1
