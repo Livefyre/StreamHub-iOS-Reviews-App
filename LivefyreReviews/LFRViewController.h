@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LFRViewController : UIViewController
+@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate>
+@property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @end

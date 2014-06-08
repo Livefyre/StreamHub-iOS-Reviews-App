@@ -8,8 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+#define AppDelegate (LFRAppDelegate *)[[UIApplication sharedApplication] delegate]
+
 @interface LFRAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (nonatomic, strong) UIStoryboard *mainStoryboard;
+
+-(NSString*)processStreamUrl:(NSString*)urlString;
 
 @end
