@@ -36,6 +36,8 @@
 		6DA1EEEE1944DB5C008E4AD3 /* UILabel+Trim.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEEA1944DB5C008E4AD3 /* UILabel+Trim.m */; };
 		6DA1EEEF1944DB5C008E4AD3 /* UIWebView+ScrollViewContentSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEEC1944DB5C008E4AD3 /* UIWebView+ScrollViewContentSize.m */; };
 		6DA1EEF21944DBB3008E4AD3 /* LFSAuthorProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEF11944DBB3008E4AD3 /* LFSAuthorProfile.m */; };
+		6DA1EEF51944E6C3008E4AD3 /* LFSUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEF41944E6C3008E4AD3 /* LFSUser.m */; };
+		6DA1EEF81944F9CE008E4AD3 /* LFSViewResources.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEF71944F9CE008E4AD3 /* LFSViewResources.m */; };
 		6DA3A45F19446F2400AF54AB /* LFRConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA3A45E19446F2400AF54AB /* LFRConfig.m */; };
 /* End PBXBuildFile section */
 
@@ -99,6 +101,10 @@
 		6DA1EEEC1944DB5C008E4AD3 /* UIWebView+ScrollViewContentSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+ScrollViewContentSize.m"; sourceTree = "<group>"; };
 		6DA1EEF01944DBB3008E4AD3 /* LFSAuthorProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSAuthorProfile.h; sourceTree = "<group>"; };
 		6DA1EEF11944DBB3008E4AD3 /* LFSAuthorProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSAuthorProfile.m; sourceTree = "<group>"; };
+		6DA1EEF31944E6C3008E4AD3 /* LFSUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSUser.h; sourceTree = "<group>"; };
+		6DA1EEF41944E6C3008E4AD3 /* LFSUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSUser.m; sourceTree = "<group>"; };
+		6DA1EEF61944F9CE008E4AD3 /* LFSViewResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSViewResources.h; sourceTree = "<group>"; };
+		6DA1EEF71944F9CE008E4AD3 /* LFSViewResources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSViewResources.m; sourceTree = "<group>"; };
 		6DA3A45D19446F2400AF54AB /* LFRConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRConfig.h; sourceTree = "<group>"; };
 		6DA3A45E19446F2400AF54AB /* LFRConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRConfig.m; sourceTree = "<group>"; };
 		FB20CC4C259548EB82144512 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -221,6 +227,8 @@
 				6DA1EED41944D757008E4AD3 /* LFSTextField.m */,
 				6DA1EED61944D856008E4AD3 /* LFSAttributedTextCell.h */,
 				6DA1EED71944D856008E4AD3 /* LFSAttributedTextCell.m */,
+				6DA1EEF61944F9CE008E4AD3 /* LFSViewResources.h */,
+				6DA1EEF71944F9CE008E4AD3 /* LFSViewResources.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -253,6 +261,8 @@
 				6DA1EEC61944D6B6008E4AD3 /* LFSModelMacros.h */,
 				6DA1EEF01944DBB3008E4AD3 /* LFSAuthorProfile.h */,
 				6DA1EEF11944DBB3008E4AD3 /* LFSAuthorProfile.m */,
+				6DA1EEF31944E6C3008E4AD3 /* LFSUser.h */,
+				6DA1EEF41944E6C3008E4AD3 /* LFSUser.m */,
 				6DA1EEE31944DB16008E4AD3 /* LFSResource.h */,
 				6DA1EEE41944DB16008E4AD3 /* LFSResource.m */,
 				6DA1EEC71944D6C1008E4AD3 /* LFSContent.h */,
@@ -400,6 +410,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DA1EEF81944F9CE008E4AD3 /* LFSViewResources.m in Sources */,
 				6DA1EED01944D6C1008E4AD3 /* LFSOembed.m in Sources */,
 				6DA3A45F19446F2400AF54AB /* LFRConfig.m in Sources */,
 				6DA1EED81944D856008E4AD3 /* LFSAttributedTextCell.m in Sources */,
@@ -410,6 +421,7 @@
 				6DA1EED51944D757008E4AD3 /* LFSTextField.m in Sources */,
 				6DA1EED11944D6C1008E4AD3 /* LFSAuthorCollection.m in Sources */,
 				6DA1EECF1944D6C1008E4AD3 /* LFSContent.m in Sources */,
+				6DA1EEF51944E6C3008E4AD3 /* LFSUser.m in Sources */,
 				6DA1EEE11944DAFF008E4AD3 /* LFSBasicHTMLParser.m in Sources */,
 				6DA1EEE21944DAFF008E4AD3 /* LFSBasicHTMLLabel.m in Sources */,
 				220F5C0A19444C8B0067B251 /* LFRViewController.m in Sources */,

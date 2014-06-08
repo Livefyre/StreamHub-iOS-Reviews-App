@@ -7,8 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "LFSContentCollection.h"
 
-@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate>
+@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic, copy) NSDictionary *collection;
+@property (nonatomic, copy) NSString *collectionId;
 
 @end

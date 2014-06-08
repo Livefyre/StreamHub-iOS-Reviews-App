@@ -28,7 +28,7 @@
     self = [super initWithFrame:frame];
     if (self)
     {
-        [self setFont:[UIFont systemFontOfSize:13.f]];
+        [self setFont:[UIFont systemFontOfSize:11.f]];
         [self setAutoresizingMask:
          (UIViewAutoresizingFlexibleHeight |
           UIViewAutoresizingFlexibleWidth)];
