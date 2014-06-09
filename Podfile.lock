@@ -21,11 +21,15 @@ PODS:
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
   - Base64 (1.0.1)
+  - EDStarRating (1.1)
   - JWT (1.0.3):
     - Base64 (~> 1.0.1)
   - LFJSONKit (1.6a)
   - NSString-Hashes (1.2.2)
   - OHAttributedLabel (3.5.4)
+  - SDWebImage (3.7.0):
+    - SDWebImage/Core
+  - SDWebImage/Core (3.7.0)
   - StreamHub-iOS-SDK (0.3.5):
     - LFJSONKit (~> 1.6a)
     - StreamHub-iOS-SDK/core
@@ -38,17 +42,21 @@ PODS:
 
 DEPENDENCIES:
   - AFHTTPRequestOperationLogger (~> 2.0.0)
+  - EDStarRating
   - OHAttributedLabel (~> 3.5.3)
+  - SDWebImage (~> 3.6)
   - StreamHub-iOS-SDK (~> 0.3.4)
 
 SPEC CHECKSUMS:
   AFHTTPRequestOperationLogger: b664dc4330b0fdfacead8338551c4ded9a2a8103
   AFNetworking: ab63e259fe91eef4519b371ef0a4955af0e73e64
   Base64: c6d74f31f150543b246a07e180ba813c88e59311
+  EDStarRating: c7b87f9866be0ea29bb054964023b8eb3f18286c
   JWT: c9cc0e2b6046c8fb2c2777a252ac73641554e7d5
   LFJSONKit: 5852f264c705b6240aec911c1e2dab92905dccf4
   NSString-Hashes: ddf6e856e93d3c83c5d4ef8fcdea2a96ed77c6bc
   OHAttributedLabel: fcf1d1245b4c8d2df94da91369b1474901d7fb14
+  SDWebImage: a1618e4ce38c2d40a844679bd832ef8219ab8557
   StreamHub-iOS-SDK: 567a01be5b3f9495a103a26ad45da1569fadd575
 
 COCOAPODS: 0.33.1

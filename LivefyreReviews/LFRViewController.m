@@ -18,22 +18,25 @@
 #import <objc/runtime.h>
 #import "UIImage+LFSColor.h"
 #import "LFSContentCollection.h"
-
-
+#import "LFRAppDelegate.h"
 
 
 @interface LFRViewController ()
+@property (strong, nonatomic) IBOutlet UIView *headerView;
 @property (nonatomic, strong) LFSContentCollection *content;
 @property (nonatomic, strong) LFSAttributedLabelDelegate *attributedLabelDelegate;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 @property (nonatomic, strong) UIImage *placeholderImage;
 
-
+@property (nonatomic, assign) BOOL prefersStatusBarHidden;
+@property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSAdminClient *adminClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
+@property (nonatomic, readonly) LFSTextField *postCommentField;
+@property (nonatomic, strong) LFSPostViewController *postViewController;
 
 @property (nonatomic, strong) LFSUser *user;
 
@@ -63,15 +66,19 @@ const static char kAtttributedTextHeightKey;
 @synthesize attributedLabelDelegate = _attributedLabelDelegate;
 @synthesize collection = _collection;
 @synthesize operationQueue = _operationQueue;
-
 @synthesize user = _user;
+@synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
+@synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
+
+
 @synthesize placeholderImage = _placeholderImage;
+@synthesize postCommentField = _postCommentField;
 
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
 @synthesize adminClient = _adminClient;
 @synthesize writeClient = _writeClient;
-
+@synthesize postViewController = _postViewController;
 
 -(LFSAdminClient*)adminClient
 {
@@ -128,8 +135,7 @@ const static char kAtttributedTextHeightKey;
     [super viewDidLoad];
     self.tableView.delegate=self;
     self.tableView.dataSource=self;
-    
-    
+    [self setNeedsStatusBarAppearanceUpdate];
     _content = [[LFSContentCollection alloc] init];
     [_content setDelegate:self];
     
@@ -138,15 +144,17 @@ const static char kAtttributedTextHeightKey;
     self.collection=[[NSDictionary alloc]init];
     self.collection=[config.collections objectAtIndex:0];
 	// Do any additional setup after loading the view, typically from a nib.
-    
+    //self.headerView.backgroundColor=UIColorFromRGB(0x2F3440);
     
     // {{{ Navigation bar
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
-    
+    //navigationBar.hidden=YES;
     if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
-        [navigationBar setBackgroundColor:[UIColor clearColor]];
-        [navigationBar setTranslucent:YES];
+    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440) ;
+        [navigationBar setTranslucent:NO];
+        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyre_logo.png"]];
+  
     }
     
     _scrollOffset = CGPointZero;
@@ -157,16 +165,16 @@ const static char kAtttributedTextHeightKey;
     
     BOOL isPortrait = UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication]
                                                         statusBarOrientation]);
-    UITextField *textField= [[LFSTextField alloc]
+   _postCommentField= [[LFSTextField alloc]
                          initWithFrame:
                          CGRectMake(0.f, 0.f, textFieldWidth, (isPortrait ? 30.f : 18.f))];
     
-    [textField setDelegate:self];
-    [textField setPlaceholder:@"Write a comment…"];
+    [_postCommentField setDelegate:self];
+    [_postCommentField setPlaceholder:@"Write a review…"];
     
     
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
-                                         initWithCustomView:textField];
+                                         initWithCustomView:_postCommentField];
     [self setToolbarItems:
      [NSArray arrayWithObjects:writeCommentItem, nil]];
     
@@ -204,12 +212,23 @@ const static char kAtttributedTextHeightKey;
 
 
 }
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleLightContent;
+}
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    
     [self authenticateUser];
     [self startStreamWithBoostrap];
 
+}
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    // add some pizzas by animating the toolbar from below (we want
+    // to encourage users to post comments and this feature serves as
+    // almost a call to action)
+    [self.navigationController setToolbarHidden:NO animated:animated];
 }
 -(void)viewWillDisappear:(BOOL)animated
 {
@@ -244,9 +263,8 @@ const static char kAtttributedTextHeightKey;
     [self.navigationController setDelegate:nil];
     [self.tableView setDelegate:nil];
     [self.tableView setDataSource:nil];
-    
-//    [_postViewController setDelegate:nil];
-//    _postViewController = nil;
+        [_postViewController setDelegate:nil];
+    _postViewController = nil;
     
     _streamClient = nil;
     _bootstrapClient = nil;
@@ -267,6 +285,43 @@ const static char kAtttributedTextHeightKey;
     _activityIndicator = nil;
 }
 
+-(void)setStatusBarHidden:(BOOL)hidden
+            withAnimation:(UIStatusBarAnimation)animation
+{
+    const static CGFloat kStatusBarHeight = 20.f;
+    _prefersStatusBarHidden = hidden;
+    _preferredStatusBarUpdateAnimation = animation;
+    
+    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
+    {
+        // iOS7
+        [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
+    }
+    else
+    {
+        // iOS6
+        [[UIApplication sharedApplication] setStatusBarHidden:hidden
+                                                withAnimation:animation];
+        if (self.navigationController) {
+            UINavigationBar *navigationBar = self.navigationController.navigationBar;
+            if (hidden && navigationBar.frame.origin.y > 0.f)
+            {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 0.f;
+                navigationBar.frame = frame;
+            }
+            else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight)
+            {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = kStatusBarHeight;
+                navigationBar.frame = frame;
+            }
+        }
+    }
+}
+
+
+
 
 #pragma mark - Toolbar behavior
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -286,12 +341,21 @@ const static char kAtttributedTextHeightKey;
 
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    //[self createComment:textField];
-    [textField resignFirstResponder];
+    [self createComment:textField];
     return NO;
 }
-
-
+-(IBAction)createComment:(id)sender
+{
+    // configure destination controller
+    [self.postViewController setCollection:self.collection];
+    [self.postViewController setCollectionId:self.collectionId];
+    [self.postViewController setAvatarImage:self.placeholderImage];
+    [self.postViewController setUser:self.user];
+    
+    [self.navigationController presentViewController:self.postViewController
+                                            animated:YES
+                                          completion:nil];
+}
 #pragma mark - Private methods
 
 - (void)authenticateUser
@@ -324,6 +388,8 @@ const static char kAtttributedTextHeightKey;
         [_content removeAllObjects];
         
         //[self startSpinning];
+//        [self.bootstrapClient getUserContentForUser:[self.collection objectForKey:@"siteId"] token:[self.collection objectForKey:@"lftoken"] statuses:<#(NSArray *)#> offset:<#(NSInteger)#> onSuccess:<#^(NSOperation *operation, id responseObject)success#> onFailure:<#^(NSOperation *operation, NSError *error)failure#>]
+        
         [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
                                      article:[self.collection objectForKey:@"articleId"]
                                    onSuccess:^(NSOperation *operation, id responseObject)
@@ -776,6 +842,126 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     } else {
         [cell setAttachmentImage:nil];
     }
+}
+
+
+//#pragma mark - LFSContentActionsDelegate
+//-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
+//{
+//    if (content != nil) {
+//        NSUInteger row = [_content indexOfObject:content];
+//        [self postDestructiveMessage:message
+//                        forIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+//        [self popDetailControllerForContent:content];
+//    }
+//}
+
+-(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient postFlag:flag
+                        forContent:content.idString
+                      inCollection:self.collectionId
+                         userToken:userToken
+                        parameters:nil
+                         onSuccess:nil
+                         onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
+-(void)featureContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient feature:YES
+                          comment:content.idString
+                     inCollection:self.collectionId
+                        userToken:userToken
+                        onSuccess:nil
+                        onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
+-(void)banAuthorOfContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient flagAuthor:content.author.idString
+                              action:LFSAuthorActionBan
+                            forSites:[self.collection objectForKey:@"siteId"]
+                         retroactive:NO
+                           userToken:userToken
+                           onSuccess:nil
+                           onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
+#pragma mark - LFSPostViewControllerDelegate
+-(id<LFSPostViewControllerDelegate>)viewController
+{
+    // forward collection view controller here to insert messagesinto
+    // the content view as soon as the server gets back to us with 200 OK
+    return self;
+}
+
+-(void)didSendPostRequestWithReplyTo:(NSString *)replyTo
+{
+    // this is triggered before we receive 200 OK from server
+    
+    // decide whether to scroll to the top row or to whichever row we are
+    // replying to
+    NSUInteger row = (replyTo != nil) ? [_content indexOfKey:replyTo] : 0;
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]
+                          atScrollPosition:UITableViewScrollPositionTop
+                                  animated:NO];
+}
+
+-(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
+{
+    // 200 OK received, post was successful
+    [_content addContent:[responseObject objectForKey:@"messages"]
+             withAuthors:[responseObject objectForKey:@"authors"]];
+}
+-(LFSPostViewController*)postViewController
+{
+    static NSString* const kLFSPostCommentViewControllerId = @"postComment";
+    
+    if (_postViewController == nil) {
+        _postViewController =
+        (LFSPostViewController*)[[AppDelegate mainStoryboard]
+                                 instantiateViewControllerWithIdentifier:
+                                 kLFSPostCommentViewControllerId];
+        [_postViewController setDelegate:self];
+    }
+    return _postViewController;
 }
 
 @end

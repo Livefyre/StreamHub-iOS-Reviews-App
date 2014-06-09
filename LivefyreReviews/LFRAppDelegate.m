@@ -18,7 +18,16 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
 };
 @implementation LFRAppDelegate
 
-
+@synthesize mainStoryboard = _mainStoryboard;
+-(UIStoryboard*)mainStoryboard {
+    static NSString* const kLFSMainStoryboardId = @"Main";
+    if (_mainStoryboard == nil) {
+        _mainStoryboard = [UIStoryboard
+                           storyboardWithName:kLFSMainStoryboardId
+                           bundle:nil];
+    }
+    return _mainStoryboard;
+}
 #pragma mark - Public methods
 
 -(NSString*)processStreamUrl:(NSString*)urlString
@@ -103,6 +112,8 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+
     return YES;
 }
 							

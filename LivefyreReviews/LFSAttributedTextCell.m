@@ -322,7 +322,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kCellHeaderTitleFontSize]];
+        [_headerTitleView setFont:[UIFont fontWithName:@"HelveticaNeue-Bold" size:kCellHeaderTitleFontSize]];
         [_headerTitleView setTextColor:[UIColor blackColor]];
         [_headerTitleView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         
@@ -372,7 +372,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         _headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:kCellHeaderAccessoryRightFontSize]];
+        [_headerAccessoryRightView setFont:[UIFont fontWithName:@"HelveticaNeue" size:kCellHeaderAccessoryRightFontSize]];
         [_headerAccessoryRightView setTextColor:[UIColor lightGrayColor]];
         //[_headerAccessoryRightView setTextAlignment:NSTextAlignmentRight];
         
