@@ -9,22 +9,22 @@
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
 #import <SDWebImage/UIImageView+WebCache.h>
-
 #import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
-
+#import "DLStarRatingControl.h"
 static const UIEdgeInsets kDetailPadding = {
     .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=75.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=265.f, .left=7.f, .bottom=20.f, .right=5.f
 };
 
 // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
 static const CGFloat kDetailHeaderTitleFontSize = 15.f;
 static const CGFloat kDetailHeaderSubtitleFontSize = 12.f;
+static const CGFloat kDetailTitleTextFieldWidth=15.f;
 
 // content font settings
 static NSString* const kPostContentFontName = @"Georgia";
@@ -34,9 +34,18 @@ static const CGFloat kPostContentFontSize = 16.0f;
 static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
 static const CGFloat kDetailHeaderAttributeTopImageHeight = 18.0f;
 static const CGFloat kDetailHeaderTitleHeight = 18.0f;
+
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 static const CGFloat kPostKeyboardMarginTop = 0.0f;
+
+
+//starView
+static const CGFloat kStarViewLeftBorder = 0.0f;
+static const CGFloat kStarViewHeight = 60.0f;
+
+
+
 
 // TODO: calculate avatar size based on pixel image size
 static const CGSize  kDetailImageViewSize = { .width=38.0f, .height=38.0f };
@@ -46,7 +55,6 @@ static const CGFloat kDetailImageMarginRight = 8.0f;
 static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 //static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
-
 @interface LFSWriteCommentView ()
 
 // UIView-specific
@@ -55,6 +63,14 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 @property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
+@property (readonly, nonatomic) UILabel *headerTitleLable;
+@property (readonly, nonatomic) UITextField *titleTextField;
+@property (readonly, nonatomic) DLStarRatingControl *starView;
+
+@property (readonly, nonatomic) UILabel *headerProsLable;
+@property (readonly, nonatomic) UILabel *consTitleLable;
+@property (readonly, nonatomic) UITextField *prosTextField;
+@property (readonly, nonatomic) UITextField *consTextField;
 
 @end
 
@@ -204,10 +220,259 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kDetailHeaderTitleFontSize]];
         
         // add to superview
-        [self.textView addSubview:_headerTitleView];
+        [self addSubview:_headerTitleView];
     }
     return _headerTitleView;
 }
+
+
+@synthesize headerTitleLable = _headerTitleLable;
+- (UILabel*)headerTitleLable
+{
+    if (_headerTitleLable == nil) {
+        
+        CGFloat leftColumnWidth = kDetailPadding.left;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _headerTitleLable = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerTitleLable
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15.0f]];
+        [_headerTitleLable setTextColor:UIColorFromRGB(0x969696)];
+        
+        // add to superview
+        [self addSubview:_headerTitleLable];
+    }
+    return _headerTitleLable;
+}
+
+@synthesize titleTextField = _titleTextField;
+- (UITextField*)titleTextField
+{
+    if (_titleTextField == nil) {
+        float widthIs =
+        [self.headerTitleLable.text
+         boundingRectWithSize:self.headerTitleLable.frame.size
+         options:NSStringDrawingUsesLineFragmentOrigin
+         attributes:@{ NSFontAttributeName:self.headerTitleLable.font }
+         context:nil]
+        .size.width;
+        NSLog(@"%f",widthIs);
+        CGFloat leftColumnWidth = kDetailPadding.left+widthIs+kDetailTitleTextFieldWidth;
+        CGFloat rightColumnWidth = self.headerTitleLable.frame.size.width + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _titleTextField = [[UITextField alloc] initWithFrame:frame];
+        
+        // configure
+        [_titleTextField
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_titleTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
+        [_titleTextField setTextColor:UIColorFromRGB(0x474C52)];
+    
+        //_titleTextField.layoutManager.delegate = self;
+        // add to superview
+        [self addSubview:_titleTextField];
+        
+    }
+    return _titleTextField;
+}
+@synthesize starView =_starView;
+-(DLStarRatingControl*)starView
+{
+    CGFloat leftColumnWidth =kStarViewLeftBorder;
+    CGFloat rightColumnWidth = kStarViewLeftBorder;
+    CGSize viewSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kStarViewHeight);
+    CGRect frame;
+    frame.size = viewSize;
+    frame.origin = CGPointMake(leftColumnWidth,
+                               self.titleTextField.frame.origin.x);
+    
+    if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // iOS6
+        frame.origin.y -= kPostContentInset.top;
+        frame.origin.x -= kPostContentInset.left;
+    }
+
+    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 0, 320, 200) andStars:5 isFractional:NO];
+//   self.starView.delegate=self;
+    [self addSubview:_starView];
+    return _starView;
+}
+
+
+@synthesize headerProsLable = _headerProsLable;
+- (UILabel*)headerProsLable
+{
+    if (_headerProsLable == nil) {
+        CGFloat leftColumnWidth = kDetailPadding.left;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   _headerTitleLable.frame.origin.y+120); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -=  kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _headerProsLable = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerProsLable
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerProsLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15.0f]];
+        [_headerProsLable setTextColor:UIColorFromRGB(0x969696)];
+        
+        // add to superview
+        [self.textView addSubview:_headerProsLable];
+    }
+    return _headerProsLable;
+}
+@synthesize prosTextField = _prosTextField;
+- (UITextField*)prosTextField
+{
+    if (_prosTextField == nil) {
+        float widthIs =
+        [self.headerProsLable.text boundingRectWithSize:self.headerProsLable.frame.size
+         options:NSStringDrawingUsesLineFragmentOrigin
+         attributes:@{ NSFontAttributeName:self.headerProsLable.font }
+         context:nil]
+        .size.width;
+        NSLog(@"%f",widthIs);
+        CGFloat leftColumnWidth = kDetailPadding.left+widthIs+kDetailTitleTextFieldWidth;
+        CGFloat rightColumnWidth = self.headerProsLable.frame.size.width + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   self.headerTitleLable.frame.origin.y+120); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _prosTextField = [[UITextField alloc] initWithFrame:frame];
+        
+        // configure
+        [_prosTextField
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_prosTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
+        [_prosTextField setTextColor:UIColorFromRGB(0x474C52)];
+        
+        //_titleTextField.layoutManager.delegate = self;
+        // add to superview
+        [self.textView addSubview:_prosTextField];
+        
+    }
+    return _prosTextField;
+}
+
+@synthesize consTitleLable = _consTitleLable;
+- (UILabel*)consTitleLable
+{
+    if (_consTitleLable == nil) {
+        CGFloat leftColumnWidth = kDetailPadding.left;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   _headerTitleLable.frame.origin.y+180); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -=  kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _consTitleLable = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_consTitleLable
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_consTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15.0f]];
+        [_consTitleLable setTextColor:UIColorFromRGB(0x969696)];
+        
+        // add to superview
+        [self.textView addSubview:_consTitleLable];
+    }
+    return _consTitleLable;
+}
+@synthesize consTextField = _consTextField;
+- (UITextField*)consTextField
+{
+    if (_consTextField == nil) {
+        float widthIs =
+        [self.consTitleLable.text
+         boundingRectWithSize:self.consTitleLable.frame.size
+         options:NSStringDrawingUsesLineFragmentOrigin
+         attributes:@{ NSFontAttributeName:self.consTitleLable.font }
+         context:nil]
+        .size.width;
+        NSLog(@"%f",widthIs);
+        CGFloat leftColumnWidth = kDetailPadding.left+widthIs+kDetailTitleTextFieldWidth;
+        CGFloat rightColumnWidth = self.consTitleLable.frame.size.width + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   self.headerTitleLable.frame.origin.y+180); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _consTextField = [[UITextField alloc] initWithFrame:frame];
+        
+        // configure
+        [_consTextField
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_consTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
+        [_consTextField setTextColor:UIColorFromRGB(0x474C52)];
+        
+        //_titleTextField.layoutManager.delegate = self;
+        // add to superview
+        [self.textView addSubview:_consTextField];
+        
+    }
+    return _consTextField;
+}
+
+
+
+
+
 
 #pragma mark -
 @synthesize headerSubtitleView = _headerSubtitleView;
@@ -255,7 +520,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     NSString *headerSubtitle = profileLocal.identifier;
     id headerAccessory = profileLocal.attributeObject;
     
-    if (headerTitle && !headerSubtitle && !headerAccessory)
+    if (!headerTitle && !headerSubtitle && !headerAccessory)
     {
         // display one string
         [self.headerTitleView setText:headerTitle];
@@ -366,14 +631,74 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self.headerSubtitleView setText:headerSubtitle];
         [self.headerSubtitleView resizeVerticalCenterRightTrim];
     }
+    else if (headerTitle && !headerSubtitle && !headerAccessory){
+        
+        [self.headerTitleLable setText:headerTitle];
+        [self.headerTitleLable resizeVerticalCenterRightTrim];
+        self.headerTitleLable.backgroundColor=[UIColor whiteColor];
+        [self.titleTextField setText:@"SS"];
+        self.titleTextField.backgroundColor=[UIColor whiteColor];
+        
+        [self.headerProsLable setText:@"Pros"];
+        [self.headerProsLable resizeVerticalCenterRightTrim];
+        
+        
+        [self.prosTextField setText:@"Pros"];
+        [self.starView setBackgroundColor:[UIColor clearColor]];
+        self.starView.delegate=self;
+        
+        [self.consTitleLable setText:@"Cons"];
+        [self.consTitleLable resizeVerticalCenterRightTrim];
+        
+        [self.consTextField setText:@"Cons"];
+        
+        
+        
+//        _starView.backgroundColor  = [UIColor yellowColor];
+//        _starView.backgroundImage=[UIImage imageNamed:@"starsbackground iOS12.png"];
+//        _starView.starImage = [[UIImage imageNamed:@"icon_star_full_orange.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//       _starView.starHighlightedImage = [[EDImage imageNamed:@"icon_star_full.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//        _starView.maxRating = 5.0;
+//        _starView.delegate = self;
+//        _starView.horizontalMargin = 15.0;
+//        _starView.editable=YES;
+//        _starView.rating= 2.5;
+//        _starView.displayMode=EDStarRatingDisplayHalf;
+//        [_starView  setNeedsDisplay];
+//        _starView.tintColor = [UIColor colorWithRed:0.11f green:0.38f blue:0.94f alpha:1.0f];
+      //  [self starsSelectionChanged:_starView rating:2.5];
+        
+        
+    }
+    
     else {
         // no header
     }
     
     // layout avatar view
-    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
-                         placeholderImage:profileLocal.icon];
+//    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
+//                         placeholderImage:profileLocal.icon];
 }
+
+- (CGFloat)layoutManager:(NSLayoutManager *)layoutManager lineSpacingAfterGlyphAtIndex:(NSUInteger)glyphIndex withProposedLineFragmentRect:(CGRect)rect
+{
+    return 28; // For really wide spacing; pick your own value
+}
+//-(void)starsSelectionChanged:(EDStarRating *)control rating:(float)rating
+//{
+//    NSString *ratingString = [NSString stringWithFormat:@"Rating: %.1f", rating];
+//    NSLog(@"%@",ratingString);
+////    if( [control isEqual:_starRating] )
+////        _starRatingLabel.text = ratingString;
+////    else
+////        _starRatingImageLabel.text = ratingString;
+//}
+
+-(void)newRating:(DLStarRatingControl *)control :(float)rating {
+	//self.stars.text = [NSString stringWithFormat:@"%0.1f star rating",rating];
+    NSLog(@"%@",[NSString stringWithFormat:@"%0.1f star rating",rating]);
+}
+
 
 #pragma mark -
 @synthesize textView = _textView;
@@ -381,6 +706,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 {
     if (_textView == nil) {
         CGRect frame = self.bounds;
+        NSLog(@"%f %f",self.bounds.origin.x, self.bounds.origin.y);
         _textView = [[UITextView alloc] initWithFrame:frame];
         
         [_textView setBackgroundColor:[UIColor whiteColor]];

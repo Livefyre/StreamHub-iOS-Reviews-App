@@ -20,6 +20,7 @@
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
+@property (nonatomic, readonly) EDStarRating *starRating;
 @property (weak, nonatomic) IBOutlet LFSWriteCommentView *writeCommentView;
 
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
@@ -37,7 +38,6 @@
 #pragma mark - Properties
 
 @synthesize writeCommentView;
-
 @synthesize delegate = _delegate;
 
 // render iOS7 status bar methods as writable properties
@@ -51,6 +51,7 @@
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
 @synthesize replyToContent = _replyToContent;
+@synthesize starRating =_starRating;
 
 - (LFSWriteClient*)writeClient
 {
@@ -94,22 +95,39 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-
     LFSAuthorProfile *author = self.user.profile;
     NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
     LFSResource *headerInfo = [[LFSResource alloc]
                                initWithIdentifier:detailString
                                attribute:nil
-                               displayString:author.displayName
+                               displayString:@"Title"
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];
     [self.writeCommentView setProfileLocal:headerInfo];
+    
+    _starRating.starImage = [EDImage imageNamed:@"star.png"];
+    _starRating.starHighlightedImage = [UIImage imageNamed:@"starhighlighted.png"];
+    _starRating.maxRating = 5.0;
+    _starRating.delegate = self;
+    _starRating.horizontalMargin = 12;
+    _starRating.editable=YES;
+    _starRating.displayMode=EDStarRatingDisplayFull;
+    [_starRating  setNeedsDisplay];
+//    _starRating.tintColor = self.colors[0];
+    [self starsSelectionChanged:_starRating rating:2.5];
 }
 
+-(void)starsSelectionChanged:(EDStarRating *)control rating:(float)rating
+{
+    NSString *ratingString = [NSString stringWithFormat:@"Rating: %.1f", rating];
+    NSLog(@"%@",ratingString);
+
+}
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.writeCommentView.textView becomeFirstResponder];
     

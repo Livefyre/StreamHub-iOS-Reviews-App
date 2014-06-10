@@ -224,6 +224,8 @@ const static char kAtttributedTextHeightKey;
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+
     
     // add some pizzas by animating the toolbar from below (we want
     // to encourage users to post comments and this feature serves as

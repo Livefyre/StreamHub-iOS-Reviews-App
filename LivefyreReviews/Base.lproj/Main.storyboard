@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="CFD-JR-ayN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="CFD-JR-ayN">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -8,15 +8,11 @@
         <scene sceneID="ufC-wZ-h7g">
             <objects>
                 <viewController id="vXZ-lx-hvc" customClass="LFRViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
-                        <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="pSJ-Y2-Pr8">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="pSJ-Y2-Pr8">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="517"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -60,15 +56,11 @@
         <scene sceneID="gip-xf-fdg">
             <objects>
                 <viewController storyboardIdentifier="postComment" id="Bjf-5Q-lwE" customClass="LFSPostViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="bDE-8z-57P"/>
-                        <viewControllerLayoutGuide type="bottom" id="Fun-z1-sex"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Xez-3g-LXt">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="32j-sD-7lJ">
+                            <navigationBar contentMode="scaleToFill" id="32j-sD-7lJ">
                                 <rect key="frame" x="0.0" y="20" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <inset key="insetFor6xAndEarlier" minX="0.0" minY="20" maxX="0.0" maxY="-20"/>
@@ -76,7 +68,7 @@
                                     <offsetWrapper key="textShadowOffset" horizontal="0.0" vertical="0.0"/>
                                 </textAttributes>
                                 <items>
-                                    <navigationItem title="New Comment" id="wdY-Vf-Aiv">
+                                    <navigationItem title="New Review" id="wdY-Vf-Aiv">
                                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="tkq-g7-BQd">
                                             <connections>
                                                 <action selector="cancelClicked:" destination="Bjf-5Q-lwE" id="uco-AF-POa"/>
@@ -90,7 +82,7 @@
                                     </navigationItem>
                                 </items>
                             </navigationBar>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L37-FV-1qO" customClass="LFSWriteCommentView">
+                            <view contentMode="scaleToFill" id="L37-FV-1qO" customClass="LFSWriteCommentView">
                                 <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>

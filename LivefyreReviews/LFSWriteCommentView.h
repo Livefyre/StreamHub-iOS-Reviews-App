@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import <EDStarRating/EDStarRating.h>
 #import "LFSResource.h"
+#import "DLStarRatingControl.h"
 
-@interface LFSWriteCommentView : UIView <UITextViewDelegate>
+@interface LFSWriteCommentView : UIView <UITextViewDelegate,DLStarRatingDelegate>
 
 @property (nonatomic, strong) LFSResource* profileLocal;
 @property (nonatomic, strong) UITextView *textView;
