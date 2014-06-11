@@ -42,17 +42,6 @@
 		6DA1EEF51944E6C3008E4AD3 /* LFSUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEF41944E6C3008E4AD3 /* LFSUser.m */; };
 		6DA1EEF81944F9CE008E4AD3 /* LFSViewResources.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA1EEF71944F9CE008E4AD3 /* LFSViewResources.m */; };
 		6DA3A45F19446F2400AF54AB /* LFRConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA3A45E19446F2400AF54AB /* LFRConfig.m */; };
-		6DA898B519474CD0000585A4 /* star-highlighted-template.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898AB19474CD0000585A4 /* star-highlighted-template.png */; };
-		6DA898B619474CD0000585A4 /* star-highlighted-template@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898AC19474CD0000585A4 /* star-highlighted-template@2x.png */; };
-		6DA898B719474CD0000585A4 /* star-template.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898AD19474CD0000585A4 /* star-template.png */; };
-		6DA898B819474CD0000585A4 /* star-template11@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898AE19474CD0000585A4 /* star-template11@2x.png */; };
-		6DA898B919474CD0000585A4 /* star-template9.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898AF19474CD0000585A4 /* star-template9.png */; };
-		6DA898BA19474CD0000585A4 /* star11.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898B019474CD0000585A4 /* star11.png */; };
-		6DA898BB19474CD0000585A4 /* starhighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898B119474CD0000585A4 /* starhighlighted.png */; };
-		6DA898BC19474CD0000585A4 /* starsbackground iOS12.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898B219474CD0000585A4 /* starsbackground iOS12.png */; };
-		6DA898BE19474CD0000585A4 /* starsbackground iOS1.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898B419474CD0000585A4 /* starsbackground iOS1.png */; };
-		6DA898C119474E82000585A4 /* icon_star_full_orange.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898BF19474E82000585A4 /* icon_star_full_orange.png */; };
-		6DA898C219474E82000585A4 /* icon_star_full.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898C019474E82000585A4 /* icon_star_full.png */; };
 		6DA898C919475570000585A4 /* DLStarRatingControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C419475570000585A4 /* DLStarRatingControl.m */; };
 		6DA898CA19475570000585A4 /* DLStarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C619475570000585A4 /* DLStarView.m */; };
 		6DA898CB19475570000585A4 /* UIView+Subviews.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C819475570000585A4 /* UIView+Subviews.m */; };
@@ -136,17 +125,6 @@
 		6DA1EEF71944F9CE008E4AD3 /* LFSViewResources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSViewResources.m; sourceTree = "<group>"; };
 		6DA3A45D19446F2400AF54AB /* LFRConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRConfig.h; sourceTree = "<group>"; };
 		6DA3A45E19446F2400AF54AB /* LFRConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRConfig.m; sourceTree = "<group>"; };
-		6DA898AB19474CD0000585A4 /* star-highlighted-template.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-highlighted-template.png"; sourceTree = "<group>"; };
-		6DA898AC19474CD0000585A4 /* star-highlighted-template@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-highlighted-template@2x.png"; sourceTree = "<group>"; };
-		6DA898AD19474CD0000585A4 /* star-template.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-template.png"; sourceTree = "<group>"; };
-		6DA898AE19474CD0000585A4 /* star-template11@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-template11@2x.png"; sourceTree = "<group>"; };
-		6DA898AF19474CD0000585A4 /* star-template9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-template9.png"; sourceTree = "<group>"; };
-		6DA898B019474CD0000585A4 /* star11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star11.png; sourceTree = "<group>"; };
-		6DA898B119474CD0000585A4 /* starhighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = starhighlighted.png; sourceTree = "<group>"; };
-		6DA898B219474CD0000585A4 /* starsbackground iOS12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "starsbackground iOS12.png"; sourceTree = "<group>"; };
-		6DA898B419474CD0000585A4 /* starsbackground iOS1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "starsbackground iOS1.png"; sourceTree = "<group>"; };
-		6DA898BF19474E82000585A4 /* icon_star_full_orange.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_star_full_orange.png; sourceTree = "<group>"; };
-		6DA898C019474E82000585A4 /* icon_star_full.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_star_full.png; sourceTree = "<group>"; };
 		6DA898C319475570000585A4 /* DLStarRatingControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLStarRatingControl.h; sourceTree = "<group>"; };
 		6DA898C419475570000585A4 /* DLStarRatingControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLStarRatingControl.m; sourceTree = "<group>"; };
 		6DA898C519475570000585A4 /* DLStarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLStarView.h; sourceTree = "<group>"; };
@@ -224,17 +202,6 @@
 			isa = PBXGroup;
 			children = (
 				6DA120DD1945B1F7009084EC /* livefyre_logo.png */,
-				6DA898AB19474CD0000585A4 /* star-highlighted-template.png */,
-				6DA898AC19474CD0000585A4 /* star-highlighted-template@2x.png */,
-				6DA898BF19474E82000585A4 /* icon_star_full_orange.png */,
-				6DA898C019474E82000585A4 /* icon_star_full.png */,
-				6DA898AD19474CD0000585A4 /* star-template.png */,
-				6DA898AE19474CD0000585A4 /* star-template11@2x.png */,
-				6DA898AF19474CD0000585A4 /* star-template9.png */,
-				6DA898B019474CD0000585A4 /* star11.png */,
-				6DA898B119474CD0000585A4 /* starhighlighted.png */,
-				6DA898B219474CD0000585A4 /* starsbackground iOS12.png */,
-				6DA898B419474CD0000585A4 /* starsbackground iOS1.png */,
 				220F5C0219444C8B0067B251 /* LFRAppDelegate.h */,
 				220F5C0319444C8B0067B251 /* LFRAppDelegate.m */,
 				220F5C0519444C8B0067B251 /* Main.storyboard */,
@@ -438,28 +405,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6DA898B819474CD0000585A4 /* star-template11@2x.png in Resources */,
 				220F5C0C19444C8B0067B251 /* Images.xcassets in Resources */,
-				6DA898BE19474CD0000585A4 /* starsbackground iOS1.png in Resources */,
-				6DA898B919474CD0000585A4 /* star-template9.png in Resources */,
-				6DA898BC19474CD0000585A4 /* starsbackground iOS12.png in Resources */,
-				6DA898B719474CD0000585A4 /* star-template.png in Resources */,
 				220F5BFE19444C8B0067B251 /* InfoPlist.strings in Resources */,
-				6DA898B619474CD0000585A4 /* star-highlighted-template@2x.png in Resources */,
 				6DA120DE1945B1F7009084EC /* livefyre_logo.png in Resources */,
-				6DA898B519474CD0000585A4 /* star-highlighted-template.png in Resources */,
 				220F5C0719444C8B0067B251 /* Main.storyboard in Resources */,
 				6DA898D41947557C000585A4 /* star.png in Resources */,
-				6DA898C219474E82000585A4 /* icon_star_full.png in Resources */,
 				6DA898D71947557C000585A4 /* star_highlighted-darker@2x.png in Resources */,
 				6DA898D919475778000585A4 /* DLStarRatingDemoViewController.xib in Resources */,
-				6DA898BB19474CD0000585A4 /* starhighlighted.png in Resources */,
-				6DA898BA19474CD0000585A4 /* star11.png in Resources */,
 				6DA898D31947557C000585A4 /* star@2x.png in Resources */,
 				6DA898D21947557C000585A4 /* star_highlighted@2x.png in Resources */,
 				6DA898D51947557C000585A4 /* star_highlighted.png in Resources */,
 				6DA898D61947557C000585A4 /* star_highlighted-darker.png in Resources */,
-				6DA898C119474E82000585A4 /* icon_star_full_orange.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

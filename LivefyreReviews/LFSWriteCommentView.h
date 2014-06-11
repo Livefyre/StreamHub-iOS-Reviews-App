@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <EDStarRating/EDStarRating.h>
 #import "LFSResource.h"
 #import "DLStarRatingControl.h"
 

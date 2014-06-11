@@ -652,23 +652,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         [self.consTextField setText:@"Cons"];
         
-        
-        
-//        _starView.backgroundColor  = [UIColor yellowColor];
-//        _starView.backgroundImage=[UIImage imageNamed:@"starsbackground iOS12.png"];
-//        _starView.starImage = [[UIImage imageNamed:@"icon_star_full_orange.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-//       _starView.starHighlightedImage = [[EDImage imageNamed:@"icon_star_full.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-//        _starView.maxRating = 5.0;
-//        _starView.delegate = self;
-//        _starView.horizontalMargin = 15.0;
-//        _starView.editable=YES;
-//        _starView.rating= 2.5;
-//        _starView.displayMode=EDStarRatingDisplayHalf;
-//        [_starView  setNeedsDisplay];
-//        _starView.tintColor = [UIColor colorWithRed:0.11f green:0.38f blue:0.94f alpha:1.0f];
-      //  [self starsSelectionChanged:_starView rating:2.5];
-        
-        
     }
     
     else {
@@ -684,15 +667,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 {
     return 28; // For really wide spacing; pick your own value
 }
-//-(void)starsSelectionChanged:(EDStarRating *)control rating:(float)rating
-//{
-//    NSString *ratingString = [NSString stringWithFormat:@"Rating: %.1f", rating];
-//    NSLog(@"%@",ratingString);
-////    if( [control isEqual:_starRating] )
-////        _starRatingLabel.text = ratingString;
-////    else
-////        _starRatingImageLabel.text = ratingString;
-//}
 
 -(void)newRating:(DLStarRatingControl *)control :(float)rating {
 	//self.stars.text = [NSString stringWithFormat:@"%0.1f star rating",rating];

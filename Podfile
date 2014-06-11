@@ -5,5 +5,4 @@ pod 'OHAttributedLabel', '~> 3.5.3'
 pod 'StreamHub-iOS-SDK', '~> 0.3.4'
 #pod 'StreamHub-iOS-SDK', :path => '../'
 pod 'SDWebImage', '~> 3.6'
-pod 'EDStarRating'
 #pod "Reveal-iOS-SDK"

@@ -20,7 +20,6 @@
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
-@property (nonatomic, readonly) EDStarRating *starRating;
 @property (weak, nonatomic) IBOutlet LFSWriteCommentView *writeCommentView;
 
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
@@ -51,8 +50,7 @@
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
 @synthesize replyToContent = _replyToContent;
-@synthesize starRating =_starRating;
-
+ 
 - (LFSWriteClient*)writeClient
 {
     if (_writeClient == nil) {
@@ -105,24 +103,8 @@
     [headerInfo setIconURLString:author.avatarUrlString75];
     [self.writeCommentView setProfileLocal:headerInfo];
     
-    _starRating.starImage = [EDImage imageNamed:@"star.png"];
-    _starRating.starHighlightedImage = [UIImage imageNamed:@"starhighlighted.png"];
-    _starRating.maxRating = 5.0;
-    _starRating.delegate = self;
-    _starRating.horizontalMargin = 12;
-    _starRating.editable=YES;
-    _starRating.displayMode=EDStarRatingDisplayFull;
-    [_starRating  setNeedsDisplay];
-//    _starRating.tintColor = self.colors[0];
-    [self starsSelectionChanged:_starRating rating:2.5];
 }
 
--(void)starsSelectionChanged:(EDStarRating *)control rating:(float)rating
-{
-    NSString *ratingString = [NSString stringWithFormat:@"Rating: %.1f", rating];
-    NSLog(@"%@",ratingString);
-
-}
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];

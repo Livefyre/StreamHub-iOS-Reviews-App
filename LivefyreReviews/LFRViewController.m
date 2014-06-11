@@ -390,7 +390,31 @@ const static char kAtttributedTextHeightKey;
         [_content removeAllObjects];
         
         //[self startSpinning];
-//        [self.bootstrapClient getUserContentForUser:[self.collection objectForKey:@"siteId"] token:[self.collection objectForKey:@"lftoken"] statuses:<#(NSArray *)#> offset:<#(NSInteger)#> onSuccess:<#^(NSOperation *operation, id responseObject)success#> onFailure:<#^(NSOperation *operation, NSError *error)failure#>]
+        
+        
+        
+//        LFSWriteClient *writeClient=[[LFSWriteClient alloc]initWithNetwork:@"labs.fyre.co" environment:@"livefyre.com"];
+//        NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:@"40", LFSStreamTypeLiveReviews,@"Hello World Body",LFSCollectionPostBodyKey,@"eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGFicy5meXJlLmNvIiwgImV4cGlyZXMiOiAxNDI3ODczNDMwLjIwNDI1NiwgInVzZXJfaWQiOiAiY29tbWVudGVyXzAifQ.xOYm5bj_M65vYSU2eLMYYt8GteaaHgNUTq55KwJnixg",LFSCollectionPostUserTokenKey, nil ];
+//        
+//        
+//        [writeClient postContentType:3 forCollection:@"26373227" parameters:dict
+//                           onSuccess:^(NSOperation *operation, id responseObject) {
+//                               NSLog(@"%@",operation);
+//                           } onFailure:^(NSOperation *operation, NSError *error) {
+//                               NSLog(@"%@",operation);
+//                           }];
+
+        
+        
+//        LFSBootstrapClient   *bootStrap=[[LFSBootstrapClient alloc]initWithNetwork:@"labs.fyre.co" environment:@"livefyre.com"];
+//        
+//        [self.bootstrapClient getInitForSite:@"303643" article:@"LiveReviews_test_collection" onSuccess:^(NSOperation *operation, id responseObject) {
+//            
+//        } onFailure:^(NSOperation *operation, NSError *error) {
+//            
+//        }];
+        
+
         
         [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
                                      article:[self.collection objectForKey:@"articleId"]
