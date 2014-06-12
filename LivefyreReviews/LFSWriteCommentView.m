@@ -28,7 +28,7 @@ static const CGFloat kDetailTitleTextFieldWidth=15.f;
 
 // content font settings
 static NSString* const kPostContentFontName = @"Georgia";
-static const CGFloat kPostContentFontSize = 16.0f;
+static const CGFloat kPostContentFontSize = 18.0f;
 
 // header label heights
 static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
@@ -237,7 +237,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
+                                   kDetailPadding.top+kDetailHeaderTitleFontSize/2); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
@@ -277,7 +277,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
+                                   kDetailPadding.top+kPostContentFontSize/2); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
@@ -290,7 +290,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         // configure
         [_titleTextField
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_titleTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
+        [_titleTextField setFont:[UIFont fontWithName:@"Georgia" size:kPostContentFontSize]];
         [_titleTextField setTextColor:UIColorFromRGB(0x474C52)];
     
         //_titleTextField.layoutManager.delegate = self;
@@ -348,7 +348,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         // configure
         [_headerProsLable
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerProsLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15.0f]];
+        [_headerProsLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:kPostContentFontSize]];
         [_headerProsLable setTextColor:UIColorFromRGB(0x969696)];
         
         // add to superview
@@ -420,7 +420,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         // configure
         [_consTitleLable
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_consTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15.0f]];
+        [_consTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:kPostContentFontSize]];
         [_consTitleLable setTextColor:UIColorFromRGB(0x969696)];
         
         // add to superview
@@ -637,21 +637,21 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self.headerTitleLable setText:headerTitle];
         [self.headerTitleLable resizeVerticalCenterRightTrim];
         self.headerTitleLable.backgroundColor=[UIColor whiteColor];
-        [self.titleTextField setText:@"SS"];
+            self.titleTextField.placeholder=@"Enter Title Here";
         self.titleTextField.backgroundColor=[UIColor whiteColor];
         
         [self.headerProsLable setText:@"Pros"];
         [self.headerProsLable resizeVerticalCenterRightTrim];
         
         
-        [self.prosTextField setText:@"Pros"];
+        self.prosTextField.placeholder=@"Enter Pros Here";
         [self.starView setBackgroundColor:[UIColor clearColor]];
         self.starView.delegate=self;
         
         [self.consTitleLable setText:@"Cons"];
         [self.consTitleLable resizeVerticalCenterRightTrim];
         
-        [self.consTextField setText:@"Cons"];
+        self.consTextField.placeholder=@"Enter Cons Here";
         
         CAShapeLayer *line1=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
         [self.layer addSublayer:line1];

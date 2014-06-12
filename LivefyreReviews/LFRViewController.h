@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "LFSContentCollection.h"
 #import "LFSPostViewController.h"
+#import "LFSDetailViewController.h"
 
-@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate>
+@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSDetailViewDelegate,LFSContentActionsDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @property (nonatomic, copy) NSDictionary *collection;

@@ -50,6 +50,7 @@ static NSString* const kFailureModifyTitle = @"Failed to modify content";
 const static CGFloat kGenerationOffset = 20.f;
 const static char kAttributedTextValueKey;
 const static char kAtttributedTextHeightKey;
+static NSString* const kCellSelectSegue = @"detailView";
 
 
 @implementation LFRViewController{
@@ -456,14 +457,14 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-//    LFSContent *content = [_content objectAtIndex:indexPath.row];
-//    LFSContentVisibility visibility = content.visibility;
-//    if (visibility == LFSContentVisibilityEveryone)
-//    {
-//        // TODO: no need to get cell from index and back if we are not using segues
-//        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-//        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
-//    }
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSContentVisibility visibility = content.visibility;
+    if (visibility == LFSContentVisibilityEveryone)
+    {
+        // TODO: no need to get cell from index and back if we are not using segues
+        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+    }
 }
 
 // disable this method to get static height = better performance
@@ -669,9 +670,45 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
     }
-    
+
     return returnedCell;
 
+}
+#pragma mark - Navigation
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Make sure your segue name in storyboard is the same as this line
+    if ([[segue identifier] isEqualToString:kCellSelectSegue])
+    {
+        // Get reference to the destination view controller
+        if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
+            if ([sender isKindOfClass:[UITableViewCell class]]) {
+                LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
+                NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+                LFSDetailViewController *vc = segue.destinationViewController;
+                
+                // assign model object(s)
+                LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
+#ifdef CACHE_SCALED_IMAGES
+                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
+                                          ?: self.placeholderImage);
+#else
+                UIImage *avatarPreview = self.placeholderImage;
+#endif
+                [vc setContentItem:contentItem];
+                [vc setAvatarImage:avatarPreview];
+                [vc setCollection:self.collection];
+                [vc setCollectionId:self.collectionId];
+                [vc setHideStatusBar:self.prefersStatusBarHidden];
+                [vc setUser:self.user];
+                [vc setDelegate:self];
+                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
+                                                                        delegate:self]];
+            }
+        }
+    }
 }
 #pragma mark - Table and cell helpers
 
