@@ -10,11 +10,11 @@
 #import <UIKit/UIKit.h>
 #import "LFSBasicHTMLLabel.h"
 #import "LFSResource.h"
-
+#import "DYRateView.h"
 extern const CGSize kCellImageViewSize;
 extern const CGSize kAttachmentImageViewSize;
 
-@interface LFSAttributedTextCell : UITableViewCell <UIAppearance>
+@interface LFSAttributedTextCell : UITableViewCell <UIAppearance,DYRateViewDelegate>
 
 #pragma mark - Properties
 @property (nonatomic, strong) LFSResource* profileLocal;

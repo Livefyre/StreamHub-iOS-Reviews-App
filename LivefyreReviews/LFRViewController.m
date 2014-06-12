@@ -19,6 +19,8 @@
 #import "UIImage+LFSColor.h"
 #import "LFSContentCollection.h"
 #import "LFRAppDelegate.h"
+#import "LFSDeletedCell.h"
+
 
 
 @interface LFRViewController ()
@@ -69,6 +71,7 @@ const static char kAtttributedTextHeightKey;
 @synthesize user = _user;
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
+static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 
 @synthesize placeholderImage = _placeholderImage;
@@ -391,31 +394,6 @@ const static char kAtttributedTextHeightKey;
         
         //[self startSpinning];
         
-        
-        
-//        LFSWriteClient *writeClient=[[LFSWriteClient alloc]initWithNetwork:@"labs.fyre.co" environment:@"livefyre.com"];
-//        NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:@"40", LFSStreamTypeLiveReviews,@"Hello World Body",LFSCollectionPostBodyKey,@"eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGFicy5meXJlLmNvIiwgImV4cGlyZXMiOiAxNDI3ODczNDMwLjIwNDI1NiwgInVzZXJfaWQiOiAiY29tbWVudGVyXzAifQ.xOYm5bj_M65vYSU2eLMYYt8GteaaHgNUTq55KwJnixg",LFSCollectionPostUserTokenKey, nil ];
-//        
-//        
-//        [writeClient postContentType:3 forCollection:@"26373227" parameters:dict
-//                           onSuccess:^(NSOperation *operation, id responseObject) {
-//                               NSLog(@"%@",operation);
-//                           } onFailure:^(NSOperation *operation, NSError *error) {
-//                               NSLog(@"%@",operation);
-//                           }];
-
-        
-        
-//        LFSBootstrapClient   *bootStrap=[[LFSBootstrapClient alloc]initWithNetwork:@"labs.fyre.co" environment:@"livefyre.com"];
-//        
-//        [self.bootstrapClient getInitForSite:@"303643" article:@"LiveReviews_test_collection" onSuccess:^(NSOperation *operation, id responseObject) {
-//            
-//        } onFailure:^(NSOperation *operation, NSError *error) {
-//            
-//        }];
-        
-
-        
         [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
                                      article:[self.collection objectForKey:@"articleId"]
                                    onSuccess:^(NSOperation *operation, id responseObject)
@@ -434,8 +412,7 @@ const static char kAtttributedTextHeightKey;
              [self.streamClient setCollectionId:collectionId];
              [self.streamClient startStreamWithEventId:eventId];
              //[self stopSpinning];
-             //[self.tableView reloadData];
-         }
+          }
                                    onFailure:^(NSOperation *operation, NSError *error)
          {
              NSLog(@"Error code %ld, with description %@", (long)error.code, [error localizedDescription]);
@@ -527,7 +504,7 @@ const static char kAtttributedTextHeightKey;
 //        cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
 //                                                    withLeftOffset:leftOffset];
     }
-    return cellHeightValue;
+    return cellHeightValue+20;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -675,26 +652,40 @@ const static char kAtttributedTextHeightKey;
     }
     else
     {
-//        LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
-//                                                  kDeletedCellReuseIdentifier];
-//        if (!cell) {
-//            cell = [[LFSDeletedCell alloc]
-//                    initWithReuseIdentifier:kDeletedCellReuseIdentifier];
-//            [cell.imageView setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
-//                                                               green:(217.f/255.f)
-//                                                                blue:(217.f/255.f)
-//                                                               alpha:1.f]];
-//            [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
-//            [cell.imageView setContentMode:UIViewContentModeCenter];
-//            [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
-//            [cell.textLabel setTextColor:[UIColor lightGrayColor]];
-//        }
-//        [self configureDeletedCell:cell forContent:content];
-//        returnedCell = cell;
+        LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
+                                                  kDeletedCellReuseIdentifier];
+        if (!cell) {
+            cell = [[LFSDeletedCell alloc]
+                    initWithReuseIdentifier:kDeletedCellReuseIdentifier];
+            [cell.imageView setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
+                                                               green:(217.f/255.f)
+                                                                blue:(217.f/255.f)
+                                                               alpha:1.f]];
+            [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
+            [cell.imageView setContentMode:UIViewContentModeCenter];
+            [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
+            [cell.textLabel setTextColor:[UIColor lightGrayColor]];
+        }
+        [self configureDeletedCell:cell forContent:content];
+        returnedCell = cell;
     }
     
     return returnedCell;
 
+}
+#pragma mark - Table and cell helpers
+
+-(void)configureDeletedCell:(LFSDeletedCell*)cell forContent:(LFSContent*)content
+{
+    LFSContentVisibility visibility = content.visibility;
+    [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
+    
+    NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
+                          ? @""
+                          : @"This comment has been removed");
+    
+    //[cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
+    [cell.textLabel setText:bodyText];
 }
 
 // called every time a cell is configured
@@ -991,3 +982,2018 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 
 @end
+
+/*
+ (lldb) po responseObject;
+ {
+ collectionSettings =     {
+ allowEditComments = 0;
+ allowGuestComments = 0;
+ archiveInfo =         {
+ nPages = 4;
+ pageInfo =             {
+ 0 =                 {
+ first = 1379374452;
+ last = 1381210768;
+ url = "/labs.fyre.co/320568/Y3VzdG9tLTEzNzkzNzIyODcwMzc=/0.json";
+ };
+ 1 =                 {
+ first = 1381210778;
+ last = 1396917158;
+ url = "/labs.fyre.co/320568/Y3VzdG9tLTEzNzkzNzIyODcwMzc=/1.json";
+ };
+ 2 =                 {
+ first = 1396917266;
+ last = 1399071838;
+ url = "/labs.fyre.co/320568/Y3VzdG9tLTEzNzkzNzIyODcwMzc=/2.json";
+ };
+ 3 =                 {
+ first = 1399072596;
+ last = 1402553454;
+ url = "/labs.fyre.co/320568/Y3VzdG9tLTEzNzkzNzIyODcwMzc=/3.json";
+ };
+ };
+ pathBase = "/labs.fyre.co/320568/Y3VzdG9tLTEzNzkzNzIyODcwMzc=/";
+ };
+ bootstrapUrl = "/labs.fyre.co/320568/Y3VzdG9tLTEzNzkzNzIyODcwMzc=/head.json";
+ checksum = "1379372387737.2224";
+ collectionId = 47466506;
+ commentsDisabled = 0;
+ config =         {
+ };
+ data =         (
+ );
+ editCommentInterval = 0;
+ event = 1402553477220916;
+ followers = 1;
+ nestLevel = 0;
+ networkId = "labs.fyre.co";
+ numVisible = 115;
+ siteId = 320568;
+ title = Sandbox;
+ url = "http://www.google.com/sergey";
+ };
+ headDocument =     {
+ authors =         {
+ "commenter_0@labs.fyre.co" =             {
+ avatar = "http://avatars.fyre.co/a/anon/50.jpg";
+ displayName = "Commenter 0";
+ id = "commenter_0@labs.fyre.co";
+ profileUrl = "";
+ tags =                 (
+ );
+ type = 1;
+ };
+ };
+ content =         (
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402553454;
+ id = 176488040;
+ parentId = "";
+ };
+ event = 1402553477220916;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402491690;
+ id = 176167036;
+ parentId = "";
+ };
+ event = 1402491699113640;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402472769;
+ id = 176126228;
+ parentId = "";
+ };
+ event = 1402488584226948;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402384054;
+ id = 175429260;
+ parentId = "";
+ };
+ event = 1402384064948125;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402381028;
+ id = 175424746;
+ parentId = "";
+ };
+ event = 1402489586137615;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>kiii</p>";
+ createdAt = 1402381010;
+ id = 175424709;
+ parentId = "";
+ updatedAt = 1402381010;
+ };
+ event = 1402381010332691;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402380956;
+ id = 175424624;
+ parentId = "";
+ };
+ event = 1402380972114677;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402380901;
+ id = 175424554;
+ parentId = "";
+ };
+ event = 1402380918845427;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402380866;
+ id = 175424505;
+ parentId = "";
+ };
+ event = 1402380921378410;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402380842;
+ id = 175424464;
+ parentId = "";
+ };
+ event = 1402380923828377;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402324776;
+ id = 175134167;
+ parentId = "";
+ };
+ event = 1402324811112859;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402324739;
+ id = 175133958;
+ parentId = "";
+ };
+ event = 1402324804563348;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402322647;
+ id = 175123413;
+ parentId = "";
+ };
+ event = 1402322650995232;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402322476;
+ id = 175122558;
+ parentId = "";
+ };
+ event = 1402324806720141;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402246935;
+ id = 174884112;
+ parentId = "";
+ };
+ event = 1402246956596196;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402223277;
+ id = 174816941;
+ parentId = "";
+ };
+ event = 1402254977158484;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402223250;
+ id = 174816909;
+ parentId = "";
+ };
+ event = 1402223642692948;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ {
+ childContent =                         (
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 174816758;
+ createdAt = 1402223236;
+ id = 174816890;
+ parentId = 174816758;
+ };
+ event = 1402223650405623;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402223125;
+ id = 174816758;
+ parentId = "";
+ };
+ event = 1402223645752817;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ {
+ childContent =                         (
+ {
+ childContent =                                 (
+ {
+ childContent =                                         (
+ {
+ childContent =                                                 (
+ {
+ childContent =                                                         (
+ {
+ childContent =                                                                 (
+ {
+ childContent =                                                                         (
+ {
+ childContent =                                                                                 (
+ {
+ childContent =                                                                                         (
+ {
+ childContent =                                                                                                 (
+ {
+ childContent =                                                                                                         (
+ {
+ childContent =                                                                                                                 (
+ {
+ childContent =                                                                                                                         (
+ {
+ childContent =                                                                                                                                 (
+ {
+ childContent =                                                                                                                                         (
+ {
+ childContent =                                                                                                                                                 (
+ {
+ childContent =                                                                                                                                                         (
+ );
+ collectionId = 47466506;
+ content =                                                                                                                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205427;
+ id = 174794639;
+ parentId = 174794626;
+ };
+ event = 1402205504928385;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205420;
+ id = 174794626;
+ parentId = 174794614;
+ };
+ event = 1402205502185047;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205414;
+ id = 174794614;
+ parentId = 174794602;
+ };
+ event = 1402205499284773;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205410;
+ id = 174794602;
+ parentId = 174794589;
+ };
+ event = 1402205496998403;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205404;
+ id = 174794589;
+ parentId = 174794526;
+ };
+ event = 1402205494816239;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205363;
+ id = 174794526;
+ parentId = 174794483;
+ };
+ event = 1402205491676625;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205345;
+ id = 174794483;
+ parentId = 174794453;
+ };
+ event = 1402205488625725;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205332;
+ id = 174794453;
+ parentId = 174794422;
+ };
+ event = 1402205486262709;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205319;
+ id = 174794422;
+ parentId = 174794385;
+ };
+ event = 1402205484028898;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205296;
+ id = 174794385;
+ parentId = 174794340;
+ };
+ event = 1402205479552281;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205271;
+ id = 174794340;
+ parentId = 174794332;
+ };
+ event = 1402205477423338;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205264;
+ id = 174794332;
+ parentId = 174794296;
+ };
+ event = 1402205473211133;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205249;
+ id = 174794296;
+ parentId = 174794282;
+ };
+ event = 1402205470941921;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205242;
+ id = 174794282;
+ parentId = 174794266;
+ };
+ event = 1402205469191557;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                         {
+ ancestorId = 174794117;
+ createdAt = 1402205234;
+ id = 174794266;
+ parentId = 174794241;
+ };
+ event = 1402205466749169;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                                 {
+ ancestorId = 174794117;
+ createdAt = 1402205222;
+ id = 174794241;
+ parentId = 174794182;
+ };
+ event = 1402205464670877;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 174794117;
+ createdAt = 1402205192;
+ id = 174794182;
+ parentId = 174794117;
+ };
+ event = 1402205462494975;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402205158;
+ id = 174794117;
+ parentId = "";
+ };
+ event = 1402205455384779;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402067780;
+ id = 174311325;
+ parentId = "";
+ };
+ event = 1402114081530035;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402067750;
+ id = 174311184;
+ parentId = "";
+ };
+ event = 1402114070491692;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1402067677;
+ id = 174310796;
+ parentId = "";
+ };
+ event = 1402114066928259;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1401812458;
+ id = 173217508;
+ parentId = "";
+ };
+ event = 1402114129745323;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1400701131;
+ id = 168996380;
+ parentId = "";
+ };
+ event = 1401812559583501;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 1503782304</p>";
+ createdAt = 1400629124;
+ id = 168569609;
+ parentId = "";
+ updatedAt = 1400629124;
+ };
+ event = 1400629124753631;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1400557356;
+ id = 168261067;
+ parentId = "";
+ };
+ event = 1401812561983508;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1400550634;
+ id = 168233964;
+ parentId = "";
+ };
+ event = 1402322655172063;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -967501481</p>";
+ createdAt = 1400533860;
+ id = 168158437;
+ parentId = "";
+ updatedAt = 1400533860;
+ };
+ event = 1400533860521543;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1400291834;
+ id = 167454190;
+ parentId = "";
+ };
+ event = 1400607862068861;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1855263841</p>";
+ createdAt = 1400207656;
+ id = 167161151;
+ parentId = "";
+ updatedAt = 1400207656;
+ };
+ event = 1400207656680134;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1400005793;
+ id = 165751559;
+ parentId = "";
+ };
+ erefs =                 (
+ "iR5vrvNGo/DWocUXDeZoXju0NlMIQS5t0JKGWUyiVt4J9Zoz/0HLYw2A8Qf3dGlx23Ux4sA9jpgcxFg="
+ );
+ event = 1400005793690361;
+ source = 5;
+ type = 0;
+ vis = 2;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1400005757;
+ id = 165751244;
+ parentId = "";
+ };
+ erefs =                 (
+ "iR5vrvNGo/DWocUXDeFpUzu0NlZbRyU5gJCBXEv5AIEO8885qUHLZA2BpQz4I2FyiSY7tpBvgMpOzQ8="
+ );
+ event = 1400005757743545;
+ source = 5;
+ type = 0;
+ vis = 2;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Refgid. CCTV </p>";
+ createdAt = 1400005461;
+ id = 165748434;
+ parentId = "";
+ updatedAt = 1400005462;
+ };
+ event = 1400005462059964;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399579734;
+ id = 164242605;
+ parentId = "";
+ };
+ event = 1400529749730170;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -751226465</p>";
+ createdAt = 1399573421;
+ id = 164208772;
+ parentId = "";
+ updatedAt = 1399573421;
+ };
+ event = 1399573421993555;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -24012981</p>";
+ createdAt = 1399573243;
+ id = 164207750;
+ parentId = "";
+ updatedAt = 1399573243;
+ };
+ event = 1399573243844633;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -906550630</p>";
+ createdAt = 1399571398;
+ id = 164197899;
+ parentId = "";
+ updatedAt = 1399571398;
+ };
+ event = 1399571398578080;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399570312;
+ id = 164192115;
+ parentId = "";
+ };
+ event = 1400529678126240;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399424516;
+ id = 163597155;
+ parentId = "";
+ };
+ event = 1400529685728869;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399313459;
+ id = 162877342;
+ parentId = "";
+ };
+ event = 1400293507036488;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399079728;
+ id = 162089781;
+ parentId = "";
+ };
+ event = 1400529682006141;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399074289;
+ id = 162053971;
+ parentId = "";
+ };
+ event = 1400618574402285;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399073045;
+ id = 162048561;
+ parentId = "";
+ };
+ event = 1400529698287908;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -760955873</p>";
+ createdAt = 1399072805;
+ id = 162047620;
+ parentId = "";
+ updatedAt = 1399072806;
+ };
+ event = 1399072806104421;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399072596;
+ id = 162046741;
+ parentId = "";
+ };
+ event = 1400293502831044;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1399071838;
+ id = 162043808;
+ parentId = "";
+ };
+ event = 1402203663006058;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1201746809</p>";
+ createdAt = 1399071718;
+ id = 162043352;
+ parentId = "";
+ updatedAt = 1399071718;
+ };
+ event = 1399071718205413;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -132481941</p>";
+ createdAt = 1399070273;
+ id = 162038102;
+ parentId = "";
+ updatedAt = 1399070273;
+ };
+ event = 1399070273667399;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1979882304</p>";
+ createdAt = 1399063893;
+ id = 162001268;
+ parentId = "";
+ updatedAt = 1399063893;
+ };
+ event = 1399063893669007;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1067301381</p>";
+ createdAt = 1399063097;
+ id = 161995421;
+ parentId = "";
+ updatedAt = 1399063097;
+ };
+ event = 1399063098489813;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<strong>bold</strong>";
+ createdAt = 1399054226;
+ id = 161935434;
+ parentId = "";
+ updatedAt = 1399054226;
+ };
+ event = 1399054226503884;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ {
+ childContent =                         (
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 161935176;
+ createdAt = 1402246896;
+ id = 174883957;
+ parentId = 161935176;
+ };
+ event = 1402246917373849;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<ul><li>this</li>\n<li>is</li>\n<li>a</li>\n<li>list</li>\n</ul>";
+ createdAt = 1399054186;
+ id = 161935176;
+ parentId = "";
+ updatedAt = 1399054186;
+ };
+ event = 1399054186929087;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1038403164</p>";
+ createdAt = 1398964752;
+ id = 161412290;
+ parentId = "";
+ updatedAt = 1398964752;
+ };
+ event = 1398964752970895;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1398816175;
+ id = 160876413;
+ parentId = "";
+ };
+ erefs =                 (
+ "iR5vrvNGo/DWpMoVCudsVDu0NlZbES09gcCCCRr6UtUM9pxk+RTNZQqLpwb6cTh12iE+s5I93Z9KzQ4="
+ );
+ event = 1398816175957420;
+ source = 5;
+ type = 0;
+ vis = 2;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>What happens to long comments? Are they truncated as they are on the web, or shown in their full glory?\n\nLorizzle pimpin' dolizzle sizzle amizzle, yo adipiscing sheezy. Nullam sapien velizzle, uhuh ... yih! volutpizzle, crackalackin shit, gravida nizzle, arcu. Cool i saw beyonces tizzles and my pizzle went crizzle tortizzle. Sed erizzle. Stuff izzle dolizzle dapibus turpis tempizzle fizzle. Maurizzle pellentesque my shizz izzle turpizzle. Shizzlin dizzle izzle tortor. Pellentesque dawg rhoncizzle da bomb. In hac bizzle platea dictumst. Donec dapibizzle. Break yo neck, yall crazy, pretizzle daahng dawg, mattizzle izzle, eleifend hizzle, nunc. Fo suscipizzle. Integer semper velit sed purus.\n\nCurabitizzle bow wow wow shiz bizzle nisi check it out mollizzle. Dawg shut the shizzle up. Morbi you son of a bizzle. Vivamus neque. Pizzle orci. My shizz maurizzle mauris, interdizzle a, feugiat crackalackin amizzle, fizzle in, boofron. Pellentesque gravida. Vestibulizzle mi, volutpizzle dizzle, sagittis sizzle, bizzle sempizzle, phat. Cras izzle shiznit. Aliquam volutpizzle sheezy vizzle . Cras quis justo shiz purus sodales ornare. Shut the shizzle up venenatizzle justo izzle lacus. Nunc phat. Suspendisse fizzle placerat shiz. Curabitizzle eu ante. Nunc pharetra, leo gangsta hendrerizzle, ipsum felizzle break it down sizzle, fo shizzle aliquizzle magna felis luctus pede. Nam izzle nisl. Class aptent pimpin' shiznit ad we gonna chung torquent gizzle conubia nostra, per fo ghetto. Aliquam interdum, yo mamma nizzle uhuh ... yih! nonummy, hizzle orci sizzle leo, that's the shizzle shut the shizzle up risus yippiyo izzle sizzle.\n\nIn sagittizzle break yo neck, yall nizzle nisi. Pellentesque ma nizzle, arcu non stuff funky fresh, sizzle sure crackalackin sem, nizzle get down get down nulla the bizzle a the bizzle. Suspendisse fizzle scelerisque augue. Sizzle egestas lectizzle away libero. Proin consectetuer blandizzle sapizzle. Crazy aliquet, dizzle sit boom shackalack accumsizzle owned, leo sizzle ultricizzle gizzle, izzle daahng dawg erat mofo sit amizzle purus. Check it out ma nizzle tortor yo mamma enizzle. Phasellizzle ghetto. Nulla da bomb that's the shizzle, convallis nizzle, dawg fo shizzle my nizzle gangsta, pulvinizzle egestizzle, augue. Shizznit convallizzle. Break yo neck, yall ante ipsum nizzle shizzlin dizzle faucibizzle orci luctizzle et ultricizzle gangster cubilia Crunk; In own yo' elit sheezy crunk dizzle condimentizzle. Mofo est get down get down, vulputate vel, semper mammasay mammasa mamma oo sa, commodo things, check out this. Yo break yo neck, yall, tortizzle egizzle vehicula stuff, phat its fo rizzle ultrices lorizzle, pot viverra mofo urna vitae erizzle.\n\n</p>";
+ createdAt = 1398469354;
+ id = 159444999;
+ parentId = "";
+ updatedAt = 1398469354;
+ };
+ event = 1398469354893606;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>hihi</p>";
+ createdAt = 1398469019;
+ id = 159443744;
+ parentId = "";
+ updatedAt = 1398469020;
+ };
+ event = 1398469020076371;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ {
+ childContent =                         (
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 156160260;
+ createdAt = 1398468451;
+ id = 159440596;
+ parentId = 156160260;
+ };
+ event = 1402254963824929;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Test 456</p>";
+ createdAt = 1397670980;
+ id = 156160260;
+ parentId = "";
+ updatedAt = 1397670980;
+ };
+ event = 1397670980641674;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1397670966;
+ id = 156160195;
+ parentId = "";
+ };
+ erefs =                 (
+ "iR5vrvNGo/DVosMUDOJkUju0NgEORClp1MeAWhr9V9UL8J0wqhWbZQ6GoQevJT8hh3Y57cM93ZpPxg8="
+ );
+ event = 1397670967228359;
+ source = 5;
+ type = 0;
+ vis = 2;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1442620612</p>";
+ createdAt = 1397517342;
+ id = 155561449;
+ parentId = "";
+ updatedAt = 1397517342;
+ };
+ event = 1397517342319824;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1397517228;
+ id = 155560689;
+ parentId = "";
+ };
+ event = 1398468457401633;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -3239611</p>";
+ createdAt = 1397510504;
+ id = 155526764;
+ parentId = "";
+ updatedAt = 1397510504;
+ };
+ event = 1397510504669041;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 88893158</p>";
+ createdAt = 1397502123;
+ id = 155480874;
+ parentId = "";
+ updatedAt = 1397502123;
+ };
+ event = 1397502123918419;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -365542664</p>";
+ createdAt = 1397501866;
+ id = 155479309;
+ parentId = "";
+ updatedAt = 1397501866;
+ };
+ event = 1397501866622173;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 1369233398</p>";
+ createdAt = 1397501785;
+ id = 155478834;
+ parentId = "";
+ updatedAt = 1397501785;
+ };
+ event = 1397501785975410;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 385137349</p>";
+ createdAt = 1397255410;
+ id = 154429267;
+ parentId = "";
+ updatedAt = 1397255410;
+ };
+ event = 1397255410388763;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 2029834917</p>";
+ createdAt = 1397255296;
+ id = 154428949;
+ parentId = "";
+ updatedAt = 1397255296;
+ };
+ event = 1397255297014122;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -482385642</p>";
+ createdAt = 1397255224;
+ id = 154428705;
+ parentId = "";
+ updatedAt = 1397255225;
+ };
+ event = 1397255225048856;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1602107983</p>";
+ createdAt = 1397255140;
+ id = 154428464;
+ parentId = "";
+ updatedAt = 1397255141;
+ };
+ event = 1397255141103942;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 252424444</p>";
+ createdAt = 1397254198;
+ id = 154425777;
+ parentId = "";
+ updatedAt = 1397254198;
+ };
+ event = 1397254198339437;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 1513670539</p>";
+ createdAt = 1397239038;
+ id = 154367348;
+ parentId = "";
+ updatedAt = 1397239038;
+ };
+ event = 1397239038488726;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1356995126</p>";
+ createdAt = 1397238966;
+ id = 154367039;
+ parentId = "";
+ updatedAt = 1397238966;
+ };
+ event = 1397238966250668;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -2070401541</p>";
+ createdAt = 1397238798;
+ id = 154366221;
+ parentId = "";
+ updatedAt = 1397238798;
+ };
+ event = 1397238798856645;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 533174202</p>";
+ createdAt = 1397237285;
+ id = 154359975;
+ parentId = "";
+ updatedAt = 1397237286;
+ };
+ event = 1397237286372630;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1397156230;
+ id = 154074923;
+ parentId = "";
+ };
+ erefs =                 (
+ "iR5vrvNGo/DVoMIVCOpvVDu0NlMIQH5p0cSCWE7+Vd4P9po2qRPBMluB8g35IGp22HE445E4i5tKwVo="
+ );
+ event = 1397156231198044;
+ source = 5;
+ type = 0;
+ vis = 2;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1397154216;
+ id = 154058501;
+ parentId = "";
+ };
+ event = 1397154223275762;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ {
+ childContent =                         (
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 154058297;
+ createdAt = 1397156199;
+ id = 154074669;
+ parentId = 154058297;
+ };
+ erefs =                         (
+ "iR5vrvNGo/DVoMIVCOVrXju0NlEGEHlrhMCACxijVtJap8o3qReabFGHoVmsIWgkiyY65ZY7gJpLwFo="
+ );
+ event = 1397156200371095;
+ source = 5;
+ type = 0;
+ vis = 2;
+ },
+ {
+ childContent =                         (
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 154058297;
+ annotations =                             {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Lvl1 reply</p>";
+ createdAt = 1397155902;
+ id = 154072130;
+ parentId = 154058297;
+ updatedAt = 1397155902;
+ };
+ event = 1397155902331472;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                         (
+ {
+ childContent =                                 (
+ );
+ collectionId = 47466506;
+ content =                                 {
+ ancestorId = 154058297;
+ annotations =                                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Reply to lvl 1</p>";
+ createdAt = 1397154285;
+ id = 154059023;
+ parentId = 154058629;
+ updatedAt = 1397154285;
+ };
+ event = 1397154285573755;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                                 (
+ {
+ childContent =                                         (
+ );
+ collectionId = 47466506;
+ content =                                         {
+ ancestorId = 154058297;
+ annotations =                                             {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Lvl 4 reply</p>";
+ createdAt = 1397154264;
+ id = 154058837;
+ parentId = 154058680;
+ updatedAt = 1397154264;
+ };
+ event = 1397154264561145;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                                         (
+ );
+ collectionId = 47466506;
+ content =                                         {
+ ancestorId = 154058297;
+ annotations =                                             {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Lvl 3 reply</p>";
+ createdAt = 1397154256;
+ id = 154058776;
+ parentId = 154058680;
+ updatedAt = 1397154256;
+ };
+ event = 1397154256633677;
+ source = 5;
+ type = 0;
+ vis = 1;
+ }
+ );
+ collectionId = 47466506;
+ content =                                 {
+ ancestorId = 154058297;
+ annotations =                                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Reply to my reply</p>";
+ createdAt = 1397154242;
+ id = 154058680;
+ parentId = 154058629;
+ updatedAt = 1397154242;
+ };
+ event = 1397154242504434;
+ source = 5;
+ type = 0;
+ vis = 1;
+ }
+ );
+ collectionId = 47466506;
+ content =                         {
+ ancestorId = 154058297;
+ createdAt = 1397154234;
+ id = 154058629;
+ parentId = 154058297;
+ };
+ event = 1397155918740123;
+ source = 5;
+ type = 0;
+ vis = 0;
+ }
+ );
+ collectionId = 47466506;
+ content =                 {
+ createdAt = 1397154184;
+ id = 154058297;
+ parentId = "";
+ };
+ event = 1402114044432092;
+ source = 5;
+ type = 0;
+ vis = 0;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 1318662855</p>";
+ createdAt = 1397086776;
+ id = 153721318;
+ parentId = "";
+ updatedAt = 1397086777;
+ };
+ event = 1397086777136890;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>Oh Hai</p>";
+ createdAt = 1397081048;
+ id = 153700635;
+ parentId = "";
+ updatedAt = 1397081048;
+ };
+ event = 1397081048480924;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 1105179846</p>";
+ createdAt = 1396995782;
+ id = 153281441;
+ parentId = "";
+ updatedAt = 1396995783;
+ };
+ event = 1396995783145332;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 594308306</p>";
+ createdAt = 1396987814;
+ id = 153243907;
+ parentId = "";
+ updatedAt = 1396987814;
+ };
+ event = 1396987814810569;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -3006484</p>";
+ createdAt = 1396987379;
+ id = 153241584;
+ parentId = "";
+ updatedAt = 1396987379;
+ };
+ event = 1396987379336500;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1544343699</p>";
+ createdAt = 1396987358;
+ id = 153241471;
+ parentId = "";
+ updatedAt = 1396987359;
+ };
+ event = 1396987359079682;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -533250509</p>";
+ createdAt = 1396982427;
+ id = 153215269;
+ parentId = "";
+ updatedAt = 1396982427;
+ };
+ event = 1396982427681114;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1015384612</p>";
+ createdAt = 1396982318;
+ id = 153214742;
+ parentId = "";
+ updatedAt = 1396982318;
+ };
+ event = 1396982318551596;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1222456846</p>";
+ createdAt = 1396980795;
+ id = 153207755;
+ parentId = "";
+ updatedAt = 1396980795;
+ };
+ event = 1396980795442638;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -631993095</p>";
+ createdAt = 1396980641;
+ id = 153207097;
+ parentId = "";
+ updatedAt = 1396980641;
+ };
+ event = 1396980641850932;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API 1106460825</p>";
+ createdAt = 1396980397;
+ id = 153205921;
+ parentId = "";
+ updatedAt = 1396980397;
+ };
+ event = 1396980397907607;
+ source = 5;
+ type = 0;
+ vis = 1;
+ },
+ {
+ childContent =                 (
+ );
+ collectionId = 47466506;
+ content =                 {
+ annotations =                     {
+ };
+ authorId = "commenter_0@labs.fyre.co";
+ bodyHtml = "<p>testing streaming API -1485481104</p>";
+ createdAt = 1396919555;
+ id = 153058135;
+ parentId = "";
+ updatedAt = 1396919555;
+ };
+ event = 1396919555802376;
+ source = 5;
+ type = 0;
+ vis = 1;
+ }
+ );
+ followers =         (
+ "commenter_0@labs.fyre.co"
+ );
+ isComplete = 0;
+ };
+ networkSettings =     {
+ allowEditComments = 0;
+ allowGuestComments = 0;
+ charLimit = 8000;
+ commentsEnabled = 1;
+ editCommentInterval = 5;
+ editMode = 0;
+ editReviewReplies = 1;
+ enabled = 1;
+ fbShareEnabled = 1;
+ featuredReaderEnabled = 1;
+ featuringEnabled = 1;
+ highVelocityMode = 0;
+ hovercardsEnabled = 1;
+ liShareEnabled = 0;
+ mediaDisplay = 1;
+ mediaUploadEnabled = 0;
+ nestLevel = 4;
+ premoderated = 0;
+ rawHtml = 0;
+ repliesEnabled = 1;
+ reviewRepliesEnabled = 1;
+ richTextEnabled = 1;
+ streamType = 1;
+ taggingEnabled = 1;
+ throttleStream = 0;
+ topContentDisplay = 1;
+ twitterShareEnabled = 1;
+ xxHtmlBlob = "";
+ };
+ siteSettings =     {
+ "__modified__" = "1357633156.357029";
+ allowGuestComments = 0;
+ enabled = 1;
+ nestLevel = 4;
+ premoderated = 0;
+ };
+ }
+ 
+ */

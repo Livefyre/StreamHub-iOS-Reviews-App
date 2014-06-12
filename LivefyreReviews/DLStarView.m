@@ -42,6 +42,7 @@
 
 
 - (UIImage *)croppedImage:(UIImage*)image {
+    
     float partWidth = image.size.width/kNumberOfFractions * image.scale;
     int part = (self.tag+kNumberOfFractions)%kNumberOfFractions;
     float xOffset = partWidth*part;
@@ -82,6 +83,7 @@
     [self setImage:starImage forState:UIControlStateNormal];
     [self setImage:highlightedImage forState:UIControlStateSelected];
     [self setImage:highlightedImage forState:UIControlStateHighlighted];
+    
 }
 
 @end

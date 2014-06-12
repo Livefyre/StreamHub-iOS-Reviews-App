@@ -17,7 +17,7 @@ static const UIEdgeInsets kDetailPadding = {
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=265.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=125.f, .left=7.f, .bottom=20.f, .right=5.f
 };
 
 // header font settings
@@ -213,7 +213,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
-        
+        _headerTitleView.backgroundColor=[UIColor whiteColor];
         // configure
         [_headerTitleView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
@@ -317,7 +317,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         frame.origin.x -= kPostContentInset.left;
     }
 
-    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 0, 320, 200) andStars:5 isFractional:NO];
+    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 60) andStars:5 isFractional:NO];
+    _starView.rating=4;
 //   self.starView.delegate=self;
     [self addSubview:_starView];
     return _starView;
@@ -334,7 +335,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   _headerTitleLable.frame.origin.y+120); // size.y will be changed in layoutSubviews
+                                   _headerTitleLable.frame.origin.y); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -=  kPostContentInset.top;
@@ -372,7 +373,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   self.headerTitleLable.frame.origin.y+120); // size.y will be changed in layoutSubviews
+                                   self.headerTitleLable.frame.origin.y); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
@@ -406,7 +407,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   _headerTitleLable.frame.origin.y+180); // size.y will be changed in layoutSubviews
+                                   _headerTitleLable.frame.origin.y+60); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -=  kPostContentInset.top;
@@ -445,7 +446,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   self.headerTitleLable.frame.origin.y+180); // size.y will be changed in layoutSubviews
+                                   self.headerTitleLable.frame.origin.y+60); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
@@ -652,6 +653,14 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         [self.consTextField setText:@"Cons"];
         
+        CAShapeLayer *line1=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
+        [self.layer addSublayer:line1];
+        CAShapeLayer *line2=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];
+        [self.layer addSublayer:line2];
+        CAShapeLayer *line3=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
+        [self.textView.layer addSublayer:line3];
+        CAShapeLayer *line4=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];
+        [self.textView.layer addSublayer:line4];
     }
     
     else {
@@ -661,6 +670,20 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     // layout avatar view
 //    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
 //                         placeholderImage:profileLocal.icon];
+}
+-(CAShapeLayer*)drawline:(CGPoint)from :(CGPoint)to{
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:from];
+    [path addLineToPoint:to];
+    
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    shapeLayer.path = [path CGPath];
+    shapeLayer.strokeColor = [[UIColor grayColor] CGColor];
+    shapeLayer.lineWidth = 0.1;
+    shapeLayer.fillColor = [[UIColor grayColor] CGColor];
+    
+    //[self.layer addSublayer:shapeLayer];
+    return shapeLayer;
 }
 
 - (CGFloat)layoutManager:(NSLayoutManager *)layoutManager lineSpacingAfterGlyphAtIndex:(NSUInteger)glyphIndex withProposedLineFragmentRect:(CGRect)rect
@@ -673,13 +696,14 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     NSLog(@"%@",[NSString stringWithFormat:@"%0.1f star rating",rating]);
 }
 
-
 #pragma mark -
 @synthesize textView = _textView;
 -(UITextView*)textView
 {
     if (_textView == nil) {
         CGRect frame = self.bounds;
+        frame.origin.y+=120;
+        frame.size.height-=120;
         NSLog(@"%f %f",self.bounds.origin.x, self.bounds.origin.y);
         _textView = [[UITextView alloc] initWithFrame:frame];
         

@@ -16,6 +16,7 @@
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
+#import "DLStarRatingControl.h"
 
 // external constants
 const CGSize kCellImageViewSize = { .width=25.f, .height=25.f };
@@ -59,6 +60,8 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
+@property (readonly, nonatomic) DYRateView *headerRatingView;
+@property (readonly, nonatomic) UILabel *footerLeftView;
 
 @property (nonatomic, strong) UIImageView *attachmentImageView;
 
@@ -332,6 +335,70 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 	return _headerTitleView;
 }
 
+// header rating
+@synthesize headerRatingView = _headerRatingView;
+
+-(UIView *)headerRatingView
+{
+    if (_headerRatingView == nil) {
+        
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
+        CGRect frame = CGRectMake(leftColumnWidth,
+                                  kCellPadding.top - kCellHeaderAdjust+_headerTitleView.frame.size.height,
+                                  self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+                                  kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust-_headerTitleView.frame.size.height);
+        NSLog(@"%f %f",frame.size.width,frame.size.height);
+        // initialize
+//        _headerRatingView = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 20, 50, 80) andStars:5 isFractional:NO];
+//        _headerRatingView.rating=4;
+        _headerRatingView = [[DYRateView alloc] initWithFrame:CGRectMake(48, 21, self.bounds.size.width, 15) fullStar:[UIImage imageNamed:@"StarFull.png"] emptyStar:[UIImage imageNamed:@"StarEmpty.png"]];
+        _headerRatingView.padding = 3;
+        _headerRatingView.alignment = RateViewAlignmentLeft;
+        _headerRatingView.editable = NO;
+        _headerRatingView.delegate = self;
+        _headerRatingView.rate=4.5;
+        // configure
+        [_headerRatingView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerRatingView setBackgroundColor:[UIColor clearColor]];
+        
+        // add to superview
+        [self.contentView addSubview:_headerRatingView];
+        
+        
+    }
+    return _headerRatingView;
+}
+@synthesize footerLeftView = _footerLeftView;
+-(UILabel*)footerLeftView
+{
+    if (_footerLeftView == nil) {
+        
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kCellPadding.left - kCellPadding.right) / 2.f), kCellPadding.bottom);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(kCellPadding.left,
+                                   _requiredBodyHeight);  // size.y will be changed in layoutSubviews
+        
+        // initialize
+        _footerLeftView = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_footerLeftView setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
+        [_footerLeftView setFont:[UIFont fontWithName:@"HelveticaNeue" size:12.f]];
+        [_footerLeftView setTextColor:UIColorFromRGB(0xb2b2b2)];
+        
+        // add to superview
+        [self addSubview:_footerLeftView];
+    }
+    return _footerLeftView;
+}
+#pragma mark - DYRateViewDelegate
+
+- (void)rateView:(DYRateView *)rateView changedToNewRate:(NSNumber *)rate {
+    //self.headerRatingView.text = [NSString stringWithFormat:@"Rate: %d", rate.intValue];
+}
+
 #pragma mark -
 @synthesize headerSubtitleView = _headerSubtitleView;
 - (UILabel*)headerSubtitleView
@@ -559,6 +626,13 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     else {
         // no header
     }
+    
+    //rating
+    
+    [self.headerRatingView setBackgroundColor:[UIColor clearColor]];
+    
+    [self.footerLeftView setText:@"4 of 24 found helpful"];
+    [self.footerLeftView resizeVerticalBottomRightTrim];
     
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
