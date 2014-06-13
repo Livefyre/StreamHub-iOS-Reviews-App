@@ -34,6 +34,8 @@
 @property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
 @property (nonatomic, strong) UIView *attachmentView;
+@property (nonatomic, assign) CGFloat leftOffset;
+
 
 @end
 

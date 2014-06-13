@@ -17,7 +17,10 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
     LFSContentActionBozo,           // 2
     LFSContentActionEdit,           // 3
     LFSContentActionFeature,        // 4
-    LFSContentActionFlag            // 5
+    LFSContentActionFlag,            // 5
+    
+    LFSContentActionYes,      //6
+    LFSContentActionNo     //7
 };
 
 
@@ -30,6 +33,7 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
 @property (nonatomic, assign) id<LFSContentActionsDelegate> delegate;
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, strong) UIActionSheet *actionSheet;
+@property (nonatomic, strong) UIActionSheet *actionSheet3;
 
 @end
 

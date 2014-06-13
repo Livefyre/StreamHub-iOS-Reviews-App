@@ -62,7 +62,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 @property (readonly, nonatomic) DYRateView *headerRatingView;
 @property (readonly, nonatomic) UILabel *footerLeftView;
-
+@property (readonly, nonatomic) UILabel *footerRightView;
 @property (nonatomic, strong) UIImageView *attachmentImageView;
 
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
@@ -343,6 +343,12 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     if (_headerRatingView == nil) {
         
         CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
+        
+//        CGRect frame = CGRectMake(leftColumnWidth,
+//                                  kCellPadding.top - kCellHeaderAdjust,
+//                                  self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+//                                  kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust);
+//
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAdjust+_headerTitleView.frame.size.height,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -351,7 +357,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         // initialize
 //        _headerRatingView = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 20, 50, 80) andStars:5 isFractional:NO];
 //        _headerRatingView.rating=4;
-        _headerRatingView = [[DYRateView alloc] initWithFrame:CGRectMake(48, 21, self.bounds.size.width, 15) fullStar:[UIImage imageNamed:@"StarFull.png"] emptyStar:[UIImage imageNamed:@"StarEmpty.png"]];
+        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"StarFull.png"] emptyStar:[UIImage imageNamed:@"StarEmpty.png"]];
         _headerRatingView.padding = 3;
         _headerRatingView.alignment = RateViewAlignmentLeft;
         _headerRatingView.editable = NO;
@@ -392,6 +398,31 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         [self addSubview:_footerLeftView];
     }
     return _footerLeftView;
+}
+
+@synthesize footerRightView = _footerRightView;
+-(UILabel*)footerRightView
+{
+    if (_footerRightView == nil) {
+        
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kCellPadding.left - kCellPadding.right) / 2.f), kCellPadding.bottom);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(kCellPadding.left,
+                                   _requiredBodyHeight);  // size.y will be changed in layoutSubviews
+        
+        // initialize
+        _footerRightView = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_footerRightView setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
+        [_footerRightView setFont:[UIFont fontWithName:@"HelveticaNeue" size:12.f]];
+        [_footerRightView setTextColor:UIColorFromRGB(0xb2b2b2)];
+        
+        // add to superview
+        [self addSubview:_footerRightView];
+    }
+    return _footerRightView;
 }
 #pragma mark - DYRateViewDelegate
 
@@ -634,6 +665,9 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     [self.footerLeftView setText:@"4 of 24 found helpful"];
     [self.footerLeftView resizeVerticalBottomRightTrim];
     
+    [self.footerRightView setText:@"3 Replies"];
+    [self.footerRightView resizeVerticalBottomRightTrim];
+    
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
     accessoryRightFrame.origin.x = leftColumnWidth;
@@ -686,6 +720,20 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     CGRect bounds = self.bodyView.bounds;
     bounds.origin = CGPointZero;
     [self.bodyView setBounds:bounds];
+    
+    
+    CGRect helpContentFrame;
+    helpContentFrame.origin = CGPointMake(leftColumn,self.requiredBodyHeight - textContentFrame.origin.y+30);
+    helpContentFrame.size = CGSizeMake(150,40);
+    [self.footerLeftView setFrame:helpContentFrame];
+    
+    CGSize textSize = [[self.footerLeftView text] sizeWithAttributes:@{NSFontAttributeName:[self.footerLeftView font]}];
+    CGFloat strikeWidth = textSize.width;
+    CGRect repliesContentFrame;
+    repliesContentFrame.origin=CGPointMake(leftColumn+strikeWidth +20, self.requiredBodyHeight - textContentFrame.origin.y+30);
+    repliesContentFrame.size = CGSizeMake(100,40);
+    [self.footerRightView setFrame:repliesContentFrame];
+    
 }
 
 #pragma mark - Public methods

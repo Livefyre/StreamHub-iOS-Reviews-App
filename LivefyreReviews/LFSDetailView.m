@@ -29,6 +29,7 @@ static NSString* const kImageViewObservedPath = @"image";
 static NSString* const kDetailContentFontName = @"Georgia";
 static const CGFloat kDetailContentFontSize = 16.0f;
 static const CGFloat kDetailContentLineSpacing = 8.0f;
+static const CGFloat kCellHeaderAccessoryRightFontSize = 11.f;
 
 // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
@@ -52,7 +53,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 static const CGFloat kDetailBarButtonHeight = 44.0f;
-static const CGFloat kDetailBarButtonWidth = 80.0f;
+static const CGFloat kDetailBarButtonWidth = 100.0f;
 
 static const CGFloat kDetailMinorVerticalSeparator = 12.0f;
 static const CGFloat kDetailMajorVerticalSeparator = 20.0f;
@@ -65,7 +66,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 // UIView-specific
 @property (readonly, nonatomic) LFSContentToolbar *toolbar;
 
-@property (readonly, nonatomic) UIButton *headerAccessoryRightView;
+@property (readonly, nonatomic) UILabel *headerAccessoryRightView;
 @property (readonly, nonatomic) UIImageView *headerImageView;
 
 @property (readonly, nonatomic) UILabel *footerLeftView;
@@ -280,25 +281,23 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 #pragma mark -
 @synthesize headerAccessoryRightView = _headerAccessoryRightView;
--(UIButton*)headerAccessoryRightView
+-(UILabel*)headerAccessoryRightView
 {
     if (_headerAccessoryRightView == nil) {
-        CGSize buttonSize = CGSizeMake(kDetailRemoteButtonWidth, kDetailRemoteButtonHeight);
+        CGSize buttonSize = CGSizeMake(40  , 50);
         CGRect frame;
         frame.size = buttonSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kDetailPadding.right - buttonSize.width, kDetailPadding.top);
+        frame.origin =CGPointMake(self.bounds.size.width  - buttonSize.width, 0);
         // initialize
-        _headerAccessoryRightView = [[UIButton alloc] initWithFrame:frame];
+        _headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerAccessoryRightView setAlpha:kDetailHeaderAccessoryRightAlpha];
         [_headerAccessoryRightView setContentMode:UIViewContentModeCenter];
-        
-        [_headerAccessoryRightView addTarget:self
-                                 action:@selector(didSelectProfile:)
-                       forControlEvents:UIControlEventTouchUpInside];
-        [_headerAccessoryRightView
+                [_headerAccessoryRightView
          setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerAccessoryRightView setFont:[UIFont fontWithName:@"HelveticaNeue" size:kCellHeaderAccessoryRightFontSize]];
+        [_headerAccessoryRightView setTextColor:[UIColor lightGrayColor]];
 
         // add to superview
         [self addSubview:_headerAccessoryRightView];
@@ -676,14 +675,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
     id headerAccessory = profileLocal.attributeObject;
-    
+
     // layout source icon
-    LFSResource *profileRemote = self.profileRemote;
-    if (profileRemote != nil) {
-        [self.headerAccessoryRightView setImage:profileRemote.icon
-                                       forState:UIControlStateNormal];
-        _profileRemoteURL = [NSURL URLWithString:profileRemote.identifier];
-    }
+//    LFSResource *profileRemote = self.profileRemote;
+//    if (profileRemote != nil) {
+//        [self.headerAccessoryRightView setImage:profileRemote.icon
+//                                       forState:UIControlStateNormal];
+//        _profileRemoteURL = [NSURL URLWithString:profileRemote.identifier];
+//    }
 
     if (headerTitle && !headerSubtitle && !headerAccessory)
     {
@@ -802,6 +801,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // layout avatar view
     [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
                          placeholderImage:profileLocal.icon];
+    [self.headerAccessoryRightView setText:[[[self class] dateFormatter]
+                                  relativeStringFromDate:self.contentDate]];
+
 }
 
 
@@ -848,18 +850,18 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [self.footerRightView setFrame:remoteUrlFrame];
     }
     
-    // layout date label
-    CGRect dateFrame = self.footerLeftView.frame;
-    dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
-    [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:[[[self class] dateFormatter]
-                                  extendedRelativeStringFromDate:self.contentDate]];
+//    // layout date label
+//    CGRect dateFrame = self.footerLeftView.frame;
+//    dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
+//    [self.footerLeftView setFrame:dateFrame];
+//    [self.footerLeftView setText:[[[self class] dateFormatter]
+//                                  extendedRelativeStringFromDate:self.contentDate]];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;
     toolbarFrame.origin = CGPointMake(0.f,
                                       bottom + kDetailMinorVerticalSeparator +
-                                      dateFrame.size.height +
+                                    
                                       kDetailMinorVerticalSeparator);
     [self.toolbar setFrame:toolbarFrame];
 }
@@ -989,14 +991,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     [self.delegate didSelectButton3:sender];
 }
 
-- (IBAction)didSelectProfile:(id)sender
-{
-    // call optional selector
-    if ([self.delegate respondsToSelector:@selector(didSelectProfile:withURL:)]) {
-        [self.delegate didSelectProfile:sender
-                                withURL:_profileRemoteURL];
-    }
-}
+//- (IBAction)didSelectProfile:(id)sender
+//{
+//    // call optional selector
+//    if ([self.delegate respondsToSelector:@selector(didSelectProfile:withURL:)]) {
+//        [self.delegate didSelectProfile:sender
+//                                withURL:_profileRemoteURL];
+//    }
+//}
 
 - (IBAction)didSelectContentRemote:(id)sender
 {

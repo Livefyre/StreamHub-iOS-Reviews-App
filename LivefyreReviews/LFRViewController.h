@@ -11,7 +11,7 @@
 #import "LFSPostViewController.h"
 #import "LFSDetailViewController.h"
 
-@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSDetailViewDelegate,LFSContentActionsDelegate>
+@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSContentActionsDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @property (nonatomic, copy) NSDictionary *collection;

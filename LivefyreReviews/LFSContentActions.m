@@ -20,6 +20,12 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
     @"feature",     // 4
     @"flag"         // 5
 };
+#define LFS_CONTENT_ACTIONS_LENGTH1 2u
+const NSString* const LFSContentActionStrings1[LFS_CONTENT_ACTIONS_LENGTH1] =
+{
+    @"Yes",      // 0
+    @"No"    // 1
+};
 
 #pragma mark -
 @interface LFSContentActions ()
@@ -81,6 +87,24 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
     }
     return _actionSheet2;
 }
+#pragma mark -
+@synthesize actionSheet3 = _actionSheet3;
+-(UIActionSheet*)actionSheet3
+{
+    if (_actionSheet3 == nil) {
+        _actionSheet3 = [[UIActionSheet alloc]
+                        initWithTitle:@"Was this helpful?"
+                        delegate:self
+                        cancelButtonTitle:@"Cancel"
+                        destructiveButtonTitle:nil
+                        otherButtonTitles:
+                        [LFSContentActionStrings[LFSContentActionYes] capitalizedString],
+                        [LFSContentActionStrings[LFSContentActionNo] capitalizedString],
+                        nil];
+    }
+    return _actionSheet3;
+}
+
 
 #pragma mark - UIActionSheetDelegate
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -151,6 +175,12 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
                 // do nothing
             }
         }
+    }
+    
+    else if(actionSheet == self.actionSheet3){
+        
+        
+        
     }
 }
 

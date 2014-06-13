@@ -123,7 +123,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     else {
         [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
                     forState:UIControlStateNormal];
-        [likeButton setTitle:@"Like"
+        [likeButton setTitle:@"Helpful?"
                     forState:UIControlStateNormal];
         [likeButton setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
                          forState:UIControlStateNormal];
@@ -298,8 +298,20 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    // {{{ Navigation bar
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    UINavigationBar *navigationBar = self.navigationController.navigationBar;
+    [navigationBar setBarStyle:UIBarStyleDefault];
+    //navigationBar.hidden=YES;
+    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
+        self.navigationController.navigationBar.barTintColor =UIColorFromRGB(0xebebeb);
+        [navigationBar setTranslucent:NO];
+        
+    }
+    
+    
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
-    //[self.navigationController setToolbarHidden:YES animated:animated];
+    [self.navigationController setToolbarHidden:YES animated:animated];
     
     // calculate content size for scrolling
     [self updateScrollViewContentSize];
@@ -373,30 +385,33 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     static NSString* const kFailureModifyTitle = @"Action Failed";
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
-        LFSMessageAction action;
-        if ([self.contentItem.likes containsObject:kCurrentUserId]) {
-            [self.contentItem.likes removeObject:kCurrentUserId];
-            action = LFSMessageUnlike;
-        } else {
-            [self.contentItem.likes addObject:kCurrentUserId];
-            action = LFSMessageLike;
-        }
-        [self updateLikeButton];
         
-        
-        [self.writeClient postMessage:action
-                           forContent:self.contentItem.idString
-                         inCollection:self.collectionId
-                            userToken:userToken
-                           parameters:nil
-                            onSuccess:^(NSOperation *operation, id responseObject)
-         {
-             //NSLog(@"success posting opine %d", action);
-         }
-                            onFailure:^(NSOperation *operation, NSError *error)
-         {
-             //NSLog(@"failed posting opine %d", action);
-         }];
+        [self.contentActions.actionSheet3 showInView:self.view];
+
+//        LFSMessageAction action;
+//        if ([self.contentItem.likes containsObject:kCurrentUserId]) {
+//            [self.contentItem.likes removeObject:kCurrentUserId];
+//            action = LFSMessageUnlike;
+//        } else {
+//            [self.contentItem.likes addObject:kCurrentUserId];
+//            action = LFSMessageLike;
+//        }
+//        [self updateLikeButton];
+//        
+//        
+//        [self.writeClient postMessage:action
+//                           forContent:self.contentItem.idString
+//                         inCollection:self.collectionId
+//                            userToken:userToken
+//                           parameters:nil
+//                            onSuccess:^(NSOperation *operation, id responseObject)
+//         {
+//             //NSLog(@"success posting opine %d", action);
+//         }
+//                            onFailure:^(NSOperation *operation, NSError *error)
+//         {
+//             //NSLog(@"failed posting opine %d", action);
+//         }];
     } else {
         // userToken is nil -- show an error message
         [[[UIAlertView alloc]
