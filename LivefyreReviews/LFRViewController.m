@@ -396,16 +396,21 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         
         //[self startSpinning];
         
-        [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
-                                     article:[self.collection objectForKey:@"articleId"]
-                                   onSuccess:^(NSOperation *operation, id responseObject)
+//        [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
+//                                     article:[self.collection objectForKey:@"articleId"]
+//                                   onSuccess:^(NSOperation *operation, id responseObject)
+        
+        
+        
+        [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"] article:[self.collection objectForKey:@"articleId"] onSuccess:^(NSOperation *operation, id responseObject)
+
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
              [_content addContent:[headDocument objectForKey:@"content"]
                       withAuthors:[headDocument objectForKey:@"authors"]];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
-             NSNumber *eventId = [collectionSettings objectForKey:@"event"];
+             NSNumber *eventId = [headDocument objectForKey:@"event"];
              
              //NSLog(@"%@", responseObject);
              
@@ -747,14 +752,17 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     // always set an object
     LFSAuthorProfile *author = content.author;
-    
+
+    NSNumber *rating=[[content.annotations objectForKey:@"rating"]objectAtIndex:0];
     NSString *title = author.displayName ?: @"";
     
-    [cell setProfileLocal:[[LFSResource alloc]
-                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
-                           attribute:AttributeObjectFromContent(content)
-                           displayString:title
-                           icon:nil]];
+//    [cell setProfileLocal:[[LFSResource alloc]
+//                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
+//                           attribute:AttributeObjectFromContent(content)
+//                           displayString:title
+//                           icon:nil]];
+    
+    [cell setProfileLocal:[[LFSResource alloc]initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")attribute:AttributeObjectFromContent(content)displayString:title icon:nil rating:rating]];
 }
 
 

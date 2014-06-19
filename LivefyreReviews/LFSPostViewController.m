@@ -248,34 +248,53 @@
         NSString *text = (self.replyToContent
                           ? [self processReplyText:textView.text]
                           : textView.text);
-        
+
+        NSString *rating=@"40";
         [textView setText:@""];
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
             collectionViewController = [self.delegate collectionViewController];
         }
-        [self.writeClient postContent:text
-                         inCollection:self.collectionId
-                            userToken:userToken
-                            inReplyTo:self.replyToContent.idString
-                            onSuccess:^(NSOperation *operation, id responseObject)
-         {
-             if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
-             {
-                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
-             }
-         }
-                            onFailure:^(NSOperation *operation, NSError *error)
-         {
-             // show an error message
-             [[[UIAlertView alloc]
-               initWithTitle:kFailurePostTitle
-               message:[error localizedRecoverySuggestion]
-               delegate:nil
-               cancelButtonTitle:@"OK"
-               otherButtonTitles:nil] show];
-         }];
+        NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:rating, LFSCollectionPostRatingKey,text,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey, nil ];
+        
+        
+        [self.writeClient postContentType:3 forCollection:self.collectionId parameters:dict
+                           onSuccess:^(NSOperation *operation, id responseObject) {
+                               if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+                               {
+                               [collectionViewController didPostContentWithOperation:operation response:responseObject];
+                                }
+                           } onFailure:^(NSOperation *operation, NSError *error) {
+                               [[[UIAlertView alloc]
+                               initWithTitle:kFailurePostTitle
+                               message:[error localizedRecoverySuggestion]
+                               delegate:nil
+                               cancelButtonTitle:@"OK"
+                               otherButtonTitles:nil] show];
+                           }];
+
+//        [self.writeClient postContent:text
+//                         inCollection:self.collectionId
+//                            userToken:userToken
+//                            inReplyTo:self.replyToContent.idString
+//                            onSuccess:^(NSOperation *operation, id responseObject)
+//         {
+//             if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+//             {
+//                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
+//             }
+//         }
+//                            onFailure:^(NSOperation *operation, NSError *error)
+//         {
+//             // show an error message
+//             [[[UIAlertView alloc]
+//               initWithTitle:kFailurePostTitle
+//               message:[error localizedRecoverySuggestion]
+//               delegate:nil
+//               cancelButtonTitle:@"OK"
+//               otherButtonTitles:nil] show];
+//         }];
         if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
             [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
         }

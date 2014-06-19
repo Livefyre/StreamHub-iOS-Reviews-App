@@ -19,11 +19,18 @@
 @property (copy, nonatomic) NSString *attributeObject;
 @property (copy, nonatomic) NSString *displayString;
 @property (copy, nonatomic) NSString *identifier;
+@property (copy, nonatomic) NSNumber *rating;
 
 -(id)initWithIdentifier:(NSString*)identifierString
               attribute:(NSString*)attributeString
           displayString:(NSString*)displayString
                    icon:(UIImage*)iconImage;
+
+-(id)initWithIdentifier:(NSString*)identifierString
+              attribute:(NSString*)attributeString
+          displayString:(NSString*)displayString
+                   icon:(UIImage*)iconImage
+                 rating:(NSNumber*)rating;
 
 -(id)initWithIdentifier:(NSString*)identifierString
           displayString:(NSString*)displayString

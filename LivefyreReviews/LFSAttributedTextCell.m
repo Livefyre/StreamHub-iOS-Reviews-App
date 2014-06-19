@@ -362,7 +362,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         _headerRatingView.alignment = RateViewAlignmentLeft;
         _headerRatingView.editable = NO;
         _headerRatingView.delegate = self;
-        _headerRatingView.rate=4.5;
+       // _headerRatingView.rate=4.5;
         // configure
         [_headerRatingView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
@@ -562,6 +562,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
+    NSNumber *rating=profileLocal.rating;
     id headerAccessory = profileLocal.attributeObject;
     
     CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
@@ -659,9 +660,13 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }
     
     //rating
-    
+    if (!rating) {
+        
+    }
+    else{
     [self.headerRatingView setBackgroundColor:[UIColor clearColor]];
-    
+    [self.headerRatingView setRate:[rating floatValue]/20];
+    }
     [self.footerLeftView setText:@"4 of 24 found helpful"];
     [self.footerLeftView resizeVerticalBottomRightTrim];
     

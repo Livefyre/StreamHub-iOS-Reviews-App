@@ -23,10 +23,10 @@
     if (_collections) {
         return _collections;
     }
-    NSArray *objects=[[NSArray alloc]initWithObjects:@"~Writable",@"livefyre.com",@"labs.fyre.co",@"320568",@"custom-1379372287037",@"eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGFicy5meXJlLmNvIiwgImV4cGlyZXMiOiAxNDI3ODczNDMwLjIwNDI1NiwgInVzZXJfaWQiOiAiY29tbWVudGVyXzAifQ.xOYm5bj_M65vYSU2eLMYYt8GteaaHgNUTq55KwJnixg",nil];
-    NSArray *keys=[[NSArray alloc]initWithObjects:@"_name",@"environment",@"network",@"siteId",@"articleId",@"lftoken", nil];
+    NSArray *objects=[[NSArray alloc]initWithObjects:@"~Writable",@"livefyre.com",@"client-solutions.fyre.co",@"360354",@"custom-1402701825509",@"eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAiY2xpZW50LXNvbHV0aW9ucy5meXJlLmNvIiwgImV4cGlyZXMiOiAxNDA1MjkzNDUxLjg5NDk1OSwgInVzZXJfaWQiOiAic3lzdGVtIn0.3fXWYzLjPW6rl-Wu94dufqcrU27TNmivtr8bEEY7r6M",@"84194121",nil];
+    NSArray *keys=[[NSArray alloc]initWithObjects:@"_name",@"environment",@"network",@"siteId",@"articleId",@"lftoken",@"CollectionId",nil];
     NSDictionary *defaults =[[NSDictionary alloc]initWithObjects:objects forKeys:keys];
-   
+    
     NSMutableArray *result=[[NSMutableArray alloc]init];
     [result addObject:defaults];
     

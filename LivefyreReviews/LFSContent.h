@@ -43,6 +43,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, copy) NSString *authorId;
 @property (nonatomic, copy) NSString *parentId;
 @property (nonatomic, copy) NSString *bodyHtml;
+@property (nonatomic, copy) NSNumber *rating;
 @property (nonatomic, copy) NSDictionary *annotations;
 
 @property (nonatomic, strong) NSDate *updatedAt;

@@ -15,6 +15,8 @@
 @synthesize icon = _icon;
 @synthesize displayString = _displayString;
 @synthesize iconURLString = _iconURLString;
+@synthesize rating =_rating;
+
 
 // designated initializer
 -(id)initWithIdentifier:(NSString*)identifierString
@@ -29,6 +31,14 @@
         _icon = iconImage;
         _displayString = displayString;
     }
+    return self;
+}
+-(id)initWithIdentifier:(NSString *)identifierString attribute:(NSString *)attributeString displayString:(NSString *)displayString icon:(UIImage *)iconImage rating:(NSNumber *)rating{
+    _identifier = identifierString;
+    _attributeObject = attributeString;
+    _icon = iconImage;
+    _displayString = displayString;
+    _rating=rating;
     return self;
 }
 
