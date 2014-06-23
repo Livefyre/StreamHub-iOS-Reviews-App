@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "LFSContentCollection.h"
 #import "LFSPostViewController.h"
+#import "LFRReplyViewController.h"
 #import "LFSDetailViewController.h"
 
 @interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSContentActionsDelegate>

@@ -236,24 +236,25 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         && (parent = [self objectForKey:object.parentId]) != nil)
     {
         // found parent
-        NSAssert(parent.datePath != nil, @"evenPath cannot be nil");
-        NSMutableArray *array = [parent.datePath mutableCopy];
-        [array addObject:object.createdAt];
-        [object setDatePath:array];
-        [object setParent:parent];
-        [parent.children addObject:object];
+//        NSAssert(parent.datePath != nil, @"evenPath cannot be nil");
+//        NSMutableArray *array = [parent.datePath mutableCopy];
+//        [array addObject:object.createdAt];
+//        [object setDatePath:array];
+//        [object setParent:parent];
+        //[parent.children addObject:object];
     }
     else
     {
         // either no nesting or parent does not exist in memory
         object.datePath = [[NSMutableArray alloc] initWithObjects:object.createdAt, nil];
+        NSUInteger index = [_array indexOfObject:object options:NSBinarySearchingInsertionIndex usingReverseOrder:YES];
+        [self.insertStack insertObject:object usingReverseOrder:YES];
+        [object setIndex:index];
     }
     
     // at this point, we actually want to know the insertion index
     // (index to maintain a sorted array)
-    NSUInteger index = [_array indexOfObject:object options:NSBinarySearchingInsertionIndex usingReverseOrder:YES];
-    [self.insertStack insertObject:object usingReverseOrder:YES];
-    [object setIndex:index];
+   
 }
 
 -(void)removeObject:(id)object
@@ -272,7 +273,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     // this is our remove primitive -- all other methods with similar functionality
     // ultimately redirect here
     //
-    [[[object parent] children] removeObject:object];
+   // [[[object parent] children] removeObject:object];
     [object setParent:nil];
     [_mapping removeObjectForKey:key];
     NSUInteger index = [self indexOfObject:object];
@@ -400,7 +401,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 -(void)transactionalDeleteObject:(LFSContent*)content
 {
     // remove object from mapping
-    [content.parent.children removeObject:content];
+    //[content.parent.children removeObject:content];
     [content setParent:nil];
     [_mapping removeObjectForKey:content.idString];
     

@@ -182,12 +182,13 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 
 @synthLazyWithNull(NSDictionary, content, _object, @"content")
 @synthLazyWithNull(NSDictionary, annotations, self.content, @"annotations")
-@synthLazyWithNull(NSArray, childContent, _object, @"childContent")
+//@synthLazyWithNull(NSArray, childContent, _object, @"childContent")
 
 @synthLazyWithNull(NSString, idString, self.content, @"id")
 @synthLazyWithNull(NSString, targetId, self.content, @"targetId")
 @synthLazyWithNull(NSString, parentId, self.content, @"parentId")
 @synthLazyWithNull(NSString, bodyHtml, self.content, @"bodyHtml")
+@synthLazyWithNull(NSString, title, self.content, @"title")
 @synthLazyWithNull(NSString, authorId, self.content, @"authorId")
 @synthLazyWithNull(NSNumber, rating, self.content, @"rating")
 @synthLazyWithNull(NSNumber, eventId, _object, @"event")
@@ -549,6 +550,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     _childContent = nil;
     _eventId = nil;
     _rating=nil;
+    _title=nil;
     
     _lastVisIsSet = NO;
     _visibilityIsSet = NO;

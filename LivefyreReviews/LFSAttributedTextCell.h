@@ -24,6 +24,7 @@ extern const CGSize kAttachmentImageViewSize;
 @property (nonatomic, strong) NSDate* contentDate;
 
 @property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
+@property (nonatomic, readonly) LFSBasicHTMLLabel *bodyTitleView;
 
 #pragma mark - UIApperance properties
 @property (nonatomic, strong) UIFont *headerTitleFont UI_APPEARANCE_SELECTOR;
@@ -51,12 +52,17 @@ extern const CGSize kAttachmentImageViewSize;
 
 + (NSMutableAttributedString*)attributedStringFromHTMLString:(NSString*)html;
 
++ (NSMutableAttributedString*)attributedStringFromTitle:(NSString *)html;
+
 + (CGFloat)cellHeightForAttributedString:(NSMutableAttributedString*)attributedText
                            hasAttachment:(BOOL)hasAttachment
                                    width:(CGFloat)width;
 
++ (CGFloat)cellHeightForAttributedTitle:(NSMutableAttributedString *)attributedText hasAttachment:(BOOL)hasAttachment width:(CGFloat)width;
+
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 
 - (void)setAttributedString:(NSMutableAttributedString *)attributedString;
+- (void)setAttributedTitleString:(NSMutableAttributedString *)attributedString;
 
 @end

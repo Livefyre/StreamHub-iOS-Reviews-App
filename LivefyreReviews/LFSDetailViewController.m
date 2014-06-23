@@ -30,6 +30,8 @@ typedef NS_ENUM(NSUInteger, LFSActionType) {
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 
 @property (strong, nonatomic) LFSPostViewController *postViewController;
+@property (strong, nonatomic) LFRReplyViewController *replyViewController;
+
 
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
@@ -54,7 +56,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 @synthesize attributedLabelDelegate = _attributedLabelDelegate;
-@synthesize postViewController = _postViewController;
+//@synthesize postViewController = _postViewController;
+@synthesize replyViewController=_replyViewController;
 @synthesize user = _user;
 
 @synthesize hideStatusBar = _hideStatusBar;
@@ -79,18 +82,31 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     return _writeClient;
 }
 
--(LFSPostViewController*)postViewController
+//-(LFSPostViewController*)postViewController
+//{
+//    // lazy-instantiate LFSPostViewController
+//    static NSString* const kLFSPostCommentViewControllerId = @"postComment";
+//    
+//    if (_postViewController == nil) {
+//        _postViewController =
+//        (LFSPostViewController*)[[AppDelegate mainStoryboard]
+//                                 instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
+//        [_postViewController setDelegate:self];
+//    }
+//    return _postViewController;
+//}
+-(LFRReplyViewController*)replyViewController
 {
-    // lazy-instantiate LFSPostViewController
-    static NSString* const kLFSPostCommentViewControllerId = @"postComment";
+    // lazy-instantiate LFRReplyViewController
+    static NSString* const kLFSPostReplyViewControllerId = @"postReply";
     
-    if (_postViewController == nil) {
-        _postViewController =
-        (LFSPostViewController*)[[AppDelegate mainStoryboard]
-                                 instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
-        [_postViewController setDelegate:self];
+    if (_replyViewController == nil) {
+        _replyViewController =
+        (LFRReplyViewController*)[[AppDelegate mainStoryboard]
+                                 instantiateViewControllerWithIdentifier:kLFSPostReplyViewControllerId];
+        [_replyViewController setDelegate:self];
     }
-    return _postViewController;
+    return _replyViewController;
 }
 
 #pragma mark - Private methods
@@ -123,7 +139,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     else {
         [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
                     forState:UIControlStateNormal];
-        [likeButton setTitle:@"Helpful?"
+        [likeButton setTitle:@"Helpful"
                     forState:UIControlStateNormal];
         [likeButton setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
                          forState:UIControlStateNormal];
@@ -157,7 +173,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if (self) {
         _hideStatusBar = NO;
         _writeClient = nil;
-        _postViewController = nil;
+//        _postViewController = nil;
+        _replyViewController=nil;
     }
     return self;
 }
@@ -168,7 +185,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if (self) {
         _hideStatusBar = NO;
         _writeClient = nil;
-        _postViewController = nil;
+//        _postViewController = nil;
+        _replyViewController=nil;
+
     }
     return self;
 }
@@ -176,8 +195,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)dealloc
 {
     [_detailView setDelegate:nil];
-    [_postViewController setDelegate:nil];
-    _postViewController = nil;
+//    [_postViewController setDelegate:nil];
+    [_replyViewController setDelegate:nil];
+    _replyViewController=nil;
+//    _postViewController = nil;
 }
 
 #pragma mark - Public methods
@@ -249,8 +270,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     [super viewDidLoad];
     
-    _postViewController = nil;
-    
+//    _postViewController = nil;
+    _replyViewController=nil;
     LFSDetailView *detailView = self.detailView;
     LFSContent *contentItem = self.contentItem;
     
@@ -298,20 +319,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    // {{{ Navigation bar
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    UINavigationBar *navigationBar = self.navigationController.navigationBar;
-    [navigationBar setBarStyle:UIBarStyleDefault];
-    //navigationBar.hidden=YES;
-    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
-        self.navigationController.navigationBar.barTintColor =UIColorFromRGB(0xebebeb);
-        [navigationBar setTranslucent:NO];
-        
-    }
-    
-    
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
-    [self.navigationController setToolbarHidden:YES animated:animated];
+    //[self.navigationController setToolbarHidden:YES animated:animated];
     
     // calculate content size for scrolling
     [self updateScrollViewContentSize];
@@ -381,13 +390,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 - (void)didSelectButton1:(id)sender
 {
-    // Like button selected
-    static NSString* const kFailureModifyTitle = @"Action Failed";
-    NSString *userToken = [self.collection objectForKey:@"lftoken"];
-    if (userToken != nil) {
-        
-        [self.contentActions.actionSheet3 showInView:self.view];
+    [self.contentActions.actionSheet3 showInView:self.view];
 
+    // Like button selected
+//    static NSString* const kFailureModifyTitle = @"Action Failed";
+//    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+//    if (userToken != nil) {
 //        LFSMessageAction action;
 //        if ([self.contentItem.likes containsObject:kCurrentUserId]) {
 //            [self.contentItem.likes removeObject:kCurrentUserId];
@@ -412,32 +420,32 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 //         {
 //             //NSLog(@"failed posting opine %d", action);
 //         }];
-    } else {
-        // userToken is nil -- show an error message
-        [[[UIAlertView alloc]
-          initWithTitle:kFailureModifyTitle
-          message:@"You do not have permission to like comments in this collection"
-          delegate:nil
-          cancelButtonTitle:@"OK"
-          otherButtonTitles:nil] show];
-    }
+//    } else {
+//        // userToken is nil -- show an error message
+//        [[[UIAlertView alloc]
+//          initWithTitle:kFailureModifyTitle
+//          message:@"You do not have permission to like comments in this collection"
+//          delegate:nil
+//          cancelButtonTitle:@"OK"
+//          otherButtonTitles:nil] show];
+//    }
 }
 
 - (void)didSelectButton2:(id)sender
 {
     // Reply selected
-    [self.postViewController setCollection:self.collection];
-    [self.postViewController setCollectionId:self.collectionId];
-    [self.postViewController setReplyToContent:self.contentItem];
+    [self.replyViewController setCollection:self.collection];
+    [self.replyViewController setCollectionId:self.collectionId];
+    [self.replyViewController setReplyToContent:self.contentItem];
     
-    [self.postViewController setUser:self.user];
-    [self.postViewController setAvatarImage:[UIImage imageWithColor:
+    [self.replyViewController setUser:self.user];
+    [self.replyViewController setAvatarImage:[UIImage imageWithColor:
                                              [UIColor colorWithRed:232.f / 255.f
                                                              green:236.f / 255.f
                                                               blue:239.f / 255.f
                                                              alpha:1.f]]];
     
-    [self.navigationController presentViewController:self.postViewController
+    [self.navigationController presentViewController:self.replyViewController
                                             animated:YES
                                           completion:nil];
 }
@@ -457,21 +465,28 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self.attributedLabelDelegate followURL:url];
 }
 
-#pragma mark - LFSPostViewControllerDelegate
--(id<LFSPostViewControllerDelegate>)collectionViewController
+//#pragma mark - LFSPostViewControllerDelegate
+//-(id<LFSPostViewControllerDelegate>)collectionViewController
+//{
+//    // forward collection view controller here to insert messagesinto
+//    // the content view as soon as the server gets back to us with 200 OK
+//    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
+//    return collectionViewController;
+//}
+-(id<LFRReplyViewControllerDelegate>)ViewController
 {
     // forward collection view controller here to insert messagesinto
     // the content view as soon as the server gets back to us with 200 OK
-    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
-    return collectionViewController;
+    id<LFRReplyViewControllerDelegate> ViewController = (id<LFRReplyViewControllerDelegate>)self.delegate;
+    return ViewController;
 }
 
 -(void)didSendPostRequestWithReplyTo:(NSString*)replyTo
 {
     // simply forward to the collection view controller
-    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
+    id<LFRReplyViewControllerDelegate> ViewController = (id<LFRReplyViewControllerDelegate>)self.delegate;
     [self.navigationController popViewControllerAnimated:NO];
-    [collectionViewController didSendPostRequestWithReplyTo:replyTo];
+    [ViewController didSendPostRequestWithReplyTo:replyTo];
 }
 
 @end

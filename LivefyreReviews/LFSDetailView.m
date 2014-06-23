@@ -50,7 +50,7 @@ static const CGFloat kDetailImageMarginRight = 8.0f;
 static const CGFloat kDetailFooterHeight = 21.0f;
 
 static const CGFloat kDetailRemoteButtonWidth = 20.0f;
-static const CGFloat kDetailRemoteButtonHeight = 20.0f;
+//static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 static const CGFloat kDetailBarButtonHeight = 44.0f;
 static const CGFloat kDetailBarButtonWidth = 100.0f;

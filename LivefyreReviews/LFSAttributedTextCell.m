@@ -28,9 +28,11 @@ static const UIEdgeInsets kCellPadding = {
 
 static const CGFloat kCellContentPaddingRight = 7.f;
 static const CGFloat kCellContentLineSpacing = 6.f;
+static const CGFloat kCellContentTitleLineSpacing = 9.f;
 
 static NSString* const kCellBodyFontName = @"Georgia";
 static const CGFloat kCellBodyFontSize = 13.f;
+static const CGFloat kCellBodyTitleFontSize = 20.f;
 
 static const CGFloat kCellHeaderTitleFontSize = 12.f;
 static const CGFloat kCellHeaderSubtitleFontSize = 11.f;
@@ -95,6 +97,28 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     return attributedText;
 }
 
++ (NSMutableAttributedString*)attributedStringFromTitle:(NSString *)html{
+    static UIFont *bodyFont = nil;
+    if (bodyFont == nil) {
+        bodyFont = [UIFont fontWithName:kCellBodyFontName size:kCellBodyTitleFontSize];
+    }
+    static NSMutableParagraphStyle* paragraphStyle = nil;
+    if (paragraphStyle == nil) {
+        paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragraphStyle setLineSpacing:kCellContentTitleLineSpacing];
+    }
+    
+    NSMutableAttributedString *attributedText =
+    [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:html];
+    [attributedText setFont:bodyFont];
+    [attributedText addAttribute:NSParagraphStyleAttributeName
+                           value:paragraphStyle
+                           range:NSMakeRange(0u, [attributedText length])];
+    
+    return attributedText;
+}
+
+
 + (CGFloat)cellHeightForAttributedString:(NSMutableAttributedString*)attributedText
                            hasAttachment:(BOOL)hasAttachment
                                    width:(CGFloat)width
@@ -119,6 +143,31 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
             ? MAX(bodySize.height, kAttachmentImageViewSize.height) + deadHeight
             : bodySize.height + deadHeight);
 }
+
++(CGFloat)cellHeightForAttributedTitle:(NSMutableAttributedString *)attributedText hasAttachment:(BOOL)hasAttachment width:(CGFloat)width
+{
+    /*  __________________________________
+     * |   ___                            |
+     * |  |ava|  <- avatar image          |
+     * |  |___|                           |
+     * |                           _____  |
+     * |  Title                   | att | | <-- attachment
+     * |  (number of lines can    | ach | |
+     * |  vary)                   |_____| |
+     * |__________________________________|
+     *
+     * |< - - - - - - width - - - - - - ->|
+     */
+    CGFloat bodyTitleWidth = width - kCellPadding.left - kCellContentPaddingRight - (hasAttachment ? kAttachmentImageViewSize.width + kCellMinorHorizontalSeparator : 0.f);
+    CGSize bodyTitleSize = [attributedText sizeConstrainedToSize:CGSizeMake(bodyTitleWidth, CGFLOAT_MAX)];
+    
+   // CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+//    return (hasAttachment
+//            ? MAX(bodyTitleSize.height, 0) + deadHeight
+//            : bodyTitleSize.height);
+    return bodyTitleSize.height;
+}
+
 
 + (NSDateFormatter*)dateFormatter {
     static NSDateFormatter *_dateFormatter = nil;
@@ -225,6 +274,37 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         _contentDate = contentDate;
     }
 }
+#pragma mark -
+@synthesize bodyTitleView = _bodyTitleView;
+-(LFSBasicHTMLLabel*)bodyTitleView
+{
+	if (_bodyTitleView == nil) {
+        const CGFloat kHeaderHeight = kCellPadding.top + kCellMinorVerticalSeparator;
+        CGRect frame = CGRectMake(kCellPadding.left + _leftOffset,
+                                  kHeaderHeight,
+                                  self.bounds.size.width - kCellPadding.left - _leftOffset - kCellContentPaddingRight,
+                                  self.bounds.size.height - kHeaderHeight);
+        
+        // initialize
+        _bodyTitleView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        
+        // configure OHAttributedLabel
+        
+        // do not display phonen number-looking data as links
+        // (we wouldn't source personal information in the first place)
+        [_bodyTitleView setAutomaticallyAddLinksForType:NSTextCheckingTypeLink];
+        [_bodyTitleView setFont:[UIFont fontWithName:kCellBodyFontName
+                                           size:kCellBodyTitleFontSize]];
+        [_bodyTitleView setTextColor:[UIColor blackColor]];
+        [_bodyTitleView setBackgroundColor:[UIColor clearColor]]; // for iOS6
+        [_bodyTitleView setLineSpacing:kCellContentLineSpacing];
+        
+        // add to superview
+		[self.contentView addSubview:_bodyTitleView];
+	}
+	return _bodyTitleView;
+}
+
 
 #pragma mark -
 @synthesize bodyView = _bodyView;
@@ -344,20 +424,15 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         
         CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         
-//        CGRect frame = CGRectMake(leftColumnWidth,
-//                                  kCellPadding.top - kCellHeaderAdjust,
-//                                  self.bounds.size.width - leftColumnWidth - kCellPadding.right,
-//                                  kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust);
-//
+
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAdjust+_headerTitleView.frame.size.height,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
                                   kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust-_headerTitleView.frame.size.height);
         NSLog(@"%f %f",frame.size.width,frame.size.height);
         // initialize
-//        _headerRatingView = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 20, 50, 80) andStars:5 isFractional:NO];
-//        _headerRatingView.rating=4;
-        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"StarFull.png"] emptyStar:[UIImage imageNamed:@"StarEmpty.png"]];
+
+        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_small"] emptyStar:[UIImage imageNamed:@"icon_star_empty_small"]];
         _headerRatingView.padding = 3;
         _headerRatingView.alignment = RateViewAlignmentLeft;
         _headerRatingView.editable = NO;
@@ -562,7 +637,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
-    NSNumber *rating=profileLocal.rating;
+//    NSNumber *rating=profileLocal.rating;
     id headerAccessory = profileLocal.attributeObject;
     
     CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
@@ -659,14 +734,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         // no header
     }
     
-    //rating
-    if (!rating) {
-        
-    }
-    else{
-    [self.headerRatingView setBackgroundColor:[UIColor clearColor]];
-    [self.headerRatingView setRate:[rating floatValue]/20];
-    }
+    
     [self.footerLeftView setText:@"4 of 24 found helpful"];
     [self.footerLeftView resizeVerticalBottomRightTrim];
     
@@ -698,6 +766,29 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 
 -(void)layoutBodyWithBounds:(CGRect)rect
 {
+    
+    //Body title
+    
+    CGRect textTitleContentFrame;
+    CGFloat leftTitleColumn = kCellPadding.left + _leftOffset;
+    CGFloat rightTitleColumn = kCellContentPaddingRight ;
+    
+    textTitleContentFrame.origin = CGPointMake(leftTitleColumn,
+                                          kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
+    textTitleContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
+                                       self.requiredBodyHeight - textTitleContentFrame.origin.y);
+    [self.bodyTitleView setFrame:textTitleContentFrame];
+    
+    
+    // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
+    // would go in the negative direction if frame origin y-value exceeded
+    // 44 pts (due to 44-pt toolbar being present?
+    
+    CGRect boundsTitle = self.bodyTitleView.bounds;
+    boundsTitle.origin = CGPointZero;
+    [self.bodyTitleView setBounds:boundsTitle];
+    
+    
     // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
     // so we take advantage of that by reusing _requiredBodyHeight
     BOOL hasAttachment = (self.attachmentImageView.hidden == NO);
@@ -707,9 +798,9 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     CGFloat rightColumn = kCellContentPaddingRight + (hasAttachment ? kAttachmentImageViewSize.width : 0.f);
     
     textContentFrame.origin = CGPointMake(leftColumn,
-                                          kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
+                                          kCellPadding.top +30+ kCellImageViewSize.height + kCellMinorVerticalSeparator);
     textContentFrame.size = CGSizeMake(rect.size.width - leftColumn - rightColumn - (hasAttachment ? kCellMinorHorizontalSeparator : 0.f),
-                                       self.requiredBodyHeight - textContentFrame.origin.y);
+                                       self.requiredBodyHeight+textContentFrame.size.height - textContentFrame.origin.y);
     [self.bodyView setFrame:textContentFrame];
     
     if (hasAttachment) {
@@ -728,18 +819,27 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     
     
     CGRect helpContentFrame;
-    helpContentFrame.origin = CGPointMake(leftColumn,self.requiredBodyHeight - textContentFrame.origin.y+30);
+    helpContentFrame.origin = CGPointMake(leftColumn,self.requiredBodyHeight - textTitleContentFrame.origin.y+30);
     helpContentFrame.size = CGSizeMake(150,40);
     [self.footerLeftView setFrame:helpContentFrame];
     
     CGSize textSize = [[self.footerLeftView text] sizeWithAttributes:@{NSFontAttributeName:[self.footerLeftView font]}];
     CGFloat strikeWidth = textSize.width;
     CGRect repliesContentFrame;
-    repliesContentFrame.origin=CGPointMake(leftColumn+strikeWidth +20, self.requiredBodyHeight - textContentFrame.origin.y+30);
+    repliesContentFrame.origin=CGPointMake(leftColumn+strikeWidth +20, self.requiredBodyHeight - textTitleContentFrame.origin.y+30);
     repliesContentFrame.size = CGSizeMake(100,40);
     [self.footerRightView setFrame:repliesContentFrame];
     
+    //rating
+    
+    LFSResource *profileLocal = self.profileLocal;
+    NSNumber *rating=profileLocal.rating;
+    if (rating) {
+    [self.headerRatingView setBackgroundColor:[UIColor clearColor]];
+    [self.headerRatingView setRate:[rating floatValue]/20];
+    }
 }
+
 
 #pragma mark - Public methods
 
@@ -757,7 +857,20 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     [self.bodyView setAttributedText:attributedString];
 	[self setNeedsLayout];
 }
-
+- (void)setAttributedTitleString:(NSMutableAttributedString *)attributedString
+{
+	// store hash isntead of attributed string itself
+	NSUInteger newHash = attributedString ? [attributedString hash] : 0u;
+    
+	if (newHash == _contentHash) {
+		return;
+	}
+    
+	_contentHash = newHash;
+    
+    [self.bodyTitleView setAttributedText:attributedString];
+	[self setNeedsLayout];
+}
 #pragma mark - Lifecycle
 -(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -768,6 +881,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         // initialize subview references
         _contentHash = 0u;
         _bodyView = nil;
+        _bodyTitleView=nil;
         _headerAccessoryRightView = nil;
         _headerAccessoryRightImageView = nil;
         _headerTitleView = nil;
@@ -798,6 +912,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 -(void)dealloc
 {
     _bodyView = nil;
+    _bodyTitleView=nil;
     _headerTitleView = nil;
     _headerAccessoryRightView = nil;
     _headerAccessoryRightImageView = nil;

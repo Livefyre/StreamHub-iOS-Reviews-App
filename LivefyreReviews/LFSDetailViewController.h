@@ -16,13 +16,14 @@
 
 #import "LFSDetailView.h"
 #import "LFSPostViewController.h"
+#import "LFRReplyViewController.h"
 
 #import "LFSAttributedLabelDelegate.h"
 #import "LFSContentActions.h"
 
 @protocol LFSDetailViewDelegate;
 
-@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate>
+@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFRReplyViewControllerDelegate>
 
 @property (nonatomic, assign) BOOL hideStatusBar;
 

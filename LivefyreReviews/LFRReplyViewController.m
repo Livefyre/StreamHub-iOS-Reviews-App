@@ -1,27 +1,25 @@
 //
-//  LFSNewCommentViewController.m
-//  CommentStream
+//  LFRReplyViewController.m
+//  LivefyreReviews
 //
-//  Created by Eugene Scherba on 9/13/13.
-//  Copyright (c) 2013 Livefyre. All rights reserved.
+//  Created by Kvana Inc 2 on 13/06/14.
+//  Copyright (c) 2014 Kvana Inc. All rights reserved.
 //
-
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
-#import "LFSPostViewController.h"
+#import "LFRReplyViewController.h"
 
-#import "LFSWriteCommentView.h"
+#import "LFSReplyWriteCommentView.h"
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
-#import "LFRConfig.h"
-@interface LFSPostViewController ()
+#define REPLY_FONT_SIZE 28
 
+@interface LFRReplyViewController ()
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
-@property (weak, nonatomic) IBOutlet LFSWriteCommentView *writeCommentView;
-
+@property (nonatomic, strong)IBOutlet LFSReplyWriteCommentView *WriteCommentView;
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
 
 
@@ -30,27 +28,27 @@
 
 @end
 
-@implementation LFSPostViewController {
+@implementation LFRReplyViewController {
     NSDictionary *_authorHandles;
 }
 
 #pragma mark - Properties
 
-@synthesize writeCommentView;
+@synthesize WriteCommentView=_WriteCommentView;
 @synthesize delegate = _delegate;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
-@synthesize collection = _collection;
 
 @synthesize postNavbar = _postNavbar;
 @synthesize user = _user;
 
 @synthesize writeClient = _writeClient;
+@synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
 @synthesize replyToContent = _replyToContent;
- 
+
 - (LFSWriteClient*)writeClient
 {
     if (_writeClient == nil) {
@@ -87,35 +85,41 @@
     _collectionId = nil;
     _replyToContent = nil;
     _delegate = nil;
-}
 
+}
+-(LFSReplyWriteCommentView *)WriteCommentView{
+    
+    if (_WriteCommentView==nil) {
+        _WriteCommentView=[[LFSReplyWriteCommentView alloc]init];
+    }
+    return _WriteCommentView;
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+//    _WriteCommentView=nil;
+
 	// Do any additional setup after loading the view.
-    LFRConfig *config = [[LFRConfig alloc] initwithValues];
-    // NSLog(@"%@",config.collections);
-    self.collection=[[NSDictionary alloc]init];
-    self.collection=[config.collections objectAtIndex:0];
     LFSAuthorProfile *author = self.user.profile;
     NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
     LFSResource *headerInfo = [[LFSResource alloc]
                                initWithIdentifier:detailString
                                attribute:nil
-                               displayString:@"Title"
+                               displayString:author.displayName
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];
-    [self.writeCommentView setProfileLocal:headerInfo];
+    [self.WriteCommentView setProfileLocal:headerInfo];
     
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    LFSAuthorProfile *author = self.user.profile;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-
+    
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
-    [self.writeCommentView.textView becomeFirstResponder];
+    [self.WriteCommentView.textView becomeFirstResponder];
     
     if (self.replyToContent != nil) {
         [self.postNavbar.topItem setTitle:@"Reply"];
@@ -123,7 +127,19 @@
         _authorHandles = nil;
         NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];
         if (replyPrefix != nil) {
-            [self.writeCommentView.textView setText:replyPrefix];
+            
+          
+            NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+            paragraphStyle.alignment = NSTextAlignmentCenter;
+            paragraphStyle.lineSpacing = REPLY_FONT_SIZE/2;
+            UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
+            NSRange range=NSMakeRange(0, replyPrefix.length);
+            NSMutableAttributedString *replyPrefixAttribute = [[NSMutableAttributedString alloc]initWithString : replyPrefix ] ;
+            [replyPrefixAttribute addAttribute:NSFontAttributeName value:labelFont range:range];
+            [replyPrefixAttribute addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x007aff) range:NSRangeFromString(author.displayName)];
+            
+            [self.WriteCommentView.textView setAttributedText:replyPrefixAttribute];
+            
         }
     }
 }
@@ -220,20 +236,20 @@
     [matches enumerateObjectsWithOptions:NSEnumerationReverse
                               usingBlock:
      ^(NSTextCheckingResult *match, NSUInteger idx, BOOL *stop)
-    {
-        NSRange handleRange = [match rangeAtIndex:1];
-        NSString *candidate = [replyText substringWithRange:match.range];
-        
-        NSString *urlString = [_authorHandles objectForKey:[[replyText substringWithRange:handleRange] lowercaseString]];
-        if (urlString != nil) {
-            // candidate found in dictionary
-            NSString *replacement = [NSString
-                                     stringWithFormat:@"<a href=\"%@\">%@</a>",
-                                     urlString, candidate];
-            [mutableReply replaceCharactersInRange:match.range withString:replacement];
-        }
-    }];
-
+     {
+         NSRange handleRange = [match rangeAtIndex:1];
+         NSString *candidate = [replyText substringWithRange:match.range];
+         
+         NSString *urlString = [_authorHandles objectForKey:[[replyText substringWithRange:handleRange] lowercaseString]];
+         if (urlString != nil) {
+             // candidate found in dictionary
+             NSString *replacement = [NSString
+                                      stringWithFormat:@"<a href=\"%@\">%@</a>",
+                                      urlString, candidate];
+             [mutableReply replaceCharactersInRange:match.range withString:replacement];
+         }
+     }];
+    
     return [mutableReply copy];
 }
 
@@ -248,59 +264,38 @@
     
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
-        UITextView *textView = self.writeCommentView.textView;
+        UITextView *textView = self.WriteCommentView.textView;
         NSString *text = (self.replyToContent
                           ? [self processReplyText:textView.text]
                           : textView.text);
-
-        NSString *rating=[NSString stringWithFormat:@"{\"default\":70}"];
+        
         [textView setText:@""];
         
-        id<LFSPostViewControllerDelegate> collectionViewController = nil;
-        if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
-            collectionViewController = [self.delegate collectionViewController];
+        id<LFRReplyViewControllerDelegate> ViewController = nil;
+        if ([self.delegate respondsToSelector:@selector(ViewController)]) {
+            ViewController = [self.delegate ViewController];
         }
-        NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:rating, LFSCollectionPostRatingKey,text,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,@"Title Naren",LFSCollectionPostTitleKey, nil ];
-        
-        
-        [self.writeClient postContentType:3 forCollection:self.collectionId parameters:dict
-                           onSuccess:^(NSOperation *operation, id responseObject) {
-                               if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
-                               {
-                               [collectionViewController didPostContentWithOperation:operation response:responseObject];
-                                }
-                           } onFailure:^(NSOperation *operation, NSError *error) {
-                               [[[UIAlertView alloc]
-                               initWithTitle:kFailurePostTitle
-                               message:[error localizedRecoverySuggestion]
-                               delegate:nil
-                               cancelButtonTitle:@"OK"
-                               otherButtonTitles:nil] show];
-                           }];
-//        rating=%7B%22default%22%3A70%7D
-//        rating="{"default":70}"
-
-//        [self.writeClient postContent:text
-//                         inCollection:self.collectionId
-//                            userToken:userToken
-//                            inReplyTo:self.replyToContent.idString
-//                            onSuccess:^(NSOperation *operation, id responseObject)
-//         {
-//             if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
-//             {
-//                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
-//             }
-//         }
-//                            onFailure:^(NSOperation *operation, NSError *error)
-//         {
-//             // show an error message
-//             [[[UIAlertView alloc]
-//               initWithTitle:kFailurePostTitle
-//               message:[error localizedRecoverySuggestion]
-//               delegate:nil
-//               cancelButtonTitle:@"OK"
-//               otherButtonTitles:nil] show];
-//         }];
+        [self.writeClient postContent:text
+                         inCollection:self.collectionId
+                            userToken:userToken
+                            inReplyTo:self.replyToContent.idString
+                            onSuccess:^(NSOperation *operation, id responseObject)
+         {
+             if ([ViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+             {
+                 [ViewController didPostContentWithOperation:operation response:responseObject];
+             }
+         }
+                            onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailurePostTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
         if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
             [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
         }

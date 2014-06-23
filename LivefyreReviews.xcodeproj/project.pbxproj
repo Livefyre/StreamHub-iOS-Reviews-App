@@ -56,10 +56,12 @@
 		6DA43AE61949E6590066DB73 /* StarFull@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA43ADE1949E6590066DB73 /* StarFull@2x.png */; };
 		6DA43AE71949E6590066DB73 /* StarFullLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA43ADF1949E6590066DB73 /* StarFullLarge.png */; };
 		6DA43AE81949E6590066DB73 /* StarFullLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA43AE01949E6590066DB73 /* StarFullLarge@2x.png */; };
-		6DA43AEB1949FADF0066DB73 /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA43AEA1949FADF0066DB73 /* LFSDetailViewController.m */; };
 		6DA43AEE1949FAF70066DB73 /* LFSRightAlignedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA43AED1949FAF70066DB73 /* LFSRightAlignedButton.m */; };
 		6DA43AF11949FB0C0066DB73 /* LFSContentToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA43AF01949FB0C0066DB73 /* LFSContentToolbar.m */; };
 		6DA43AF71949FE960066DB73 /* LFSDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA43AF61949FE960066DB73 /* LFSDetailView.m */; };
+		6DA463751952E36F0012F7FB /* LFRReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA463741952E36F0012F7FB /* LFRReplyViewController.m */; };
+		6DA463781952EA8A0012F7FB /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA463771952EA8A0012F7FB /* LFSDetailViewController.m */; };
+		6DA4637C1952F4E50012F7FB /* LFSReplyWriteCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */; };
 		6DA66A09194B2C3F00590F96 /* LFSContentActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA66A08194B2C3F00590F96 /* LFSContentActions.m */; };
 		6DA898C919475570000585A4 /* DLStarRatingControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C419475570000585A4 /* DLStarRatingControl.m */; };
 		6DA898CA19475570000585A4 /* DLStarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C619475570000585A4 /* DLStarView.m */; };
@@ -154,14 +156,18 @@
 		6DA43ADE1949E6590066DB73 /* StarFull@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StarFull@2x.png"; sourceTree = "<group>"; };
 		6DA43ADF1949E6590066DB73 /* StarFullLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StarFullLarge.png; sourceTree = "<group>"; };
 		6DA43AE01949E6590066DB73 /* StarFullLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StarFullLarge@2x.png"; sourceTree = "<group>"; };
-		6DA43AE91949FADF0066DB73 /* LFSDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSDetailViewController.h; sourceTree = "<group>"; };
-		6DA43AEA1949FADF0066DB73 /* LFSDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSDetailViewController.m; sourceTree = "<group>"; };
 		6DA43AEC1949FAF70066DB73 /* LFSRightAlignedButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSRightAlignedButton.h; sourceTree = "<group>"; };
 		6DA43AED1949FAF70066DB73 /* LFSRightAlignedButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSRightAlignedButton.m; sourceTree = "<group>"; };
 		6DA43AEF1949FB0C0066DB73 /* LFSContentToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSContentToolbar.h; sourceTree = "<group>"; };
 		6DA43AF01949FB0C0066DB73 /* LFSContentToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSContentToolbar.m; sourceTree = "<group>"; };
 		6DA43AF51949FE960066DB73 /* LFSDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSDetailView.h; sourceTree = "<group>"; };
 		6DA43AF61949FE960066DB73 /* LFSDetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSDetailView.m; sourceTree = "<group>"; };
+		6DA463741952E36F0012F7FB /* LFRReplyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRReplyViewController.m; sourceTree = "<group>"; };
+		6DA463761952E3790012F7FB /* LFRReplyViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFRReplyViewController.h; sourceTree = "<group>"; };
+		6DA463771952EA8A0012F7FB /* LFSDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSDetailViewController.m; sourceTree = "<group>"; };
+		6DA463791952EA920012F7FB /* LFSDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFSDetailViewController.h; sourceTree = "<group>"; };
+		6DA4637A1952F4E50012F7FB /* LFSReplyWriteCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSReplyWriteCommentView.h; sourceTree = "<group>"; };
+		6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSReplyWriteCommentView.m; sourceTree = "<group>"; };
 		6DA66A07194B2C3F00590F96 /* LFSContentActions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSContentActions.h; sourceTree = "<group>"; };
 		6DA66A08194B2C3F00590F96 /* LFSContentActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSContentActions.m; sourceTree = "<group>"; };
 		6DA898C319475570000585A4 /* DLStarRatingControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLStarRatingControl.h; sourceTree = "<group>"; };
@@ -242,17 +248,19 @@
 				220F5C0919444C8B0067B251 /* LFRViewController.m */,
 				6DA120DF1945E1AE009084EC /* LFSPostViewController.h */,
 				6DA120E01945E1AE009084EC /* LFSPostViewController.m */,
+				6DA463761952E3790012F7FB /* LFRReplyViewController.h */,
+				6DA463741952E36F0012F7FB /* LFRReplyViewController.m */,
 				6DA3A45D19446F2400AF54AB /* LFRConfig.h */,
 				6DA3A45E19446F2400AF54AB /* LFRConfig.m */,
 				6DA898C319475570000585A4 /* DLStarRatingControl.h */,
 				6DA898D819475778000585A4 /* DLStarRatingDemoViewController.xib */,
 				6DA898C419475570000585A4 /* DLStarRatingControl.m */,
+				6DA463791952EA920012F7FB /* LFSDetailViewController.h */,
+				6DA463771952EA8A0012F7FB /* LFSDetailViewController.m */,
 				6DA898C519475570000585A4 /* DLStarView.h */,
 				6DA898C619475570000585A4 /* DLStarView.m */,
 				6DA898C719475570000585A4 /* UIView+Subviews.h */,
 				6DA898C819475570000585A4 /* UIView+Subviews.m */,
-				6DA43AE91949FADF0066DB73 /* LFSDetailViewController.h */,
-				6DA43AEA1949FADF0066DB73 /* LFSDetailViewController.m */,
 				6DA43ACB1949C5060066DB73 /* unselect_star.png */,
 				6DA43ACC1949C5060066DB73 /* unselect_star@2x.png */,
 				6DA43ACF1949C5260066DB73 /* select_star.png */,
@@ -309,6 +317,8 @@
 		6DA1EEB51944D2FC008E4AD3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6DA4637A1952F4E50012F7FB /* LFSReplyWriteCommentView.h */,
+				6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */,
 				6DA43AEC1949FAF70066DB73 /* LFSRightAlignedButton.h */,
 				6DA43AED1949FAF70066DB73 /* LFSRightAlignedButton.m */,
 				6DA66A07194B2C3F00590F96 /* LFSContentActions.h */,
@@ -532,10 +542,13 @@
 				6DA3A45F19446F2400AF54AB /* LFRConfig.m in Sources */,
 				6DA898CA19475570000585A4 /* DLStarView.m in Sources */,
 				6DA1EED81944D856008E4AD3 /* LFSAttributedTextCell.m in Sources */,
+				6DA463751952E36F0012F7FB /* LFRReplyViewController.m in Sources */,
 				6DA1EEE51944DB16008E4AD3 /* LFSResource.m in Sources */,
 				220F5C0019444C8B0067B251 /* main.m in Sources */,
+				6DA4637C1952F4E50012F7FB /* LFSReplyWriteCommentView.m in Sources */,
 				6DA898CB19475570000585A4 /* UIView+Subviews.m in Sources */,
 				6DA1EED21944D6C1008E4AD3 /* LFSContentCollection.m in Sources */,
+				6DA463781952EA8A0012F7FB /* LFSDetailViewController.m in Sources */,
 				6DA1EEED1944DB5C008E4AD3 /* UIImage+LFSColor.m in Sources */,
 				6DA43AEE1949FAF70066DB73 /* LFSRightAlignedButton.m in Sources */,
 				6DA120E41945E2FA009084EC /* LFSWriteCommentView.m in Sources */,
@@ -546,7 +559,6 @@
 				6DA1EEE11944DAFF008E4AD3 /* LFSBasicHTMLParser.m in Sources */,
 				6DA1EEE21944DAFF008E4AD3 /* LFSBasicHTMLLabel.m in Sources */,
 				6DA43AD81949E6460066DB73 /* DYRateView.m in Sources */,
-				6DA43AEB1949FADF0066DB73 /* LFSDetailViewController.m in Sources */,
 				220F5C0A19444C8B0067B251 /* LFRViewController.m in Sources */,
 				6DA1EEDC1944D9B3008E4AD3 /* LFSAttributedLabelDelegate.m in Sources */,
 				6DA1EEF21944DBB3008E4AD3 /* LFSAuthorProfile.m in Sources */,

@@ -23,13 +23,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Pods/StreamHub-iOS-SDK/LFSClient/Classes/LFSWriteClient.m"
-            timestampString = "424788941.830432"
+            filePath = "LivefyreReviews/LFRReplyViewController.m"
+            timestampString = "424878868.063538"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "185"
-            endingLineNumber = "185"
-            landmarkName = "-postContentType:forCollection:parameters:onSuccess:onFailure:"
+            startingLineNumber = "278"
+            endingLineNumber = "278"
+            landmarkName = "-postClicked:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -39,13 +39,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Pods/StreamHub-iOS-SDK/LFSClient/Classes/LFSWriteClient.m"
-            timestampString = "424789567.878496"
+            filePath = "LivefyreReviews/LFRReplyViewController.m"
+            timestampString = "424879003.631432"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
-            landmarkName = "-postContentType:forCollection:parameters:onSuccess:onFailure:"
+            startingLineNumber = "266"
+            endingLineNumber = "266"
+            landmarkName = "-postClicked:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -55,13 +55,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Pods/StreamHub-iOS-SDK/LFSClient/Classes/LFSWriteClient.m"
-            timestampString = "424789645.095728"
+            filePath = "LivefyreReviews/LFSContentCollection.m"
+            timestampString = "425228688.604851"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
-            landmarkName = "-postContentType:forCollection:parameters:onSuccess:onFailure:"
+            startingLineNumber = "421"
+            endingLineNumber = "421"
+            landmarkName = "-transactionalDeleteObject:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -71,13 +71,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Pods/StreamHub-iOS-SDK/LFSClient/Classes/LFSWriteClient.m"
-            timestampString = "424789872.703802"
+            filePath = "LivefyreReviews/LFSContentCollection.m"
+            timestampString = "425228689.97732"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
-            landmarkName = "-postContentType:forCollection:parameters:onSuccess:onFailure:"
+            startingLineNumber = "425"
+            endingLineNumber = "425"
+            landmarkName = "-transactionalDeleteObject:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

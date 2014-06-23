@@ -96,12 +96,12 @@ const NSString* const LFSContentActionStrings1[LFS_CONTENT_ACTIONS_LENGTH1] =
                         initWithTitle:@"Was this helpful?"
                         delegate:self
                         cancelButtonTitle:@"Cancel"
-                        destructiveButtonTitle:nil
+                        destructiveButtonTitle:[LFSContentActionStrings[LFSContentActionYes] capitalizedString]
                         otherButtonTitles:
-                        [LFSContentActionStrings[LFSContentActionYes] capitalizedString],
                         [LFSContentActionStrings[LFSContentActionNo] capitalizedString],
                         nil];
     }
+    _actionSheet3.destructiveButtonIndex=1;
     return _actionSheet3;
 }
 

@@ -49,6 +49,7 @@ static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
 static NSString* const kFailureModifyTitle = @"Failed to modify content";
 const static CGFloat kGenerationOffset = 20.f;
 const static char kAttributedTextValueKey;
+const static char kAttributedTitleValueKey;
 const static char kAtttributedTextHeightKey;
 static NSString* const kCellSelectSegue = @"detailView";
 
@@ -406,6 +407,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
+            
              [_content addContent:[headDocument objectForKey:@"content"]
                       withAuthors:[headDocument objectForKey:@"authors"]];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
@@ -440,12 +442,29 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     UITableView *tableView = self.tableView;
     
+//    NSMutableArray *parentId=[[NSMutableArray alloc]init];
+//    for (NSString *contentUrl in _content.allKeys) {
+//        if ( [[_content valueForKey:contentUrl] valueForKey:@"parentId"]) {
+//           [parentId addObject:[[_content valueForKey:contentUrl] valueForKey:@"parentId"]];
+//        }
+//    }
+//  
+//    for (NSString *parent in parentId ){
+//        if ([parent isEqualToString:@""]) {
+// 
+//        }
+//    }
+    
+    
+    
     [tableView beginUpdates];
     [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
     [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
     [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
     [tableView endUpdates];
+
     
+   
     //[tableView reloadData];
 }
 
@@ -488,14 +507,24 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             NSMutableAttributedString *attributedString =
             [LFSAttributedTextCell attributedStringFromHTMLString:(content.bodyHtml ?: @"")];
             
+            NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(content.title ?: @"")];
+            
             objc_setAssociatedObject(content, &kAttributedTextValueKey,
                                      attributedString,
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             
+            
+            objc_setAssociatedObject(content, &kAttributedTitleValueKey,
+                                     attributedTitleString,
+                                     OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            
             cellHeightValue = [LFSAttributedTextCell
-                               cellHeightForAttributedString:attributedString
-                               hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil)
+                               cellHeightForAttributedString:attributedString                               hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil)
                                width:(tableView.bounds.size.width - leftOffset)];
+           
+            
+            cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:YES width:(tableView.bounds.size.width)];
+            
             
             objc_setAssociatedObject(content, &kAtttributedTextHeightKey,
                                      [NSNumber numberWithFloat:cellHeightValue],
@@ -520,6 +549,18 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    
+//    int i=0;
+//
+//         for (NSString *contentUrl in _content) {
+//            if ( [[_content valueForKey:contentUrl] valueForKey:@"title"] != nil) {
+//                i++;
+//                NSLog(@" i count %d",i);
+//                NSLog(@"count count %d",i);
+//            }
+//    }
+//
+    
     return [_content count];
 }
 
@@ -643,8 +684,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
      LFSContentVisibility visibility = LFSContentVisibilityEveryone;
 
     id returnedCell;
-    
-    
+   if ([content.parentId isEqualToString:@""]) {
+      
     if (visibility == LFSContentVisibilityEveryone)
     {
         LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:kAttributedCellReuseIdentifier];
@@ -654,8 +695,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                     initWithReuseIdentifier:kAttributedCellReuseIdentifier];
             [cell.bodyView setDelegate:self.attributedLabelDelegate];
         }
-       [self configureAttributedCell:cell forContent:content];
+      [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
+  }
     }
     else
     {
@@ -676,7 +718,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
     }
-
     return returnedCell;
 
 }
@@ -727,7 +768,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                           ? @""
                           : @"This comment has been removed");
     
-    //[cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
+    [cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
     [cell.textLabel setText:bodyText];
 }
 
@@ -746,6 +787,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     NSMutableAttributedString *attributedString = objc_getAssociatedObject(content, &kAttributedTextValueKey);
     [cell setAttributedString:attributedString];
+    
+    NSMutableAttributedString *attributedTitle=objc_getAssociatedObject(content, &kAttributedTitleValueKey);
+    [cell setAttributedTitleString:attributedTitle];
     
     NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
     [cell setRequiredBodyHeight:[cellHeight floatValue]];
