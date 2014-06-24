@@ -736,7 +736,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 
 -(void)newRating:(DLStarRatingControl *)control :(float)rating {
 	//self.stars.text = [NSString stringWithFormat:@"%0.1f star rating",rating];
-    NSLog(@"%@",[NSString stringWithFormat:@"%0.1f star rating",rating]);
+    NSLog(@"%@",[NSString stringWithFormat:@"%0.0f star rating",rating]);
+    _ratingPost=[NSString stringWithFormat:@"%0.0f",rating*20];
 }
 
 #pragma mark -

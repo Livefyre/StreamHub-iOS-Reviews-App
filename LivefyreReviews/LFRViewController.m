@@ -220,7 +220,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
         self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440) ;
         [navigationBar setTranslucent:NO];
-        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyre_logo.png"]];
+        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyrelogo.png"]];
         
     }
     [self authenticateUser];

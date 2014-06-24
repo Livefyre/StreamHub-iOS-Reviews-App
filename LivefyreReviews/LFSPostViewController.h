@@ -11,10 +11,10 @@
 
 #import "LFSUser.h"
 #import "LFSContent.h"
-
+#import "DYRateView.h"
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController
+@interface LFSPostViewController : UIViewController<DYRateViewDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;

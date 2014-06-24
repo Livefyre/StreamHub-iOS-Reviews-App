@@ -13,6 +13,7 @@
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
 #import "LFRConfig.h"
+#import "DYRateView.h"
 @interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
@@ -236,6 +237,9 @@
 
     return [mutableReply copy];
 }
+- (void)rateView:(DYRateView *)rateView changedToNewRate:(NSNumber *)rate {
+    //self.headerRatingView.text = [NSString stringWithFormat:@"Rate: %d", rate.intValue];
+}
 
 #pragma mark - Actions
 - (IBAction)cancelClicked:(UIBarButtonItem *)sender {
@@ -262,10 +266,11 @@
         NSString *cons=consText.text;
         NSString *bodyofReview=[NSString stringWithFormat:@"<p><strong>Pros:</strong>%@</p><p><strong>Cons:</strong>%@</p><p><strong>Description:</strong>%@</p>", pros,cons,text];
 
-//        NSString *rating=@"{\"default\":70}";
-        NSNumber *value = @70;
+
+        NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+        [f setNumberStyle:NSNumberFormatterNoStyle];
+        NSNumber * value = [f numberFromString:self.writeCommentView.ratingPost];
         NSDictionary *rating = @{@"default":value};
-//        NSDictionary *rating=@{@"rating": defaultRating};
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:rating options:0 error:NULL];
         NSString *ratingjsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         

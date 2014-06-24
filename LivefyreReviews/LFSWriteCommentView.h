@@ -17,4 +17,5 @@
 @property (readonly, nonatomic) UITextField *titleTextField;
 @property (readonly, nonatomic) UITextField *prosTextField;
 @property (readonly, nonatomic) UITextField *consTextField;
+@property (readonly, nonatomic) NSString *ratingPost;
 @end
