@@ -64,13 +64,12 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 @property (readonly, nonatomic) UILabel *headerTitleLable;
-@property (readonly, nonatomic) UITextField *titleTextField;
 @property (readonly, nonatomic) DLStarRatingControl *starView;
 
 @property (readonly, nonatomic) UILabel *headerProsLable;
 @property (readonly, nonatomic) UILabel *consTitleLable;
-@property (readonly, nonatomic) UITextField *prosTextField;
-@property (readonly, nonatomic) UITextField *consTextField;
+
+@property (readonly, nonatomic) UIView *addPhotoImageView;
 
 @end
 
@@ -508,6 +507,49 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     return _headerSubtitleView;
 }
 
+#pragma mark -
+@synthesize addPhotoImageView = _addPhotoImageView;
+-(UIView*)addPhotoImageView
+{
+    if (_addPhotoImageView == nil) {
+        CGRect screenRect = [[UIScreen mainScreen] bounds];
+        CGFloat screenHeight = screenRect.size.height;
+        NSLog(@"Screan Height %f",screenHeight);
+        _addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-326, 320, 50)];
+        [_addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
+        
+        _addPhotoImageView.alpha=0.8;
+        
+        UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
+        [addImageButton setImage:[UIImage imageNamed:@"image.png"] forState:UIControlStateNormal];
+        [_addPhotoImageView addSubview:addImageButton];
+        UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(136,11, 100, 28)];
+        [addPhoto setTitle:@"Add Photo" forState:UIControlStateNormal];
+        addPhoto.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:18];
+        [addPhoto setTitleColor:UIColorFromRGB(0x80848B) forState:UIControlStateNormal];
+        [addPhoto addTarget:self action:@selector(addPhotoClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [_addPhotoImageView addSubview:addPhoto];
+        [self addSubview:_addPhotoImageView];
+    }
+
+    return _addPhotoImageView;
+}
+-(IBAction)addPhotoClicked:(id)sender
+{
+    UIImagePickerController *imagePicker =[[UIImagePickerController alloc] init];
+    imagePicker.delegate = self;
+    imagePicker.sourceType =UIImagePickerControllerSourceTypePhotoLibrary;
+    //imagePicker.mediaTypes = [NSArray arrayWithObjects:(NSString *) kUTTypeImage,nil];
+    imagePicker.allowsEditing = YES;
+   // [self presentViewController:imagePicker animated:YES completion:nil];
+}
+-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+  //  [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+
 #pragma mark - Private overrides
 -(void)layoutSubviews
 {
@@ -633,7 +675,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self.headerSubtitleView resizeVerticalCenterRightTrim];
     }
     else if (headerTitle && !headerSubtitle && !headerAccessory){
-        
         [self.headerTitleLable setText:headerTitle];
         [self.headerTitleLable resizeVerticalCenterRightTrim];
         self.headerTitleLable.backgroundColor=[UIColor whiteColor];
@@ -653,6 +694,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         self.consTextField.placeholder=@"Enter Cons Here";
         
+        [self.addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3) ];
+
         CAShapeLayer *line1=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
         [self.layer addSublayer:line1];
         CAShapeLayer *line2=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];

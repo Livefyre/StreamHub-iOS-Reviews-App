@@ -62,6 +62,7 @@
 		6DA463751952E36F0012F7FB /* LFRReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA463741952E36F0012F7FB /* LFRReplyViewController.m */; };
 		6DA463781952EA8A0012F7FB /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA463771952EA8A0012F7FB /* LFSDetailViewController.m */; };
 		6DA4637C1952F4E50012F7FB /* LFSReplyWriteCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */; };
+		6DA4F04719599FD300400BA4 /* image.png in Resources */ = {isa = PBXBuildFile; fileRef = 6DA4F04619599FD300400BA4 /* image.png */; };
 		6DA66A09194B2C3F00590F96 /* LFSContentActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA66A08194B2C3F00590F96 /* LFSContentActions.m */; };
 		6DA898C919475570000585A4 /* DLStarRatingControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C419475570000585A4 /* DLStarRatingControl.m */; };
 		6DA898CA19475570000585A4 /* DLStarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C619475570000585A4 /* DLStarView.m */; };
@@ -168,6 +169,7 @@
 		6DA463791952EA920012F7FB /* LFSDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFSDetailViewController.h; sourceTree = "<group>"; };
 		6DA4637A1952F4E50012F7FB /* LFSReplyWriteCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSReplyWriteCommentView.h; sourceTree = "<group>"; };
 		6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSReplyWriteCommentView.m; sourceTree = "<group>"; };
+		6DA4F04619599FD300400BA4 /* image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = image.png; sourceTree = "<group>"; };
 		6DA66A07194B2C3F00590F96 /* LFSContentActions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSContentActions.h; sourceTree = "<group>"; };
 		6DA66A08194B2C3F00590F96 /* LFSContentActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSContentActions.m; sourceTree = "<group>"; };
 		6DA898C319475570000585A4 /* DLStarRatingControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLStarRatingControl.h; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 		220F5BF919444C8B0067B251 /* LivefyreReviews */ = {
 			isa = PBXGroup;
 			children = (
+				6DA4F04619599FD300400BA4 /* image.png */,
 				6DA120DD1945B1F7009084EC /* livefyre_logo.png */,
 				220F5C0219444C8B0067B251 /* LFRAppDelegate.h */,
 				220F5C0319444C8B0067B251 /* LFRAppDelegate.m */,
@@ -485,6 +488,7 @@
 				6DA43ACD1949C5060066DB73 /* unselect_star.png in Resources */,
 				6DA43AE21949E6590066DB73 /* StarEmpty@2x.png in Resources */,
 				6DA43AE41949E6590066DB73 /* StarEmptyLarge@2x.png in Resources */,
+				6DA4F04719599FD300400BA4 /* image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

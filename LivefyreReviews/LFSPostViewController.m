@@ -252,18 +252,34 @@
         NSString *text = (self.replyToContent
                           ? [self processReplyText:textView.text]
                           : textView.text);
+        UITextField *titleText=self.writeCommentView.titleTextField;
+        NSString *title=titleText.text;
+        
+        UITextField *prosText=self.writeCommentView.prosTextField;
+        NSString *pros=prosText.text;
+        
+        UITextField *consText=self.writeCommentView.consTextField;
+        NSString *cons=consText.text;
+        NSString *bodyofReview=[NSString stringWithFormat:@"<p><strong>Pros:</strong>%@</p><p><strong>Cons:</strong>%@</p><p><strong>Description:</strong>%@</p>", pros,cons,text];
 
-        NSString *rating=[NSString stringWithFormat:@"{\"default\":70}"];
+//        NSString *rating=@"{\"default\":70}";
+        NSNumber *value = @70;
+        NSDictionary *rating = @{@"default":value};
+//        NSDictionary *rating=@{@"rating": defaultRating};
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:rating options:0 error:NULL];
+        NSString *ratingjsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        
+        NSLog(@"%@", ratingjsonString);
         [textView setText:@""];
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
             collectionViewController = [self.delegate collectionViewController];
         }
-        NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:rating, LFSCollectionPostRatingKey,text,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,@"Title Naren",LFSCollectionPostTitleKey, nil ];
+        NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey, nil ];
         
         
-        [self.writeClient postContentType:3 forCollection:self.collectionId parameters:dict
+        [self.writeClient postContentType:2 forCollection:self.collectionId parameters:dict
                            onSuccess:^(NSOperation *operation, id responseObject) {
                                if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
                                {

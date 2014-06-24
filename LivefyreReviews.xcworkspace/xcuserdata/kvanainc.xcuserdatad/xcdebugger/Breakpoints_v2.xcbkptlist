@@ -55,29 +55,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LivefyreReviews/LFSContentCollection.m"
-            timestampString = "425228688.604851"
+            filePath = "LivefyreReviews/LFSWriteCommentView.m"
+            timestampString = "425309527.184836"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "421"
-            endingLineNumber = "421"
-            landmarkName = "-transactionalDeleteObject:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "LivefyreReviews/LFSContentCollection.m"
-            timestampString = "425228689.97732"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "425"
-            endingLineNumber = "425"
-            landmarkName = "-transactionalDeleteObject:"
+            startingLineNumber = "539"
+            endingLineNumber = "539"
+            landmarkName = "-addPhotoClicked:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
