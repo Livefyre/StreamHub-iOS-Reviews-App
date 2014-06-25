@@ -514,7 +514,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     if (_addPhotoImageView == nil) {
         CGRect screenRect = [[UIScreen mainScreen] bounds];
         CGFloat screenHeight = screenRect.size.height;
-        NSLog(@"Screan Height %f",screenHeight);
         _addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-326, 320, 50)];
         [_addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
         
