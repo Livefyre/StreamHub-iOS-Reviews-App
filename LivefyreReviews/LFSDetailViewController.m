@@ -137,7 +137,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         }
     }
     else {
-        [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
+        [likeButton setImage:[UIImage imageNamed:@"heartsmall"]
                     forState:UIControlStateNormal];
         [likeButton setTitle:@"Helpful"
                     forState:UIControlStateNormal];
@@ -314,6 +314,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];
     [detailView setProfileLocal:headerInfo];
+ 
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -321,6 +322,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewWillAppear:animated];
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
+    self.navigationController.navigationBar.backgroundColor = [UIColor clearColor];
     
     // calculate content size for scrolling
     [self updateScrollViewContentSize];

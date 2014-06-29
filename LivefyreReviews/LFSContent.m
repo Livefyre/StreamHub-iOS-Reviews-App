@@ -182,7 +182,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 
 @synthLazyWithNull(NSDictionary, content, _object, @"content")
 @synthLazyWithNull(NSDictionary, annotations, self.content, @"annotations")
-//@synthLazyWithNull(NSArray, childContent, _object, @"childContent")
+@synthLazyWithNull(NSArray, childContent, _object, @"childContent")
 
 @synthLazyWithNull(NSString, idString, self.content, @"id")
 @synthLazyWithNull(NSString, targetId, self.content, @"targetId")

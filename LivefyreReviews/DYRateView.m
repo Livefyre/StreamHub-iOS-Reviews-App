@@ -43,7 +43,7 @@ static NSString *DefaultEmptyStarImageFilename = @"icon_star_empty_small";
 @synthesize rate = _rate;
 @synthesize alignment = _alignment;
 @synthesize padding = _padding;
-@synthesize editable = _editable;
+//@synthesize editable = _editable;
 @synthesize fullStarImage = _fullStarImage;
 @synthesize emptyStarImage = _emptyStarImage;
 @synthesize delegate = _delegate;
@@ -89,7 +89,7 @@ static NSString *DefaultEmptyStarImageFilename = @"icon_star_empty_small";
     _padding = 4;
     _numOfStars = 5;
     self.alignment = RateViewAlignmentLeft;
-    self.editable = NO;
+//    self.editable = NO;
 }
 
 - (void)drawRect:(CGRect)rect
@@ -144,10 +144,10 @@ static NSString *DefaultEmptyStarImageFilename = @"icon_star_empty_small";
     [self setNeedsLayout];
 }
 
-- (void)setEditable:(BOOL)editable {
-    _editable = editable;
-    self.userInteractionEnabled = _editable;
-}
+//- (void)setEditable:(BOOL)editable {
+//    _editable = editable;
+//    self.userInteractionEnabled = _editable;
+//}
 
 - (void)setFullStarImage:(UIImage *)fullStarImage
 {
@@ -166,7 +166,7 @@ static NSString *DefaultEmptyStarImageFilename = @"icon_star_empty_small";
 }
 
 - (void)handleTouchAtLocation:(CGPoint)location {
-    for(int i = _numOfStars - 1; i > -1; i--) {
+    for(int i = (int)_numOfStars - 1; i > -1; i--) {
         if (location.x > _origin.x + i * (_fullStarImage.size.width + _padding) - _padding / 2.) {
             self.rate = i + 1;
             return;

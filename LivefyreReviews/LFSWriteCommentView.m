@@ -301,7 +301,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 }
 @synthesize starView =_starView;
 -(DLStarRatingControl*)starView
-{
+{   _ratingPost=0;
     CGFloat leftColumnWidth =kStarViewLeftBorder;
     CGFloat rightColumnWidth = kStarViewLeftBorder;
     CGSize viewSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kStarViewHeight);
@@ -317,7 +317,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     }
 
     _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 60) andStars:5 isFractional:NO];
-    _starView.rating=4;
+    _starView.rating=0;
 //   self.starView.delegate=self;
     [self addSubview:_starView];
     return _starView;
@@ -520,6 +520,13 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         _addPhotoImageView.alpha=0.8;
         
         UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
+        CAShapeLayer *lineOnImage=[self drawline:CGPointMake(0, 0) :CGPointMake(320, 0)];
+        lineOnImage.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
+        lineOnImage.lineWidth = 0.1;
+        lineOnImage.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
+
+        [_addPhotoImageView.layer addSublayer:lineOnImage];
+        
         [addImageButton setImage:[UIImage imageNamed:@"image.png"] forState:UIControlStateNormal];
         [_addPhotoImageView addSubview:addImageButton];
         UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(136,11, 100, 28)];
@@ -703,6 +710,9 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self.textView.layer addSublayer:line3];
         CAShapeLayer *line4=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];
         [self.textView.layer addSublayer:line4];
+        
+        CAShapeLayer *line5=[self drawline:CGPointMake(0, 0) :CGPointMake(320, 0)];
+        [self.layer addSublayer:line5];
     }
     
     else {
@@ -720,11 +730,9 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
     shapeLayer.path = [path CGPath];
-    shapeLayer.strokeColor = [[UIColor grayColor] CGColor];
+    shapeLayer.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
     shapeLayer.lineWidth = 0.1;
-    shapeLayer.fillColor = [[UIColor grayColor] CGColor];
-    
-    //[self.layer addSublayer:shapeLayer];
+    shapeLayer.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
     return shapeLayer;
 }
 
@@ -732,7 +740,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 {
     return 28; // For really wide spacing; pick your own value
 }
-
+#pragma mark - Rating Delegate
 -(void)newRating:(DLStarRatingControl *)control :(float)rating {
 	//self.stars.text = [NSString stringWithFormat:@"%0.1f star rating",rating];
     NSLog(@"%@",[NSString stringWithFormat:@"%0.0f star rating",rating]);

@@ -115,6 +115,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self.view setBackgroundColor:[UIColor whiteColor]];
     LFSAuthorProfile *author = self.user.profile;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     

@@ -43,7 +43,7 @@ typedef enum {
 @property(nonatomic, assign) RateViewAlignment alignment;
 @property(nonatomic, assign) CGFloat rate;
 @property(nonatomic, assign) CGFloat padding;
-@property(nonatomic, assign) BOOL editable;
+//@property(nonatomic, assign) BOOL editable;
 @property(nonatomic, retain) UIImage *fullStarImage;
 @property(nonatomic, retain) UIImage *emptyStarImage;
 @property(nonatomic, assign) NSObject<DYRateViewDelegate> *delegate;

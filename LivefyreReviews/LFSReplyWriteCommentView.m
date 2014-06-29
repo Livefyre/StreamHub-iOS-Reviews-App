@@ -16,7 +16,9 @@
 static const UIEdgeInsets kPostContentInset = {
     .top=15.f, .left=7.f, .bottom=20.f, .right=5.f
 };
-
+static const CGFloat kPostKeyboardMarginTop = 10.0f;
+static NSString* const kPostContentFontName = @"Georgia";
+static const CGFloat kPostContentFontSize = 18.0f;
 
 @interface LFSReplyWriteCommentView ()
 
@@ -60,6 +62,7 @@ static const UIEdgeInsets kPostContentInset = {
             // iOS6
             [_textView setContentInset:UIEdgeInsetsMake(kPostContentInset.top, 0.f, kPostContentInset.bottom, 0.f)];
         }
+        [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];
         [_textView setUserInteractionEnabled:YES];
         [_textView setScrollEnabled:YES];
         [_textView setDelegate:self];
@@ -135,6 +138,7 @@ static const UIEdgeInsets kPostContentInset = {
         if (up) {
             // shrink the view
             _previousViewHeight = viewFrame.size.height;
+            viewFrame.size.height = _previousViewHeight - overlapHeight -kPostKeyboardMarginTop;
          } else {
             // restore the previous view height
             viewFrame.size.height = _previousViewHeight;
