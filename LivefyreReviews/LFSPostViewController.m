@@ -256,31 +256,69 @@
         NSString *text = (self.replyToContent
                           ? [self processReplyText:textView.text]
                           : textView.text);
+        
+        
         UITextField *titleText=self.writeCommentView.titleTextField;
         NSString *title=titleText.text;
-        
         UITextField *prosText=self.writeCommentView.prosTextField;
         NSString *pros=prosText.text;
-        
         UITextField *consText=self.writeCommentView.consTextField;
         NSString *cons=consText.text;
-        NSString *bodyofReview=[NSString stringWithFormat:@"<p><strong>Pros:</strong>%@</p><p><strong>Cons:</strong>%@</p><p><strong>Description:</strong>%@</p>", pros,cons,text];
-
-
         NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
         [f setNumberStyle:NSNumberFormatterNoStyle];
         NSNumber * value = [f numberFromString:self.writeCommentView.ratingPost];
+        
+
+        if (title.length == 0 ) {
+            UIAlertView * alertView=[[UIAlertView alloc]initWithTitle:@"alert" message:@"Your review must include a title" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+            [alertView show];
+        }
+        else if (((int) value<1  && (int) value > 100) || self.writeCommentView.ratingPost==nil){
+            UIAlertView * alertView=[[UIAlertView alloc]initWithTitle:@"alert" message:@"Your review must include a star rating" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+            [alertView show];
+            
+        }
+        
+        else{
+            
+            if (pros.length == 0){
+                pros=@"";
+            }
+            else{
+                pros=[NSString stringWithFormat:@"<p><strong>Pros:</strong>%@</p>",pros];
+
+            }
+            if (cons.length == 0){
+                cons=@"";
+            }
+            else{
+                cons=[NSString stringWithFormat:@"<p><strong>Cons:</strong>%@</p>",cons];
+                
+            }
+            if (pros.length == 0 && cons.length == 0){
+                
+            }
+            else{
+                text=[NSString stringWithFormat:@"<p><strong>Description:</strong>%@</p>",text];
+                
+            }
         NSDictionary *rating = @{@"default":value};
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:rating options:0 error:NULL];
         NSString *ratingjsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         
         NSLog(@"%@", ratingjsonString);
+            NSString *bodyofReview=[NSString stringWithFormat:@"%@%@%@",pros,cons,text];
+
         [textView setText:@""];
+        
+        
+        
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
             collectionViewController = [self.delegate collectionViewController];
         }
+        
         NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey, nil ];
         
         
@@ -298,32 +336,11 @@
                                cancelButtonTitle:@"OK"
                                otherButtonTitles:nil] show];
                            }];
-//        rating=%7B%22default%22%3A70%7D
-//        rating="{"default":70}"
 
-//        [self.writeClient postContent:text
-//                         inCollection:self.collectionId
-//                            userToken:userToken
-//                            inReplyTo:self.replyToContent.idString
-//                            onSuccess:^(NSOperation *operation, id responseObject)
-//         {
-//             if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
-//             {
-//                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
-//             }
-//         }
-//                            onFailure:^(NSOperation *operation, NSError *error)
-//         {
-//             // show an error message
-//             [[[UIAlertView alloc]
-//               initWithTitle:kFailurePostTitle
-//               message:[error localizedRecoverySuggestion]
-//               delegate:nil
-//               cancelButtonTitle:@"OK"
-//               otherButtonTitles:nil] show];
-//         }];
         if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
             [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
+        }
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
     } else {
         // userToken is nil -- show an error message
@@ -333,8 +350,11 @@
           delegate:nil
           cancelButtonTitle:@"OK"
           otherButtonTitles:nil] show];
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+        
+    
+    ;
 }
 
 @end

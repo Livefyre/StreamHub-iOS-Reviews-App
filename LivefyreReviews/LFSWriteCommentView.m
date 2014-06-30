@@ -13,11 +13,11 @@
 #import "UILabel+Trim.h"
 #import "DLStarRatingControl.h"
 static const UIEdgeInsets kDetailPadding = {
-    .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
+    .top=10.0f, .left=15.0f, .bottom=115.0f, .right=15.0f
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=125.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=255.f, .left=7.f, .bottom=80.f, .right=5.f
 };
 
 // header font settings
@@ -33,11 +33,11 @@ static const CGFloat kPostContentFontSize = 18.0f;
 // header label heights
 static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
 static const CGFloat kDetailHeaderAttributeTopImageHeight = 18.0f;
-static const CGFloat kDetailHeaderTitleHeight = 18.0f;
+static const CGFloat kDetailHeaderTitleHeight = 40.0f;
 
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
-static const CGFloat kPostKeyboardMarginTop = 0.0f;
+static const CGFloat kPostKeyboardMarginTop = 50.0f;
 
 
 //starView
@@ -204,13 +204,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kDetailPadding.top); // size.y will be changed in layoutSubviews
-        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
-            // iOS6
-            frame.origin.y -= kPostContentInset.top;
-            frame.origin.x -= kPostContentInset.left;
-        }
-        
-        // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         _headerTitleView.backgroundColor=[UIColor whiteColor];
         // configure
@@ -219,7 +212,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kDetailHeaderTitleFontSize]];
         
         // add to superview
-        [self addSubview:_headerTitleView];
+        [self.textView addSubview:_headerTitleView];
     }
     return _headerTitleView;
 }
@@ -232,11 +225,11 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         CGFloat leftColumnWidth = kDetailPadding.left;
         CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
+        CGSize labelSize = CGSizeMake(0, kDetailHeaderTitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kDetailPadding.top+kDetailHeaderTitleFontSize/2); // size.y will be changed in layoutSubviews
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
@@ -247,13 +240,13 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         _headerTitleLable = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerTitleLable
-         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//        [_headerTitleLable
+//         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
         [_headerTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15.0f]];
         [_headerTitleLable setTextColor:UIColorFromRGB(0x969696)];
         
         // add to superview
-        [self addSubview:_headerTitleLable];
+        [self.textView addSubview:_headerTitleLable];
     }
     return _headerTitleLable;
 }
@@ -276,39 +269,34 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kDetailPadding.top+kPostContentFontSize/2); // size.y will be changed in layoutSubviews
-        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
-            // iOS6
-            frame.origin.y -= kPostContentInset.top;
-            frame.origin.x -= kPostContentInset.left;
-        }
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
         
         // initialize
         _titleTextField = [[UITextField alloc] initWithFrame:frame];
         
         // configure
-        [_titleTextField
-         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//        [_titleTextField
+//         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
         [_titleTextField setFont:[UIFont fontWithName:@"Georgia" size:kPostContentFontSize]];
         [_titleTextField setTextColor:UIColorFromRGB(0x474C52)];
     
         //_titleTextField.layoutManager.delegate = self;
         // add to superview
-        [self addSubview:_titleTextField];
+        [self.textView addSubview:_titleTextField];
         
     }
     return _titleTextField;
 }
 @synthesize starView =_starView;
 -(DLStarRatingControl*)starView
-{
+{   _ratingPost=0;
     CGFloat leftColumnWidth =kStarViewLeftBorder;
     CGFloat rightColumnWidth = kStarViewLeftBorder;
     CGSize viewSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kStarViewHeight);
     CGRect frame;
     frame.size = viewSize;
     frame.origin = CGPointMake(leftColumnWidth,
-                               self.titleTextField.frame.origin.x);
+                               self.titleTextField.frame.size.height);
     
     if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
         // iOS6
@@ -316,10 +304,10 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         frame.origin.x -= kPostContentInset.left;
     }
 
-    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 60) andStars:5 isFractional:NO];
-    _starView.rating=4;
+    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 50) andStars:5 isFractional:NO];
+    _starView.rating=0;
 //   self.starView.delegate=self;
-    [self addSubview:_starView];
+    [self.textView addSubview:_starView];
     return _starView;
 }
 
@@ -334,7 +322,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   _headerTitleLable.frame.origin.y); // size.y will be changed in layoutSubviews
+                                   95+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -=  kPostContentInset.top;
@@ -372,12 +360,12 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   self.headerTitleLable.frame.origin.y); // size.y will be changed in layoutSubviews
-        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
-            // iOS6
-            frame.origin.y -= kPostContentInset.top;
-            frame.origin.x -= kPostContentInset.left;
-        }
+                                   95+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
+//        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+//            // iOS6
+//            frame.origin.y -= kPostContentInset.top;
+//            frame.origin.x -= kPostContentInset.left;
+//        }
         
         // initialize
         _prosTextField = [[UITextField alloc] initWithFrame:frame];
@@ -406,7 +394,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   _headerTitleLable.frame.origin.y+60); // size.y will be changed in layoutSubviews
+                                   kDetailHeaderTitleHeight+145); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -=  kPostContentInset.top;
@@ -445,7 +433,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   self.headerTitleLable.frame.origin.y+60); // size.y will be changed in layoutSubviews
+                                   kDetailHeaderTitleHeight+145); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
@@ -520,6 +508,13 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         _addPhotoImageView.alpha=0.8;
         
         UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
+        CAShapeLayer *lineOnImage=[self drawline:CGPointMake(0, 0) :CGPointMake(320, 0)];
+        lineOnImage.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
+        lineOnImage.lineWidth = 0.1;
+        lineOnImage.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
+
+        [_addPhotoImageView.layer addSublayer:lineOnImage];
+        
         [addImageButton setImage:[UIImage imageNamed:@"image.png"] forState:UIControlStateNormal];
         [_addPhotoImageView addSubview:addImageButton];
         UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(136,11, 100, 28)];
@@ -696,13 +691,16 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self.addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3) ];
 
         CAShapeLayer *line1=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
-        [self.layer addSublayer:line1];
+        [self.textView.layer addSublayer:line1];
         CAShapeLayer *line2=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];
-        [self.layer addSublayer:line2];
-        CAShapeLayer *line3=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
+        [self.textView.layer addSublayer:line2];
+        CAShapeLayer *line3=[self drawline:CGPointMake(0, 180) :CGPointMake(320, 180)];
         [self.textView.layer addSublayer:line3];
-        CAShapeLayer *line4=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];
+        CAShapeLayer *line4=[self drawline:CGPointMake(0, 240) :CGPointMake(320, 240)];
         [self.textView.layer addSublayer:line4];
+        
+        CAShapeLayer *line5=[self drawline:CGPointMake(0, 0) :CGPointMake(320, 0)];
+        [self.layer addSublayer:line5];
     }
     
     else {
@@ -720,11 +718,9 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
     shapeLayer.path = [path CGPath];
-    shapeLayer.strokeColor = [[UIColor grayColor] CGColor];
+    shapeLayer.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
     shapeLayer.lineWidth = 0.1;
-    shapeLayer.fillColor = [[UIColor grayColor] CGColor];
-    
-    //[self.layer addSublayer:shapeLayer];
+    shapeLayer.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
     return shapeLayer;
 }
 
@@ -732,7 +728,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 {
     return 28; // For really wide spacing; pick your own value
 }
-
+#pragma mark - Rating Delegate
 -(void)newRating:(DLStarRatingControl *)control :(float)rating {
 	//self.stars.text = [NSString stringWithFormat:@"%0.1f star rating",rating];
     NSLog(@"%@",[NSString stringWithFormat:@"%0.0f star rating",rating]);
@@ -745,8 +741,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 {
     if (_textView == nil) {
         CGRect frame = self.bounds;
-        frame.origin.y+=120;
-        frame.size.height-=120;
+//        frame.origin.y+=120;
+//        frame.size.height-=120;
         NSLog(@"%f %f",self.bounds.origin.x, self.bounds.origin.y);
         _textView = [[UITextView alloc] initWithFrame:frame];
         

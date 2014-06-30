@@ -11,11 +11,16 @@
 #import "LFSPostViewController.h"
 #import "LFRReplyViewController.h"
 #import "LFSDetailViewController.h"
+#import "DYRateView.h"
+#import "TSMessage.h"
+#import "TSMessageView.h"
 
 @interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSContentActionsDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
+
+-(void)viewReviewSelected;
 
 @end

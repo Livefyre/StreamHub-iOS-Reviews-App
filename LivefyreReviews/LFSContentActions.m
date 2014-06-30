@@ -135,7 +135,9 @@ const NSString* const LFSContentActionStrings1[LFS_CONTENT_ACTIONS_LENGTH1] =
         }
         else if  ([action isEqualToString:[LFSContentActionStrings[LFSContentActionEdit] capitalizedString]])
         {
-            // TODO: add edit widget
+//            if ([delegate respondsToSelector:@selector(editReview:)]) {
+//                [delegate editPostReview];
+//            }
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionFeature] capitalizedString]])
         {

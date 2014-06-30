@@ -31,8 +31,8 @@ static const CGFloat kCellContentLineSpacing = 6.f;
 static const CGFloat kCellContentTitleLineSpacing = 9.f;
 
 static NSString* const kCellBodyFontName = @"Georgia";
-static const CGFloat kCellBodyFontSize = 13.f;
-static const CGFloat kCellBodyTitleFontSize = 20.f;
+static const CGFloat kCellBodyFontSize = 18.f;
+static const CGFloat kCellBodyTitleFontSize = 24.f;
 
 static const CGFloat kCellHeaderTitleFontSize = 12.f;
 static const CGFloat kCellHeaderSubtitleFontSize = 11.f;
@@ -66,6 +66,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @property (readonly, nonatomic) UILabel *footerLeftView;
 @property (readonly, nonatomic) UILabel *footerRightView;
 @property (nonatomic, strong) UIImageView *attachmentImageView;
+
 
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
 
@@ -161,11 +162,18 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     CGFloat bodyTitleWidth = width - kCellPadding.left - kCellContentPaddingRight - (hasAttachment ? kAttachmentImageViewSize.width + kCellMinorHorizontalSeparator : 0.f);
     CGSize bodyTitleSize = [attributedText sizeConstrainedToSize:CGSizeMake(bodyTitleWidth, CGFLOAT_MAX)];
     
-   // CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+//    CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
 //    return (hasAttachment
 //            ? MAX(bodyTitleSize.height, 0) + deadHeight
 //            : bodyTitleSize.height);
     return bodyTitleSize.height;
+    
+    CGFloat bodyWidth = width - kCellPadding.left - kCellContentPaddingRight - (hasAttachment ? kAttachmentImageViewSize.width + kCellMinorHorizontalSeparator : 0.f);
+    CGSize bodySize = [attributedText sizeConstrainedToSize:CGSizeMake(bodyWidth, CGFLOAT_MAX)];
+    CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+    return (hasAttachment
+            ? MAX(bodySize.height, kAttachmentImageViewSize.height) + deadHeight
+            : bodySize.height + deadHeight);
 }
 
 
@@ -435,7 +443,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_small"] emptyStar:[UIImage imageNamed:@"icon_star_empty_small"]];
         _headerRatingView.padding = 3;
         _headerRatingView.alignment = RateViewAlignmentLeft;
-        _headerRatingView.editable = NO;
+        _headerRatingView.userInteractionEnabled = NO;
         _headerRatingView.delegate = self;
        // _headerRatingView.rate=4.5;
         // configure
@@ -735,12 +743,10 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }
     
     
-    [self.footerLeftView setText:@"4 of 24 found helpful"];
+    [self.footerLeftView setText:[NSString stringWithFormat:@"%lu of 24 found helpful",(unsigned long)[_content.likes count]]];
     [self.footerLeftView resizeVerticalBottomRightTrim];
-    
-    [self.footerRightView setText:@"3 Replies"];
+    [self.footerRightView setText:[NSString stringWithFormat:@"%lu Replies",(long)_content.nodeCount-1 ] ];
     [self.footerRightView resizeVerticalBottomRightTrim];
-    
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
     accessoryRightFrame.origin.x = leftColumnWidth;
@@ -768,17 +774,21 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 {
     
     //Body title
-    
+//    NSMutableAttributedString *attributedTitle=[ self getAttributedTextWithFormat:_content.title :24 :@"Georgia" :14];
+
+//     CGSize titleSize = [attributedTitle sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
     CGRect textTitleContentFrame;
     CGFloat leftTitleColumn = kCellPadding.left + _leftOffset;
     CGFloat rightTitleColumn = kCellContentPaddingRight ;
     
+    
+    NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(_content.title ?: @"")];
+
     textTitleContentFrame.origin = CGPointMake(leftTitleColumn,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
     textTitleContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
-                                       self.requiredBodyHeight - textTitleContentFrame.origin.y);
+                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(290.0f)]);
     [self.bodyTitleView setFrame:textTitleContentFrame];
-    
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
     // would go in the negative direction if frame origin y-value exceeded
@@ -793,14 +803,28 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     // so we take advantage of that by reusing _requiredBodyHeight
     BOOL hasAttachment = (self.attachmentImageView.hidden == NO);
     
-    CGRect textContentFrame;
+    
+        CGRect textContentFrame;
     CGFloat leftColumn = kCellPadding.left + _leftOffset;
     CGFloat rightColumn = kCellContentPaddingRight + (hasAttachment ? kAttachmentImageViewSize.width : 0.f);
+    NSMutableAttributedString *attributedbodyString=[LFSAttributedTextCell attributedStringFromHTMLString:(_content.bodyHtml ?: @"")];
     
-    textContentFrame.origin = CGPointMake(leftColumn,
-                                          kCellPadding.top +30+ kCellImageViewSize.height + kCellMinorVerticalSeparator);
-    textContentFrame.size = CGSizeMake(rect.size.width - leftColumn - rightColumn - (hasAttachment ? kCellMinorHorizontalSeparator : 0.f),
-                                       self.requiredBodyHeight+textContentFrame.size.height - textContentFrame.origin.y);
+    textContentFrame.origin = CGPointMake(leftTitleColumn,
+                                               kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator+textTitleContentFrame.size.height+15);
+    textContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
+                                            [LFSAttributedTextCell cellHeightForAttributedTitle:attributedbodyString hasAttachment:NO width:(290.0f)]);
+    
+
+    
+//    NSMutableAttributedString *attributedbody=[ self getAttributedTextWithFormat:_content.bodyHtml :24 :@"Georgia" :14];
+    
+//    CGSize bodySize = [[self.bodyView text] sizeWithAttributes:@{NSFontAttributeName:[self.bodyView font]}];
+
+    
+//    textContentFrame.origin = CGPointMake(leftColumn,
+//                                          kCellPadding.top +30+ kCellImageViewSize.height + kCellMinorVerticalSeparator);
+//    textContentFrame.size = CGSizeMake(rect.size.width - leftColumn - rightColumn - (hasAttachment ? kCellMinorHorizontalSeparator : 0.f),
+//                                       bodySize.height);
     [self.bodyView setFrame:textContentFrame];
     
     if (hasAttachment) {
@@ -819,14 +843,14 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     
     
     CGRect helpContentFrame;
-    helpContentFrame.origin = CGPointMake(leftColumn,self.requiredBodyHeight - textTitleContentFrame.origin.y+30);
+    helpContentFrame.origin = CGPointMake(leftColumn,self.requiredBodyHeight );
     helpContentFrame.size = CGSizeMake(150,40);
     [self.footerLeftView setFrame:helpContentFrame];
     
     CGSize textSize = [[self.footerLeftView text] sizeWithAttributes:@{NSFontAttributeName:[self.footerLeftView font]}];
     CGFloat strikeWidth = textSize.width;
     CGRect repliesContentFrame;
-    repliesContentFrame.origin=CGPointMake(leftColumn+strikeWidth +20, self.requiredBodyHeight - textTitleContentFrame.origin.y+30);
+    repliesContentFrame.origin=CGPointMake(leftColumn+strikeWidth +20, self.requiredBodyHeight);
     repliesContentFrame.size = CGSizeMake(100,40);
     [self.footerRightView setFrame:repliesContentFrame];
     
@@ -840,7 +864,20 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }
 }
 
-
+-(NSMutableAttributedString*)getAttributedTextWithFormat:(NSString*)text :(float) fontSize :(NSString*)fontName :(float)lineSpace{
+    NSMutableAttributedString *attributedText=[LFSBasicHTMLParser attributedStringByProcessingMarkupInString:text];
+    UIFont *textFont;
+    textFont = [UIFont fontWithName:fontName size:fontSize];
+    NSMutableParagraphStyle* paragraphStyle;
+    paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    [paragraphStyle setLineSpacing:lineSpace];
+    [attributedText setFont:textFont];
+    [attributedText addAttribute:NSParagraphStyleAttributeName
+                           value:paragraphStyle
+                           range:NSMakeRange(0u, [attributedText length])];
+    
+    return attributedText;
+}
 #pragma mark - Public methods
 
 - (void)setAttributedString:(NSMutableAttributedString *)attributedString

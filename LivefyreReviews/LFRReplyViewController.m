@@ -115,6 +115,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    self.navigationController.navigationBar.barTintColor=UIColorFromRGB(0xF6F6F6);
+//    [self.view setBackgroundColor:[UIColor whiteColor]];
     LFSAuthorProfile *author = self.user.profile;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     

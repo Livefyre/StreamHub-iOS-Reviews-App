@@ -20,6 +20,8 @@
 #import "LFSContentCollection.h"
 #import "LFRAppDelegate.h"
 #import "LFSDeletedCell.h"
+#import "DLStarRatingControl.h"
+
 
 
 
@@ -39,9 +41,9 @@
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 @property (nonatomic, readonly) LFSTextField *postCommentField;
 @property (nonatomic, strong) LFSPostViewController *postViewController;
-
+@property (nonatomic,assign)NSInteger oldCount;
 @property (nonatomic, strong) LFSUser *user;
-
+@property (nonatomic, strong) NSMutableArray *contentArray;
 
 @end
 
@@ -138,57 +140,25 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    _oldCount = 0;
     self.tableView.delegate=self;
     self.tableView.dataSource=self;
     [self setNeedsStatusBarAppearanceUpdate];
     _content = [[LFSContentCollection alloc] init];
     [_content setDelegate:self];
-    
+    _contentArray=[[NSMutableArray alloc]init];
     LFRConfig *config = [[LFRConfig alloc] initwithValues];
    // NSLog(@"%@",config.collections);
     self.collection=[[NSDictionary alloc]init];
     self.collection=[config.collections objectAtIndex:0];
 	// Do any additional setup after loading the view, typically from a nib.
-    //self.headerView.backgroundColor=UIColorFromRGB(0x2F3440);
     
    
+    ////notification/////
     
-    _scrollOffset = CGPointZero;
+    
+    
 
-    CGFloat textFieldWidth =
-    self.navigationController.navigationBar.frame.size.width -
-    (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70) ? 32.f : 25.f);
-    
-    BOOL isPortrait = UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication]
-                                                        statusBarOrientation]);
-   _postCommentField= [[LFSTextField alloc]
-                         initWithFrame:
-                         CGRectMake(0.f, 0.f, textFieldWidth, (isPortrait ? 30.f : 18.f))];
-    
-    [_postCommentField setDelegate:self];
-    [_postCommentField setPlaceholder:@"Write a review…"];
-    
-    
-    UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
-                                         initWithCustomView:_postCommentField];
-    [self setToolbarItems:
-     [NSArray arrayWithObjects:writeCommentItem, nil]];
-    
-    UIToolbar *toolbar = self.navigationController.toolbar;
-    [toolbar setBackgroundColor:[UIColor clearColor]];
-    [toolbar setBarStyle:UIBarStyleDefault];
-    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70))
-    {
-        // iOS7
-        [toolbar setBackgroundColor:[UIColor clearColor]];
-        [toolbar setTranslucent:YES];
-    }
-    else
-    {
-        // iOS6
-        [toolbar setBarStyle:UIBarStyleDefault];
-        //[toolbar setTintColor:[UIColor lightGrayColor]];
-    }
 #ifdef CACHE_SCALED_IMAGES
     _imageCache = [[NSCache alloc] init];
 #endif
@@ -413,7 +383,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [headDocument objectForKey:@"event"];
-             
+             _oldCount=_content.count;
              //NSLog(@"%@", responseObject);
              
              // we are already on the main queue...
@@ -442,30 +412,206 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     UITableView *tableView = self.tableView;
     
-//    NSMutableArray *parentId=[[NSMutableArray alloc]init];
-//    for (NSString *contentUrl in _content.allKeys) {
-//        if ( [[_content valueForKey:contentUrl] valueForKey:@"parentId"]) {
-//           [parentId addObject:[[_content valueForKey:contentUrl] valueForKey:@"parentId"]];
+    
+//    [tableView beginUpdates];
+//    [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
+//    [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
+//    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
+//    [tableView endUpdates];
+
+    int count=0;
+    float rating=0;
+    if(_content.count){
+        //// newCount Calculating here
+        //
+        if(_oldCount>[_content count])
+            _oldCount=[_content count];
+        if (_oldCount<[_content count] && _oldCount!=0) {
+            [TSMessage dismissActiveNotification];
+            [TSMessage showNotificationInViewController:self
+                    title:[ NSString stringWithFormat:@"%lu",(unsigned long)(_content.count-_oldCount)]
+                    subtitle:nil//NSLocalizedString(@"Please update our app. We would be very thankful", nil)
+                    image:nil
+                    type:TSMessageNotificationTypeMessage
+                    duration:TSMessageNotificationDurationEndless
+                    callback:nil
+                    buttonTitle:NSLocalizedString(@"New Reviews", nil)
+                    buttonCallback:^{
+                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
+                                              atScrollPosition:UITableViewScrollPositionTop
+                                                      animated:YES];
+
+                        
+                       
+                    }
+                    atPosition:TSMessageNotificationPositionTop
+                    canBeDismissedByUser:YES];
+            
+            _oldCount=[_content count];
+
+        }
+        //
+        [_contentArray removeAllObjects];
+        for (int index=0;index<[_content count] ; index++) {
+            LFSContent *content=[_content objectAtIndex:index];
+            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
+                count++;
+                rating=[[[content.annotations objectForKey:@"rating"]objectAtIndex:0] floatValue]/20;
+                NSLog(@"%f",rating);
+            }
+            if ([content.parentId isEqual:@""]) {
+                [_contentArray addObject:content];
+            }
+        }
+    }
+    if (count == 1) {
+        DYRateView *headerRatingView=[[DYRateView alloc]init];
+        UILabel *reviewLabel=[[UILabel alloc]initWithFrame:CGRectMake(30, self.navigationController.navigationBar.frame.size.height/2, 95, 30)];
+        reviewLabel.text=@"Your Review";
+        reviewLabel.font=[UIFont fontWithName:@"helvetica neue regular" size:16];
+        [reviewLabel setTextColor:UIColorFromRGB(0x777777)];
+        
+        headerRatingView=[[DYRateView alloc] initWithFrame:CGRectMake(135, self.navigationController.navigationBar.frame.size.height/2, 135, 15) fullStar:[UIImage imageNamed:@"icon_star_small.png"] emptyStar:[UIImage imageNamed:@"smallEmptyStar.png"]];
+        headerRatingView.padding = 3;
+        headerRatingView.alignment = RateViewAlignmentLeft;
+        headerRatingView.userInteractionEnabled=NO;
+        headerRatingView.rate=rating;
+        
+        UIButton *viewButton=[[UIButton alloc]initWithFrame:CGRectMake(290, self.navigationController.navigationBar.frame.size.height/2, 40, 30)];
+        [viewButton setTitle:@"View" forState:UIControlStateNormal];
+        
+        [viewButton addTarget:self action:@selector(viewReviewSelected) forControlEvents:UIControlEventTouchUpInside];
+        [viewButton.titleLabel setFont:[UIFont fontWithName:@"helvetica neue medium" size:16]];
+        [viewButton.titleLabel setTextColor:UIColorFromRGB(0x0F98EC)];
+        self.navigationController.navigationBar.barTintColor = [UIColor blackColor];
+        //        UIBarButtonItem *spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+        //        spacer.width = 50; // for example shift right bar button to the right
+        //
+        //        self.navigationItem.rightBarButtonItems = @[spacer, viewButton];
+        
+        //   self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithCustomView:viewButton];
+        UIBarButtonItem *viewButtonOnRating=[[UIBarButtonItem alloc]initWithCustomView:viewButton];
+        UIBarButtonItem *starRating=[[UIBarButtonItem alloc]initWithCustomView:headerRatingView];
+        UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]initWithCustomView:reviewLabel];
+        [self setToolbarItems:[NSArray arrayWithObjects:writeCommentItem,starRating,viewButtonOnRating,nil]];
+        UIToolbar *toolbar = self.navigationController.toolbar;
+        [toolbar setBackgroundColor:[UIColor clearColor]];
+        [toolbar setBarStyle:UIBarStyleDefault];
+        headerRatingView.userInteractionEnabled=NO;
+        if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70))
+        {
+            // iOS7
+            [toolbar setBackgroundColor:[UIColor clearColor]];
+            [toolbar setTranslucent:YES];
+        }
+        else
+        {
+            // iOS6
+            [toolbar setBarStyle:UIBarStyleDefault];
+            //[toolbar setTintColor:[UIColor lightGrayColor]];
+        }
+    }
+    else{
+        _scrollOffset = CGPointZero;
+        
+        CGFloat textFieldWidth =
+        self.navigationController.navigationBar.frame.size.width -
+        (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70) ? 32.f : 25.f);
+        
+        BOOL isPortrait = UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication]
+                                                            statusBarOrientation]);
+        _postCommentField= [[LFSTextField alloc]
+                            initWithFrame:
+                            CGRectMake(0.f, 0.f, textFieldWidth, (isPortrait ? 30.f : 18.f))];
+        
+        [_postCommentField setDelegate:self];
+        [_postCommentField setPlaceholder:@"Write a review…"];
+        UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
+                                             initWithCustomView:_postCommentField];
+        [self setToolbarItems:
+         [NSArray arrayWithObjects:writeCommentItem, nil]];
+        
+        UIToolbar *toolbar = self.navigationController.toolbar;
+        [toolbar setBackgroundColor:[UIColor clearColor]];
+        [toolbar setBarStyle:UIBarStyleDefault];
+        if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70))
+        {
+            // iOS7
+            [toolbar setBackgroundColor:[UIColor clearColor]];
+            [toolbar setTranslucent:YES];
+        }
+        else
+        {
+            // iOS6
+            [toolbar setBarStyle:UIBarStyleDefault];
+            //[toolbar setTintColor:[UIColor lightGrayColor]];
+        }
+    }
+    
+    
+    
+    [tableView reloadData];
+
+}
+
+
+-(void)viewReviewSelected
+{
+    if(_contentArray.count){
+        for (int index=0;index<[_contentArray count] ; index++) {
+            LFSContent *content=[_contentArray objectAtIndex:index];
+            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
+                [self performSegueWithIdentifier:kCellSelectSegue sender:content];
+            }
+        }
+    }
+    
+//    // Make sure your segue name in storyboard is the same as this line
+//    if ([[segue identifier] isEqualToString:kCellSelectSegue])
+//    {
+//        // Get reference to the destination view controller
+//        if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
+//            if ([sender isKindOfClass:[UITableViewCell class]]) {
+//                LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
+//                NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+//                LFSDetailViewController *vc = segue.destinationViewController;
+//                
+//                // assign model object(s)
+//                LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
+//#ifdef CACHE_SCALED_IMAGES
+//                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
+//                                          ?: self.placeholderImage);
+//#else
+//                UIImage *avatarPreview = self.placeholderImage;
+//#endif
+//                [vc setContentItem:contentItem];
+//                [vc setAvatarImage:avatarPreview];
+//                [vc setCollection:self.collection];
+//                [vc setCollectionId:self.collectionId];
+//                [vc setHideStatusBar:self.prefersStatusBarHidden];
+//                [vc setUser:self.user];
+//                [vc setDelegate:self];
+//                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+//                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
+//                                                                        delegate:self]];
+//            }
 //        }
 //    }
-//  
-//    for (NSString *parent in parentId ){
-//        if ([parent isEqualToString:@""]) {
-// 
-//        }
-//    }
-    
-    
-    
-    [tableView beginUpdates];
-    [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
-    [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
-    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
-    [tableView endUpdates];
 
     
-   
-    //[tableView reloadData];
+    
+////    LFSContent *content=[_content objectAtIndex:indexpath];
+//    for (int indexpath=0;indexpath== [content.parentId isEqual:@""] & content.authorIsModerator; index++) {
+//        
+//    }
+//    LFSContent *content = [_content objectAtIndex:indexPath.row];
+//    
+//    
+//        // TODO: no need to get cell from index and back if we are not using segues
+//        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+    
+
 }
 
 
@@ -473,7 +619,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 -(NSIndexPath*)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
     LFSContentVisibility visibility = content.visibility;
     return (visibility == LFSContentVisibilityEveryone
             ? indexPath
@@ -482,7 +628,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
     LFSContentVisibility visibility = content.visibility;
     if (visibility == LFSContentVisibilityEveryone)
     {
@@ -496,7 +642,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CGFloat cellHeightValue;
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
     CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
     LFSContentVisibility visibility = content.visibility;
     if (visibility == LFSContentVisibilityEveryone || visibility == LFSContentVisibilityPendingDelete)
@@ -523,7 +669,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                                width:(tableView.bounds.size.width - leftOffset)];
            
             
-            cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:YES width:(tableView.bounds.size.width)];
+            cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(tableView.bounds.size.width)];
             
             
             objc_setAssociatedObject(content, &kAtttributedTextHeightKey,
@@ -540,7 +686,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //        cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
 //                                                    withLeftOffset:leftOffset];
     }
-    return cellHeightValue+20;
+    return cellHeightValue+45;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -561,7 +707,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //    }
 //
     
-    return [_content count];
+    return [_contentArray count];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -569,7 +715,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     // TODO: find out which content was created by current user
     // and only return "YES" for cells displaying that content
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
     LFSContentVisibility visibility = content.visibility;
     return (userToken  != nil &&
             visibility == LFSContentVisibilityEveryone);
@@ -680,12 +826,12 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-     LFSContent *content = [_content objectAtIndex:indexPath.row];
+     LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
      LFSContentVisibility visibility = LFSContentVisibilityEveryone;
 
     id returnedCell;
-   if ([content.parentId isEqualToString:@""]) {
-      
+//   if ([content.parentId isEqualToString:@""]) {
+    
     if (visibility == LFSContentVisibilityEveryone)
     {
         LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:kAttributedCellReuseIdentifier];
@@ -698,7 +844,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
       [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
   }
-    }
+//    }
     else
     {
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
@@ -736,7 +882,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 LFSDetailViewController *vc = segue.destinationViewController;
                 
                 // assign model object(s)
-                LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
+                LFSContent *contentItem = [_contentArray objectAtIndex:indexPath.row];
 #ifdef CACHE_SCALED_IMAGES
                 UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
                                           ?: self.placeholderImage);
@@ -753,6 +899,25 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
                 [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
                                                                         delegate:self]];
+            }else if([sender isKindOfClass:[LFSContent class]]){
+                LFSDetailViewController *vc = segue.destinationViewController;
+#ifdef CACHE_SCALED_IMAGES
+                UIImage *avatarPreview = ([_imageCache objectForKey:sender.author.idString]
+                                          ?: self.placeholderImage);
+#else
+                UIImage *avatarPreview = self.placeholderImage;
+#endif
+                [vc setContentItem:sender];
+                [vc setAvatarImage:avatarPreview];
+                [vc setCollection:self.collection];
+                [vc setCollectionId:self.collectionId];
+                [vc setHideStatusBar:self.prefersStatusBarHidden];
+                [vc setUser:self.user];
+                [vc setDelegate:self];
+                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+                [vc setContentActions:[[LFSContentActions alloc] initWithContent:sender
+                                                                        delegate:self]];
+
             }
         }
     }
@@ -768,7 +933,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                           ? @""
                           : @"This comment has been removed");
     
-    [cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
+    [cell.textLabel setText:[NSString stringWithFormat:@"%@ (%ld)", bodyText, (long)content.nodeCount]];
     [cell.textLabel setText:bodyText];
 }
 
@@ -800,11 +965,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     NSNumber *rating=[[content.annotations objectForKey:@"rating"]objectAtIndex:0];
     NSString *title = author.displayName ?: @"";
     
+    cell.content=content;
 //    [cell setProfileLocal:[[LFSResource alloc]
 //                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
 //                           attribute:AttributeObjectFromContent(content)
 //                           displayString:title
 //                           icon:nil]];
+    
     
     [cell setProfileLocal:[[LFSResource alloc]initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")attribute:AttributeObjectFromContent(content)displayString:title icon:nil rating:rating]];
 }
@@ -1029,6 +1196,71 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                otherButtonTitles:nil] show];
          }];
     }
+}
+-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    NSString *contentId = content.idString;
+    LFSContentVisibility visibility = content.visibility;
+    
+    [self.writeClient postMessage:message
+                       forContent:content.idString
+                     inCollection:self.collectionId
+                        userToken:userToken
+                       parameters:nil
+                        onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         /*
+          NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
+          @"Wrong content Id received");
+          
+          // Note: sometimes we get an object like this:
+          {
+          collections =     (
+          10726472
+          );
+          messageId = "051d17a631d943f58705e4ad974f4131@livefyre.com";
+          }
+          */
+         
+         NSUInteger row = [_content indexOfKey:contentId ];
+         if (row != NSNotFound) {
+             [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
+             [self.navigationController popToRootViewControllerAnimated:YES];
+         }
+         
+     }
+     
+                        onFailure:^(NSOperation *operation, NSError *error)
+     {
+         // show an error message
+         [[[UIAlertView alloc]
+           initWithTitle:kFailureModifyTitle
+           message:[error localizedRecoverySuggestion]
+           delegate:nil
+           cancelButtonTitle:@"OK"
+           otherButtonTitles:nil] show];
+         
+         // check if an object with the cached id still exists in the model
+         // and if so, revert to its previous visibility state. This check is necessary
+         // because it is conceivable that the streaming client has already deleted
+         // the content object
+         NSUInteger newContentIndex = [_content indexOfKey:contentId];
+         if (newContentIndex != NSNotFound)
+         {
+             [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
+             
+             // obtain new index path since it could have changed during the time
+             // it toook for the error response to come back
+             [self didUpdateModelWithDeletes:nil
+                                     updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
+                                     inserts:nil];
+         }
+     }];
+}
+-(void)editReview:(LFSContent*)content
+{
+    
 }
 
 #pragma mark - LFSPostViewControllerDelegate

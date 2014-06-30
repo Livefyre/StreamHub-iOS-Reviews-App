@@ -11,6 +11,7 @@
 #import "LFSBasicHTMLLabel.h"
 #import "LFSResource.h"
 #import "DYRateView.h"
+#import "LFSContent.h"
 extern const CGSize kCellImageViewSize;
 extern const CGSize kAttachmentImageViewSize;
 
@@ -25,6 +26,7 @@ extern const CGSize kAttachmentImageViewSize;
 
 @property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
 @property (nonatomic, readonly) LFSBasicHTMLLabel *bodyTitleView;
+@property (nonatomic, weak) LFSContent *content;
 
 #pragma mark - UIApperance properties
 @property (nonatomic, strong) UIFont *headerTitleFont UI_APPEARANCE_SELECTOR;

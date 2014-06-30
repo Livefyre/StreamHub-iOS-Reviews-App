@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="CFD-JR-ayN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="CFD-JR-ayN">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -114,7 +114,7 @@
             </objects>
             <point key="canvasLocation" x="1502" y="96"/>
         </scene>
-        <!--Detail View Controller - Comment-->
+        <!--Detail View Controller - Review-->
         <scene sceneID="Hoi-00-bAB">
             <objects>
                 <viewController storyboardIdentifier="commentDetail" id="P8K-eY-Ebn" customClass="LFSDetailViewController" sceneMemberID="viewController">
@@ -130,7 +130,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </scrollView>
-                    <navigationItem key="navigationItem" title="Comment" id="eyC-4o-7C6"/>
+                    <navigationItem key="navigationItem" title="Review" id="eyC-4o-7C6"/>
                     <connections>
                         <outlet property="detailView" destination="IFA-al-nz6" id="Me7-gz-rFn"/>
                         <outlet property="scrollView" destination="6pP-yb-7n0" id="Cgz-cj-9HR"/>
@@ -156,7 +156,7 @@
                                     <offsetWrapper key="textShadowOffset" horizontal="0.0" vertical="0.0"/>
                                 </textAttributes>
                                 <items>
-                                    <navigationItem title="New Review" id="v0i-D6-7h3">
+                                    <navigationItem title="Reply" id="v0i-D6-7h3">
                                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="dap-ji-mKC">
                                             <connections>
                                                 <action selector="cancelClicked:" destination="gEL-zJ-XBW" id="uyT-MA-xwl"/>
