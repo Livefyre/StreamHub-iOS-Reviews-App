@@ -10,12 +10,12 @@
 #import "LFSContentCollection.h"
 #import "LFSPostViewController.h"
 #import "LFRReplyViewController.h"
-#import "LFSDetailViewController.h"
+#import "LFRDetailViewController.h"
 #import "DYRateView.h"
 #import "TSMessage.h"
 #import "TSMessageView.h"
 
-@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSContentActionsDelegate>
+@interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSContentCollectionDelegate,Delete>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @property (nonatomic, copy) NSDictionary *collection;

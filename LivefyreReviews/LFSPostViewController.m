@@ -114,12 +114,13 @@
 {
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    self.navigationController.navigationBar.barTintColor=UIColorFromRGB(0xF6F6F6);
 
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.writeCommentView.textView becomeFirstResponder];
     
     if (self.replyToContent != nil) {
-        [self.postNavbar.topItem setTitle:@"Reply"];
+        [self.postNavbar.topItem setTitle:@"NewReview"];
         
         _authorHandles = nil;
         NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];

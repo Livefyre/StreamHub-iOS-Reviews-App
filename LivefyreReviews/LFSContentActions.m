@@ -106,6 +106,7 @@ const NSString* const LFSContentActionStrings1[LFS_CONTENT_ACTIONS_LENGTH1] =
 }
 
 
+
 #pragma mark - UIActionSheetDelegate
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -135,9 +136,9 @@ const NSString* const LFSContentActionStrings1[LFS_CONTENT_ACTIONS_LENGTH1] =
         }
         else if  ([action isEqualToString:[LFSContentActionStrings[LFSContentActionEdit] capitalizedString]])
         {
-//            if ([delegate respondsToSelector:@selector(editReview:)]) {
-//                [delegate editPostReview];
-//            }
+            if ([delegate respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
+                [delegate editReviewOfContent:LFSMessageEdit   forContent:self.contentItem];
+            }
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionFeature] capitalizedString]])
         {

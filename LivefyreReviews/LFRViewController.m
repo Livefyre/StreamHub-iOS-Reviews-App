@@ -152,8 +152,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     self.collection=[[NSDictionary alloc]init];
     self.collection=[config.collections objectAtIndex:0];
 	// Do any additional setup after loading the view, typically from a nib.
+    [self authenticateUser];
     
-   
     ////notification/////
     
     
@@ -345,11 +345,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     [self.adminClient authenticateUserWithToken:[self.collection objectForKey:@"lftoken"]
                                            site:[self.collection objectForKey:@"siteId"]
                                         article:[self.collection objectForKey:@"articleId"]
-                                      onSuccess:^(NSOperation *operation, id responseObject)
+      onSuccess:^(NSOperation *operation, id responseObject)
      {
          self.user = [[LFSUser alloc] initWithObject:responseObject];
+     
+     
      }
-                                      onFailure:^(NSOperation *operation, NSError *error)
+      onFailure:^(NSOperation *operation, NSError *error)
      {
          NSLog(@"Could not authenticate user against collection");
      }];
@@ -366,18 +368,12 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [_content removeAllObjects];
         
         //[self startSpinning];
-        
-//        [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
-//                                     article:[self.collection objectForKey:@"articleId"]
-//                                   onSuccess:^(NSOperation *operation, id responseObject)
-        
-        
-        
+             
         [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"] article:[self.collection objectForKey:@"articleId"] onSuccess:^(NSOperation *operation, id responseObject)
 
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-            
+             
              [_content addContent:[headDocument objectForKey:@"content"]
                       withAuthors:[headDocument objectForKey:@"authors"]];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
@@ -450,6 +446,10 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             _oldCount=[_content count];
 
         }
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"ToDetail"
+         object:_content];
+
         //
         [_contentArray removeAllObjects];
         for (int index=0;index<[_content count] ; index++) {
@@ -484,12 +484,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [viewButton.titleLabel setFont:[UIFont fontWithName:@"helvetica neue medium" size:16]];
         [viewButton.titleLabel setTextColor:UIColorFromRGB(0x0F98EC)];
         self.navigationController.navigationBar.barTintColor = [UIColor blackColor];
-        //        UIBarButtonItem *spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        //        spacer.width = 50; // for example shift right bar button to the right
-        //
-        //        self.navigationItem.rightBarButtonItems = @[spacer, viewButton];
-        
-        //   self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithCustomView:viewButton];
         UIBarButtonItem *viewButtonOnRating=[[UIBarButtonItem alloc]initWithCustomView:viewButton];
         UIBarButtonItem *starRating=[[UIBarButtonItem alloc]initWithCustomView:headerRatingView];
         UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]initWithCustomView:reviewLabel];
@@ -554,65 +548,72 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 }
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
+    LFSContentVisibility visibility = content.visibility;
+    if (visibility == LFSContentVisibilityEveryone)
+    {
+        
+        UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        detailViewController.deletedContent=self;
+        detailViewController.collection=self.collection;
+        detailViewController.collectionId=self.collectionId;
+        detailViewController.contentItem=content;
+        NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+        [chaildContent addObject:content];
+        for (int i=0; i<[_content count]; i++) {
+            LFSContent *singleContent=[_content objectAtIndex:i];
+            if ([singleContent.parentId isEqual:content.idString]) {
+                [chaildContent addObject:singleContent];
+            }
+        }
+        detailViewController.mainContent=chaildContent;
+        [self.navigationController setToolbarHidden:YES animated:YES];
+
+
+    }
+}
 
 -(void)viewReviewSelected
 {
+//    if(_contentArray.count){
+//        for (int index=0;index<[_contentArray count] ; index++) {
+//            LFSContent *content=[_contentArray objectAtIndex:index];
+//            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
+//                [self performSegueWithIdentifier:kCellSelectSegue sender:content];
+//            }
+//        }
+//    }
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
             if ([content.parentId isEqual:@""] & content.authorIsModerator) {
-                [self performSegueWithIdentifier:kCellSelectSegue sender:content];
+                UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
+                [self.navigationController pushViewController:detailViewController animated:YES];
+                detailViewController.deletedContent=self;
+                detailViewController.collection=self.collection;
+                detailViewController.collectionId=self.collectionId;
+                detailViewController.contentItem=content;
+                [self.navigationController
+                 setToolbarHidden:YES
+                 animated:YES];
+                
+                
+                
             }
         }
     }
-    
-//    // Make sure your segue name in storyboard is the same as this line
-//    if ([[segue identifier] isEqualToString:kCellSelectSegue])
-//    {
-//        // Get reference to the destination view controller
-//        if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
-//            if ([sender isKindOfClass:[UITableViewCell class]]) {
-//                LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
-//                NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-//                LFSDetailViewController *vc = segue.destinationViewController;
-//                
-//                // assign model object(s)
-//                LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
-//#ifdef CACHE_SCALED_IMAGES
-//                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
-//                                          ?: self.placeholderImage);
-//#else
-//                UIImage *avatarPreview = self.placeholderImage;
-//#endif
-//                [vc setContentItem:contentItem];
-//                [vc setAvatarImage:avatarPreview];
-//                [vc setCollection:self.collection];
-//                [vc setCollectionId:self.collectionId];
-//                [vc setHideStatusBar:self.prefersStatusBarHidden];
-//                [vc setUser:self.user];
-//                [vc setDelegate:self];
-//                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
-//                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
-//                                                                        delegate:self]];
-//            }
-//        }
-//    }
 
-    
-    
-////    LFSContent *content=[_content objectAtIndex:indexpath];
-//    for (int indexpath=0;indexpath== [content.parentId isEqual:@""] & content.authorIsModerator; index++) {
-//        
-//    }
-//    LFSContent *content = [_content objectAtIndex:indexPath.row];
-//    
-//    
-//        // TODO: no need to get cell from index and back if we are not using segues
-//        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-//        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
-    
+
 
 }
+
+
+
 
 
 #pragma mark - Table view data source
@@ -626,17 +627,17 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             : nil);
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
-    LFSContentVisibility visibility = content.visibility;
-    if (visibility == LFSContentVisibilityEveryone)
-    {
-        // TODO: no need to get cell from index and back if we are not using segues
-        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
-    }
-}
+//-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
+//    LFSContentVisibility visibility = content.visibility;
+//    if (visibility == LFSContentVisibilityEveryone)
+//    {
+//        // TODO: no need to get cell from index and back if we are not using segues
+//        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+//    }
+//}
 
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -875,48 +876,82 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if ([[segue identifier] isEqualToString:kCellSelectSegue])
     {
         // Get reference to the destination view controller
-        if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
+        if ([segue.destinationViewController isKindOfClass:[LFRDetailViewController class]]) {
             if ([sender isKindOfClass:[UITableViewCell class]]) {
                 LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
                 NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-                LFSDetailViewController *vc = segue.destinationViewController;
+                LFRDetailViewController *vc = segue.destinationViewController;
                 
                 // assign model object(s)
                 LFSContent *contentItem = [_contentArray objectAtIndex:indexPath.row];
-#ifdef CACHE_SCALED_IMAGES
-                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
-                                          ?: self.placeholderImage);
-#else
-                UIImage *avatarPreview = self.placeholderImage;
-#endif
-                [vc setContentItem:contentItem];
-                [vc setAvatarImage:avatarPreview];
-                [vc setCollection:self.collection];
-                [vc setCollectionId:self.collectionId];
-                [vc setHideStatusBar:self.prefersStatusBarHidden];
-                [vc setUser:self.user];
-                [vc setDelegate:self];
-                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
-                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
-                                                                        delegate:self]];
+//#ifdef CACHE_SCALED_IMAGES
+//                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
+//                                          ?: self.placeholderImage);
+//#else
+//                UIImage *avatarPreview = self.placeholderImage;
+//#endif
+                
+                
+                
+                vc.deletedContent=self;
+                vc.collection=self.collection;
+                vc.collectionId=self.collectionId;
+                vc.contentItem=contentItem;
+                NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+                [chaildContent addObject:contentItem];
+                for (int i=0; i<[_content count]; i++) {
+                    LFSContent *singleContent=[_content objectAtIndex:i];
+                    if ([singleContent.parentId isEqual:contentItem.idString]) {
+                        [chaildContent addObject:singleContent];
+                    }
+                }
+                vc.mainContent=chaildContent;
+                
+//                [vc setContentItem:contentItem];
+//                [vc setAvatarImage:avatarPreview];
+//                [vc setCollection:self.collection];
+//                [vc setCollectionId:self.collectionId];
+//                [vc setHideStatusBar:self.prefersStatusBarHidden];
+//                [vc setUser:self.user];
+//                [vc setDelegate:self];
+//                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+//                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
+//                                                                        delegate:self]];
             }else if([sender isKindOfClass:[LFSContent class]]){
-                LFSDetailViewController *vc = segue.destinationViewController;
-#ifdef CACHE_SCALED_IMAGES
-                UIImage *avatarPreview = ([_imageCache objectForKey:sender.author.idString]
-                                          ?: self.placeholderImage);
-#else
-                UIImage *avatarPreview = self.placeholderImage;
-#endif
-                [vc setContentItem:sender];
-                [vc setAvatarImage:avatarPreview];
-                [vc setCollection:self.collection];
-                [vc setCollectionId:self.collectionId];
-                [vc setHideStatusBar:self.prefersStatusBarHidden];
-                [vc setUser:self.user];
-                [vc setDelegate:self];
-                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
-                [vc setContentActions:[[LFSContentActions alloc] initWithContent:sender
-                                                                        delegate:self]];
+                LFRDetailViewController *vc = segue.destinationViewController;
+//#ifdef CACHE_SCALED_IMAGES
+//                UIImage *avatarPreview = ([_imageCache objectForKey:sender.author.idString]
+//                                          ?: self.placeholderImage);
+//#else
+//                UIImage *avatarPreview = self.placeholderImage;
+//#endif
+                LFSContent *contentItem=(LFSContent*)sender;
+                
+                vc.deletedContent=self;
+                vc.collection=self.collection;
+                vc.collectionId=self.collectionId;
+                vc.contentItem=contentItem;
+                NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+                [chaildContent addObject:sender];
+                for (int i=0; i<[_content count]; i++) {
+                    LFSContent *singleContent=[_content objectAtIndex:i];
+                    if ([singleContent.parentId isEqual:contentItem.idString]) {
+                        [chaildContent addObject:singleContent];
+                    }
+                }
+                vc.mainContent=chaildContent;
+                
+                
+//                [vc setContentItem:sender];
+//                [vc setAvatarImage:avatarPreview];
+//                [vc setCollection:self.collection];
+//                [vc setCollectionId:self.collectionId];
+//                [vc setHideStatusBar:self.prefersStatusBarHidden];
+//                [vc setUser:self.user];
+//                [vc setDelegate:self];
+//                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+//                [vc setContentActions:[[LFSContentActions alloc] initWithContent:sender
+//                                                                        delegate:self]];
 
             }
         }
@@ -1258,11 +1293,22 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
          }
      }];
 }
--(void)editReview:(LFSContent*)content
+-(void)editReviewOfContent:(LFSContent *)content
 {
-    
+    if (content.authorIsModerator) {
+        NSLog(@"%@",content);
+        [self.postViewController setCollection:self.collection];
+        [self.postViewController setCollectionId:self.collectionId];
+        [self.postViewController setAvatarImage:self.placeholderImage];
+        [self.postViewController setUser:self.user];
+        //        [self.postViewController setTitle:[content valueForKey:@"title"]];
+        //        [self.postViewController setrating]
+        
+        [self.navigationController presentViewController:self.postViewController
+                                                animated:YES
+                                              completion:nil];
+    }
 }
-
 #pragma mark - LFSPostViewControllerDelegate
 -(id<LFSPostViewControllerDelegate>)viewController
 {

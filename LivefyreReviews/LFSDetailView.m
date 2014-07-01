@@ -44,8 +44,8 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 // TODO: calculate avatar size based on pixel image size
 static const CGSize  kDetailImageViewSize = { .width=38.0f, .height=38.0f };
-static const CGFloat kDetailImageCornerRadius = 4.f;
-static const CGFloat kDetailImageMarginRight = 8.0f;
+static const CGFloat kDetailImageCornerRadius = 3.f;
+static const CGFloat kDetailImageMarginRight = 20.0f;
 
 static const CGFloat kDetailFooterHeight = 21.0f;
 
@@ -316,12 +316,12 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
             && ([UIScreen mainScreen].scale == 2.f))
         {
             // Retina display, okay to use half-points
-            avatarViewSize = CGSizeMake(37.5f, 37.5f);
+            avatarViewSize = CGSizeMake(48.0f, 48.0f);
         }
         else
         {
             // non-Retina display, do not use half-points
-            avatarViewSize = CGSizeMake(37.f, 37.f);
+            avatarViewSize = CGSizeMake(48.f, 48.f);
         }
         CGRect frame;
         frame.origin = CGPointMake(kDetailPadding.left, kDetailPadding.top);

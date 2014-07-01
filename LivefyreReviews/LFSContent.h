@@ -24,7 +24,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, strong) id object;
 @property (nonatomic, copy) NSString *idString;
-
+@property (nonatomic, strong)NSArray *vote;
 @property (nonatomic, assign) NSUInteger index;
 
 @property (nonatomic, readonly) BOOL authorIsModerator;
@@ -57,6 +57,8 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, assign) NSUInteger contentSource;
 
 @property (nonatomic, strong) NSMutableSet *likes;
+//@property (nonatomic,strong) NSMutableSet *Vote;
+
 @property (nonatomic, copy) NSMutableArray *datePath;
 
 @property (nonatomic, strong) NSArray *childContent;

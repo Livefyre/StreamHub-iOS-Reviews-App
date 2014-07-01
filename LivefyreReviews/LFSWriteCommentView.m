@@ -17,7 +17,7 @@ static const UIEdgeInsets kDetailPadding = {
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=255.f, .left=7.f, .bottom=80.f, .right=5.f
+    .top=255.f, .left=7.f, .bottom=80.f, .right=15.f
 };
 
 // header font settings
@@ -304,7 +304,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         frame.origin.x -= kPostContentInset.left;
     }
 
-    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 50) andStars:5 isFractional:NO];
+    _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 60) andStars:5 isFractional:NO];
     _starView.rating=0;
 //   self.starView.delegate=self;
     [self.textView addSubview:_starView];
@@ -361,11 +361,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    95+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
-//        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
-//            // iOS6
-//            frame.origin.y -= kPostContentInset.top;
-//            frame.origin.x -= kPostContentInset.left;
-//        }
+
         
         // initialize
         _prosTextField = [[UITextField alloc] initWithFrame:frame];
@@ -508,7 +504,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         _addPhotoImageView.alpha=0.8;
         
         UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
-        CAShapeLayer *lineOnImage=[self drawline:CGPointMake(0, 0) :CGPointMake(320, 0)];
+        CAShapeLayer *lineOnImage=[self drawline:CGPointMake(0, -3) :CGPointMake(320, -3  )];
         lineOnImage.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
         lineOnImage.lineWidth = 0.1;
         lineOnImage.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];

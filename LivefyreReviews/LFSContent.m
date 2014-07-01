@@ -136,6 +136,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 
 @synthesize datePath = _datePath;
 @synthesize likes = _likes;
+//@synthesize Vote=_Vote;
 @synthesize nodeCount = _nodeCount;
 @synthesize parent = _parent;
 @synthesize index = _index;
@@ -192,6 +193,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 @synthLazyWithNull(NSString, authorId, self.content, @"authorId")
 @synthLazyWithNull(NSNumber, rating, self.content, @"rating")
 @synthLazyWithNull(NSNumber, eventId, _object, @"event")
+@synthLazyWithNull(NSArray, vote, self.content, @"vote")
 
 #pragma mark -
 @synthesize firstOembed = _firstOembed;
@@ -551,7 +553,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     _eventId = nil;
     _rating=nil;
     _title=nil;
-    
+    _vote=nil;
     _lastVisIsSet = NO;
     _visibilityIsSet = NO;
     _contentSourceIsSet = NO;

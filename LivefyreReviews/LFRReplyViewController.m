@@ -115,11 +115,12 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.navigationController.navigationBar.barTintColor=UIColorFromRGB(0xF6F6F6);
-//    [self.view setBackgroundColor:[UIColor whiteColor]];
+  
+    
+
     LFSAuthorProfile *author = self.user.profile;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    
+    self.navigationController.navigationBar.barTintColor=UIColorFromRGB(0xF6F3F1);
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.WriteCommentView.textView becomeFirstResponder];
     
@@ -130,7 +131,6 @@
         NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];
         if (replyPrefix != nil) {
             
-          
             NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
             paragraphStyle.alignment = NSTextAlignmentCenter;
             paragraphStyle.lineSpacing = REPLY_FONT_SIZE/2;

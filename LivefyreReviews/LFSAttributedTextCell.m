@@ -741,9 +741,14 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     else {
         // no header
     }
-    
-    
-    [self.footerLeftView setText:[NSString stringWithFormat:@"%lu of 24 found helpful",(unsigned long)[_content.likes count]]];
+    int count=0;
+    NSArray *votes=[[NSArray alloc]initWithArray:[_content.annotations objectForKey:@"vote" ]];
+    for (NSDictionary *voteObject in votes) {
+        if ([[voteObject valueForKey:@"value"] integerValue] ==1) {
+            count++;
+        }[voteObject valueForKey:@"value"];
+    }
+    [self.footerLeftView setText:[NSString stringWithFormat:@"%d of %ld found helpful",count,(unsigned long)[[_content.annotations objectForKey:@"vote" ] count]]];
     [self.footerLeftView resizeVerticalBottomRightTrim];
     [self.footerRightView setText:[NSString stringWithFormat:@"%lu Replies",(long)_content.nodeCount-1 ] ];
     [self.footerRightView resizeVerticalBottomRightTrim];
