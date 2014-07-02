@@ -368,7 +368,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
       onSuccess:^(NSOperation *operation, id responseObject)
      {
          self.user = [[LFSUser alloc] initWithObject:responseObject];
-     
+        [self showStatusBarWithReview];
      
      }
       onFailure:^(NSOperation *operation, NSError *error)
@@ -435,8 +435,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
 //    [tableView endUpdates];
 
-    int count=0;
-    float rating=0;
+    
     if(_content.count){
         //// newCount Calculating here
         //
@@ -489,18 +488,28 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             [tableView reloadData];
         }
         //    [tableView reloadData];
-        
-        for (int index=0;index<[_content count] ; index++) {
-            LFSContent *content=[_content objectAtIndex:index];
-            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
-                count++;
-                rating=[[[content.annotations objectForKey:@"rating"]objectAtIndex:0] floatValue]/20;
-                NSLog(@"%f",rating);
-            }
-        }
         [[NSNotificationCenter defaultCenter]
          postNotificationName:@"ToDetail"
          object:_content];
+        [self showStatusBarWithReview];
+        
+            }
+    
+    
+    
+    [tableView reloadData];
+
+}
+-(void)showStatusBarWithReview{
+    int count=0;
+    float rating=0;
+    for (int index=0;index<[_contentArray count] ; index++) {
+        LFSContent *content=[_contentArray objectAtIndex:index];
+        if ([content.parentId isEqual:@""] && [content.author.idString isEqual: self.user.idString]) {
+            count++;
+            rating=[[[content.annotations objectForKey:@"rating"]objectAtIndex:0] floatValue]/20;
+            NSLog(@"%f",rating);
+        }
     }
     if (count == 1) {
         DYRateView *headerRatingView=[[DYRateView alloc]init];
@@ -518,7 +527,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         UIButton *viewButton=[[UIButton alloc]initWithFrame:CGRectMake(290, self.navigationController.navigationBar.frame.size.height/2, 40, 30)];
         [viewButton setTitle:@"View" forState:UIControlStateNormal];
         [viewButton.titleLabel setFont:[UIFont fontWithName:@"helvetica neue medium" size:16]];
-         [viewButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
+        [viewButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
         
         self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440);
         [viewButton addTarget:self action:@selector(viewReviewButtonSelected) forControlEvents:UIControlEventTouchUpInside];
@@ -580,13 +589,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             [toolbar setBarStyle:UIBarStyleDefault];
         }
     }
-    
-    
-    
-    [tableView reloadData];
 
 }
-
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
@@ -622,7 +626,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
-            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
+            if ([content.parentId isEqual:@""] & [content.author.idString isEqual:self.user.idString]) {
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
                 [self.navigationController pushViewController:detailViewController animated:YES];
