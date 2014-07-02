@@ -19,6 +19,8 @@
 -(void)featureContent:(LFSContent*)content;
 -(void)banAuthorOfContent:(LFSContent*)content;
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
+-(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
+
 @end
 
 @interface LFRDetailViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIActionSheetDelegate>

@@ -102,7 +102,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
         [navigationBar setTranslucent:NO];
         self.navigationController.title=@"Review";
-//        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyre_logo"]];
     }
 
 }
@@ -386,13 +385,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 
-//- (void)didSelectButton1:(id)sender
-//{
-//    self.actionSheet=[[UIActionSheet alloc]initWithTitle:@"Was this helpful?" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Yes" otherButtonTitles:@"No", nil];
-//     self.actionSheet.destructiveButtonIndex=1;
-//    [ self.actionSheet showInView:self.view];
-//    
-//}
 
 -(void)didSelectButton2:(id)sender{
     
@@ -415,6 +407,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+//    id<LFSContentActionsDelegate> delegate = self.delegate;
     //static NSString* const kFailureModifyTitle = @"Action Failed";
     
 
@@ -502,20 +495,27 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             {
                 if ([self.deletedContent respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
                     [self.deletedContent postDestructiveMessage:LFSMessageDelete forContent:self.contentItem];
-                }             }
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                }
+            }
             else if ([action isEqualToString:@"Ban User"])
             {
                 [self.deletedContent banAuthorOfContent:self.contentItem];
+                 [self.navigationController popToRootViewControllerAnimated:YES];
              }
             else if ([action isEqualToString:@"Bozo"])
             {
                 if ([self.deletedContent respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
                     [self.deletedContent postDestructiveMessage:LFSMessageBozo forContent:self.contentItem];
+                    [self.navigationController popToRootViewControllerAnimated:YES];
                 }
             }
             else if ([action isEqualToString:@"Edit"])
             {
-                //edit code here
+                if ([self.deletedContent respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
+                    [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem];
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                }
             }
             else if ([action isEqualToString:@"Feature"])
             {

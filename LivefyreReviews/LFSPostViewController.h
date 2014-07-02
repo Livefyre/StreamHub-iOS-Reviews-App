@@ -12,6 +12,7 @@
 #import "LFSUser.h"
 #import "LFSContent.h"
 #import "DYRateView.h"
+
 @protocol LFSPostViewControllerDelegate;
 
 @interface LFSPostViewController : UIViewController<DYRateViewDelegate>
@@ -23,8 +24,8 @@
 @property (nonatomic, strong) LFSUser *user;
 @property (nonatomic, strong) UIImage *avatarImage;
 
-@property (nonatomic, weak) id<LFSPostViewControllerDelegate> delegate;
 
+@property (nonatomic, weak) id<LFSPostViewControllerDelegate> delegate;
 @end
 
 

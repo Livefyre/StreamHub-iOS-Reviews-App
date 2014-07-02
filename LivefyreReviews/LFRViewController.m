@@ -190,8 +190,11 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
         self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440) ;
         [navigationBar setTranslucent:NO];
-        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyrelogo.png"]];
         
+        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyrelogo.png"]];
+//        [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
+        
+
     }
     [self authenticateUser];
     [self startStreamWithBoostrap];
@@ -302,11 +305,28 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 
 #pragma mark - Toolbar behavior
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (scrollView.contentOffset.y == 0){
+        [_contentArray removeAllObjects];
+        
+        for (int index=0;index<[_content count] ; index++) {
+            LFSContent *content=[_content objectAtIndex:index];
+            if ([content.parentId isEqual:@""]) {
+                [_contentArray addObject:content];
+            }
+        }
+        [TSMessage dismissActiveNotification];
+        [self.tableView reloadData];
+        
+    }
+    
+}
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     [self.navigationController
      setToolbarHidden:(scrollView.contentOffset.y <= _scrollOffset.y)
      animated:YES];
+//    [viewButton.titleLabel setTextColor:UIColorFromRGB(0x0F98EC)];
 }
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
@@ -420,38 +440,56 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_content.count){
         //// newCount Calculating here
         //
-        if(_oldCount>[_content count])
-            _oldCount=[_content count];
-        if (_oldCount<[_content count] && _oldCount!=0) {
+        int newCount=0;
+        for (int index=0;index<[_content count] ; index++) {
+            LFSContent *content=[_content objectAtIndex:index];
+            if ([content.parentId isEqual:@""]) {
+                newCount++;
+            }
+        }
+        if (_contentArray.count<newCount && _contentArray.count!=0 && tableView.contentOffset.y!=0) {
             [TSMessage dismissActiveNotification];
             [TSMessage showNotificationInViewController:self
-                    title:[ NSString stringWithFormat:@"%lu",(unsigned long)(_content.count-_oldCount)]
-                    subtitle:nil//NSLocalizedString(@"Please update our app. We would be very thankful", nil)
-                    image:nil
-                    type:TSMessageNotificationTypeMessage
-                    duration:TSMessageNotificationDurationEndless
-                    callback:nil
-                    buttonTitle:NSLocalizedString(@"New Reviews", nil)
-                    buttonCallback:^{
-                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
-                                              atScrollPosition:UITableViewScrollPositionTop
-                                                      animated:YES];
-
-                        
-                       
-                    }
-                    atPosition:TSMessageNotificationPositionTop
-                    canBeDismissedByUser:YES];
+                                                  title:[ NSString stringWithFormat:@"%lu",(unsigned long)(newCount-_contentArray.count)]
+                                               subtitle:nil//NSLocalizedString(@"Please update our app. We would be very thankful", nil)
+                                                  image:nil
+                                                   type:TSMessageNotificationTypeMessage
+                                               duration:TSMessageNotificationDurationEndless
+                                               callback:nil
+                                            buttonTitle:NSLocalizedString(@"New Reviews", nil)
+                                         buttonCallback:^{
+                                             
+                                             [_contentArray removeAllObjects];
+                                             
+                                             for (int index=0;index<[_content count] ; index++) {
+                                                 LFSContent *content=[_content objectAtIndex:index];
+                                                 if ([content.parentId isEqual:@""]) {
+                                                     [_contentArray addObject:content];
+                                                 }
+                                             }
+                                             [tableView reloadData];
+                                             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
+                                                                   atScrollPosition:UITableViewScrollPositionTop
+                                                                           animated:YES];
+                                             
+                                         }
+                                             atPosition:TSMessageNotificationPositionTop
+                                   canBeDismissedByUser:YES];
+            [tableView reloadData];
             
-            _oldCount=[_content count];
-
+        }else{
+            [_contentArray removeAllObjects];
+            
+            for (int index=0;index<[_content count] ; index++) {
+                LFSContent *content=[_content objectAtIndex:index];
+                if ([content.parentId isEqual:@""]) {
+                    [_contentArray addObject:content];
+                }
+            }
+            [tableView reloadData];
         }
-        [[NSNotificationCenter defaultCenter]
-         postNotificationName:@"ToDetail"
-         object:_content];
-
-        //
-        [_contentArray removeAllObjects];
+        //    [tableView reloadData];
+        
         for (int index=0;index<[_content count] ; index++) {
             LFSContent *content=[_content objectAtIndex:index];
             if ([content.parentId isEqual:@""] & content.authorIsModerator) {
@@ -459,10 +497,10 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 rating=[[[content.annotations objectForKey:@"rating"]objectAtIndex:0] floatValue]/20;
                 NSLog(@"%f",rating);
             }
-            if ([content.parentId isEqual:@""]) {
-                [_contentArray addObject:content];
-            }
         }
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"ToDetail"
+         object:_content];
     }
     if (count == 1) {
         DYRateView *headerRatingView=[[DYRateView alloc]init];
@@ -479,11 +517,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         
         UIButton *viewButton=[[UIButton alloc]initWithFrame:CGRectMake(290, self.navigationController.navigationBar.frame.size.height/2, 40, 30)];
         [viewButton setTitle:@"View" forState:UIControlStateNormal];
-        
-        [viewButton addTarget:self action:@selector(viewReviewSelected) forControlEvents:UIControlEventTouchUpInside];
         [viewButton.titleLabel setFont:[UIFont fontWithName:@"helvetica neue medium" size:16]];
-        [viewButton.titleLabel setTextColor:UIColorFromRGB(0x0F98EC)];
-        self.navigationController.navigationBar.barTintColor = [UIColor blackColor];
+         [viewButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
+        
+        self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440);
+        [viewButton addTarget:self action:@selector(viewReviewButtonSelected) forControlEvents:UIControlEventTouchUpInside];
+        
+        
         UIBarButtonItem *viewButtonOnRating=[[UIBarButtonItem alloc]initWithCustomView:viewButton];
         UIBarButtonItem *starRating=[[UIBarButtonItem alloc]initWithCustomView:headerRatingView];
         UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]initWithCustomView:reviewLabel];
@@ -538,7 +578,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         {
             // iOS6
             [toolbar setBarStyle:UIBarStyleDefault];
-            //[toolbar setTintColor:[UIColor lightGrayColor]];
         }
     }
     
@@ -577,16 +616,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     }
 }
 
--(void)viewReviewSelected
+-(void)viewReviewButtonSelected
 {
-//    if(_contentArray.count){
-//        for (int index=0;index<[_contentArray count] ; index++) {
-//            LFSContent *content=[_contentArray objectAtIndex:index];
-//            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
-//                [self performSegueWithIdentifier:kCellSelectSegue sender:content];
-//            }
-//        }
-//    }
+
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
@@ -598,11 +630,17 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 detailViewController.collection=self.collection;
                 detailViewController.collectionId=self.collectionId;
                 detailViewController.contentItem=content;
-                [self.navigationController
-                 setToolbarHidden:YES
-                 animated:YES];
-                
-                
+                NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+                [chaildContent addObject:content];
+                for (int i=0; i<[_content count]; i++) {
+                    LFSContent *singleContent=[_content objectAtIndex:i];
+                    if ([singleContent.parentId isEqual:content.idString]) {
+                        [chaildContent addObject:singleContent];
+                    }
+                }
+                detailViewController.mainContent=chaildContent;
+                [self.navigationController setToolbarHidden:YES animated:YES];
+
                 
             }
         }
@@ -907,16 +945,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 }
                 vc.mainContent=chaildContent;
                 
-//                [vc setContentItem:contentItem];
-//                [vc setAvatarImage:avatarPreview];
-//                [vc setCollection:self.collection];
-//                [vc setCollectionId:self.collectionId];
-//                [vc setHideStatusBar:self.prefersStatusBarHidden];
-//                [vc setUser:self.user];
-//                [vc setDelegate:self];
-//                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
-//                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
-//                                                                        delegate:self]];
+
             }else if([sender isKindOfClass:[LFSContent class]]){
                 LFRDetailViewController *vc = segue.destinationViewController;
 //#ifdef CACHE_SCALED_IMAGES
@@ -941,17 +970,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 }
                 vc.mainContent=chaildContent;
                 
-                
-//                [vc setContentItem:sender];
-//                [vc setAvatarImage:avatarPreview];
-//                [vc setCollection:self.collection];
-//                [vc setCollectionId:self.collectionId];
-//                [vc setHideStatusBar:self.prefersStatusBarHidden];
-//                [vc setUser:self.user];
-//                [vc setDelegate:self];
-//                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
-//                [vc setContentActions:[[LFSContentActions alloc] initWithContent:sender
-//                                                                        delegate:self]];
 
             }
         }
@@ -1293,20 +1311,20 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
          }
      }];
 }
--(void)editReviewOfContent:(LFSContent *)content
+-(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
 {
-    if (content.authorIsModerator) {
+    if (content.authorIsModerator && content.author.self) {
         NSLog(@"%@",content);
         [self.postViewController setCollection:self.collection];
+       
         [self.postViewController setCollectionId:self.collectionId];
         [self.postViewController setAvatarImage:self.placeholderImage];
         [self.postViewController setUser:self.user];
-        //        [self.postViewController setTitle:[content valueForKey:@"title"]];
-        //        [self.postViewController setrating]
-        
+                
         [self.navigationController presentViewController:self.postViewController
                                                 animated:YES
                                               completion:nil];
+         self.postViewController =[content valueForKey:@"title"];
     }
 }
 #pragma mark - LFSPostViewControllerDelegate

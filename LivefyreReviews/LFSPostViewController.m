@@ -9,11 +9,12 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSPostViewController.h"
 
-#import "LFSWriteCommentView.h"
+
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
 #import "LFRConfig.h"
 #import "DYRateView.h"
+#import "LFSWriteCommentView.h"
 @interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
@@ -128,6 +129,9 @@
             [self.writeCommentView.textView setText:replyPrefix];
         }
     }
+    
+    
+    
 }
 
 - (NSString*)replyPrefixFromContent:(LFSContent*)content
