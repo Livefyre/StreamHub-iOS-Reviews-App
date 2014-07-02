@@ -39,15 +39,13 @@ PODS:
     - JWT (~> 1.0.3)
     - LFJSONKit (~> 1.6a)
     - NSString-Hashes (~> 1.2.0)
-  - TSMessages (0.9.9):
-    - HexColors
 
 DEPENDENCIES:
   - AFHTTPRequestOperationLogger (~> 2.0.0)
+  - HexColors
   - OHAttributedLabel (~> 3.5.3)
   - SDWebImage (~> 3.6)
   - StreamHub-iOS-SDK (~> 0.3.4)
-  - TSMessages
 
 SPEC CHECKSUMS:
   AFHTTPRequestOperationLogger: b664dc4330b0fdfacead8338551c4ded9a2a8103
@@ -60,6 +58,5 @@ SPEC CHECKSUMS:
   OHAttributedLabel: fcf1d1245b4c8d2df94da91369b1474901d7fb14
   SDWebImage: a1618e4ce38c2d40a844679bd832ef8219ab8557
   StreamHub-iOS-SDK: 567a01be5b3f9495a103a26ad45da1569fadd575
-  TSMessages: 2999ef55e532378692e9d14d32da2bb60e285129
 
 COCOAPODS: 0.33.1

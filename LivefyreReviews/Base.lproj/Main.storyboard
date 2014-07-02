@@ -114,7 +114,7 @@
         <!--Reply View Controller - New Comment-->
         <scene sceneID="SJ0-Il-JWF">
             <objects>
-                <viewController storyboardIdentifier="postReply" id="gEL-zJ-XBW" customClass="LFRReplyViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ReplyViewController" id="gEL-zJ-XBW" customClass="LFRReplyViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rCS-ij-0Ch">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask"/>

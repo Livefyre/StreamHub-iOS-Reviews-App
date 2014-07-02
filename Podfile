@@ -6,4 +6,5 @@ pod 'StreamHub-iOS-SDK', '~> 0.3.4'
 #pod 'StreamHub-iOS-SDK', :path => '../'
 pod 'SDWebImage', '~> 3.6'
 #pod "Reveal-iOS-SDK"
-pod 'TSMessages'
+#pod 'TSMessages'
+pod 'HexColors'
