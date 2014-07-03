@@ -748,9 +748,18 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
             count++;
         }[voteObject valueForKey:@"value"];
     }
+    NSString *replyString=nil;
+    if(_content.nodeCount-1 ==0){
+        replyString=@"No Replies";
+    }else if (_content.nodeCount-1 ==1){
+        replyString=@"1 Reply";
+    }else{
+        replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
+    }
+    
     [self.footerLeftView setText:[NSString stringWithFormat:@"%d of %ld found helpful",count,(unsigned long)[[_content.annotations objectForKey:@"vote" ] count]]];
     [self.footerLeftView resizeVerticalBottomRightTrim];
-    [self.footerRightView setText:[NSString stringWithFormat:@"%lu Replies",(long)_content.nodeCount-1 ] ];
+    [self.footerRightView setText:[NSString stringWithFormat:@"%@",replyString ]];
     [self.footerRightView resizeVerticalBottomRightTrim];
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
