@@ -11,6 +11,7 @@
 #import "LFRDetailTableViewCell.h"
 #import "LFSContent.h"
 #import "LFSContentCollection.h"
+#import "LFSUser.h"
 
 @protocol LFRDetailTableViewCellDelegate;
 
@@ -34,4 +35,5 @@
 @property (retain, nonatomic) UIActionSheet *actionSheet2;
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, strong) NSMutableArray *mainContent;
+@property (nonatomic, weak)LFSUser *user;
 @end

@@ -435,8 +435,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
 //    [tableView endUpdates];
 
-    int count=0;
-    float rating=0;
+//    int count=0;
+//    float rating=0;
     if(_content.count){
         //// newCount Calculating here
         //
@@ -492,7 +492,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         
         for (int index=0;index<[_content count] ; index++) {
             LFSContent *content=[_content objectAtIndex:index];
-            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
+            if ([self.user.idString isEqualToString:content.author.idString]) {
                 count++;
                 rating=[[[content.annotations objectForKey:@"rating"]objectAtIndex:0] floatValue]/20;
                 NSLog(@"%f",rating);
@@ -601,6 +601,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         detailViewController.collection=self.collection;
         detailViewController.collectionId=self.collectionId;
         detailViewController.contentItem=content;
+        detailViewController.user=self.user;
         NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
         [chaildContent addObject:content];
         for (int i=0; i<[_content count]; i++) {
@@ -622,7 +623,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
-            if ([content.parentId isEqual:@""] & content.authorIsModerator) {
+            if ([content.parentId isEqual:@""] & [content.author.idString isEqual:self.user.idString]) {
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
                 [self.navigationController pushViewController:detailViewController animated:YES];
@@ -630,6 +631,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 detailViewController.collection=self.collection;
                 detailViewController.collectionId=self.collectionId;
                 detailViewController.contentItem=content;
+                detailViewController.user=self.user;
                 NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
                 [chaildContent addObject:content];
                 for (int i=0; i<[_content count]; i++) {

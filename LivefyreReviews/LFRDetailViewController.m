@@ -399,8 +399,23 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     
 }
 -(void)didSelectButton3:(id)sender{
-    self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Edit",@"Feature",@"Flag",nil];
- 
+    CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
+    self.contentItem =[self.mainContent objectAtIndex:indexPath.row];
+    
+    if ([self.user.permissions objectForKey:@"moderator_key"] && self.contentItem.authorIsModerator) {
+        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",@"Feature",nil];
+    }
+    else if([self.user.permissions objectForKey:@"moderator_key"]){
+        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Edit",@"Feature",@"Flag",nil];
+    }
+    else if([self.user.idString isEqualToString:self.contentItem.author.idString]){
+        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",nil];
+    }
+    else{
+        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Flag",nil];
+        
+    }
     [ self.actionSheet1 showInView:self.view];
     
 }
