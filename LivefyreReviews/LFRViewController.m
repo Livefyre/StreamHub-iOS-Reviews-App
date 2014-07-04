@@ -420,7 +420,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [self.streamClient startStreamWithEventId:eventId];
     }
 }
-
 -(void)didUpdateModelWithDeletes:(NSArray*)deletes updates:(NSArray*)updates inserts:(NSArray*)inserts
 {
     // TODO: only perform animated insertion of cells when the top of the
@@ -485,6 +484,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                     [_contentArray addObject:content];
                 }
             }
+            [self sortReviews:_contentArray];
             [tableView reloadData];
         }
         //    [tableView reloadData];
@@ -499,6 +499,51 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     [tableView reloadData];
 
+}
+-(void)sortReviews:(NSMutableArray*)allReviewsBeforeSort{
+    LFSContent *ownReview;
+    
+    if(_contentArray.count){
+        for (int index=0;index<[_contentArray count] ; index++) {
+            LFSContent *content=[_contentArray objectAtIndex:index];
+            if ([content.parentId isEqual:@""] & [content.author.idString isEqual:self.user.idString]) {
+                ownReview=content;
+                [allReviewsBeforeSort removeObjectAtIndex:index];
+        }
+    }
+    
+        
+        NSArray *sortedArray;
+        
+        sortedArray = [allReviewsBeforeSort sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+            //[[_content.annotations objectForKey:@"vote" ] count]
+            
+            
+                        int countA=0;
+            NSArray *votesA=[[NSArray alloc]initWithArray:[[(LFSContent*)a annotations]objectForKey:@"vote" ]];
+            for (NSDictionary *voteObject in votesA) {
+                if ([[voteObject valueForKey:@"value"] integerValue] ==1) {
+                    countA++;
+                }[voteObject valueForKey:@"value"];
+            }
+            int countB=0;
+            NSArray *votesB=[[NSArray alloc]initWithArray:[[(LFSContent*)b annotations]objectForKey:@"vote" ]];
+            for (NSDictionary *voteObject in votesB) {
+                if ([[voteObject valueForKey:@"value"] integerValue] ==1) {
+                    countB++;
+                }[voteObject valueForKey:@"value"];
+            }
+
+            
+            NSString *first=[NSString stringWithFormat:@"%d",countA];
+            NSString *second=[NSString stringWithFormat:@"%d",countB];
+            return [second compare:first options:NSNumericSearch];
+        }];
+        [_contentArray removeAllObjects];
+        if(ownReview)
+        [_contentArray addObject:ownReview];
+        [_contentArray addObjectsFromArray:sortedArray];
+    }
 }
 -(void)showStatusBarWithReview{
     int count=0;
@@ -607,7 +652,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         detailViewController.contentItem=content;
         detailViewController.user=self.user;
         NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-        [chaildContent addObject:content];
         for (int i=0; i<[_content count]; i++) {
             LFSContent *singleContent=[_content objectAtIndex:i];
             if ([singleContent.parentId isEqual:content.idString]) {
@@ -630,6 +674,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             if ([content.parentId isEqual:@""] & [content.author.idString isEqual:self.user.idString]) {
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
+//                [self.navigationController presentViewController:detailViewController animated:YES completion:nil];
                 [self.navigationController pushViewController:detailViewController animated:YES];
                 detailViewController.deletedContent=self;
                 detailViewController.collection=self.collection;
@@ -637,7 +682,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 detailViewController.contentItem=content;
                 detailViewController.user=self.user;
                 NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-                [chaildContent addObject:content];
                 for (int i=0; i<[_content count]; i++) {
                     LFSContent *singleContent=[_content objectAtIndex:i];
                     if ([singleContent.parentId isEqual:content.idString]) {

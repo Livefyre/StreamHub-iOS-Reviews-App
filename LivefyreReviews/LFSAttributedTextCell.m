@@ -757,6 +757,9 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
     }
     
+    
+    
+    
     [self.footerLeftView setText:[NSString stringWithFormat:@"%d of %ld found helpful",count,(unsigned long)[[_content.annotations objectForKey:@"vote" ] count]]];
     [self.footerLeftView resizeVerticalBottomRightTrim];
     [self.footerRightView setText:[NSString stringWithFormat:@"%@",replyString ]];
