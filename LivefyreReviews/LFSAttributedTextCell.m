@@ -376,25 +376,25 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
 - (UIImageView*)headerAttributeTopImageView
 {
-    if (_headerAttributeTopImageView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
-                                      kCellHeaderAttributeTopHeight);
-        CGRect frame;
-        frame.size = labelSize;
-        frame.origin = CGPointMake(leftColumnWidth,
-                                   kCellPadding.top); // size.y will be changed in layoutSubviews
-        // initialize
-        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
-        
-        // configure
-        [_headerAttributeTopImageView
-         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerAttributeTopImageView setContentMode:UIViewContentModeTopLeft];
-        
-        // add to superview
-        [self.contentView addSubview:_headerAttributeTopImageView];
-    }
+//    if (_headerAttributeTopImageView == nil) {
+//        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
+//        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+//                                      kCellHeaderAttributeTopHeight);
+//        CGRect frame;
+//        frame.size = labelSize;
+//        frame.origin = CGPointMake(leftColumnWidth,
+//                                   kCellPadding.top); // size.y will be changed in layoutSubviews
+//        // initialize
+//        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
+//        
+//        // configure
+//        [_headerAttributeTopImageView
+//         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//        [_headerAttributeTopImageView setContentMode:UIViewContentModeTopLeft];
+//        
+//        // add to superview
+//        [self.contentView addSubview:_headerAttributeTopImageView];
+//    }
     return _headerAttributeTopImageView;
 }
 
@@ -437,10 +437,10 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
                                   kCellPadding.top - kCellHeaderAdjust+_headerTitleView.frame.size.height,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
                                   kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust-_headerTitleView.frame.size.height);
-        NSLog(@"%f %f",frame.size.width,frame.size.height);
+//        NSLog(@"%f %f",frame.size.width,frame.size.height);
         // initialize
 
-        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_small"] emptyStar:[UIImage imageNamed:@"icon_star_empty_small"]];
+        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_small.png"] emptyStar:[UIImage imageNamed:@"icon_star_empty_small.png"]];
         _headerRatingView.padding = 3;
         _headerRatingView.alignment = RateViewAlignmentLeft;
         _headerRatingView.userInteractionEnabled = NO;
@@ -754,7 +754,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }else if (_content.nodeCount-1 ==1){
         replyString=@"1 Reply";
     }else{
-        replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
+        replyString=[NSString stringWithFormat:@"%ld Replies",_content.nodeCount-1];
     }
     
     

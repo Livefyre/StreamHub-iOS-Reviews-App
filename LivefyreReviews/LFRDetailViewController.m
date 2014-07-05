@@ -125,24 +125,24 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    NSArray *sortedArray;
-    
-    sortedArray = [self.mainContent sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-        NSDate *first = [(LFSContent*)a updatedAt];
-        NSDate *second=[(LFSContent*)b updatedAt];
-        return [second compare:first];
-    }];
-    
-    [self.mainContent removeAllObjects];
-    [self.mainContent addObject:self.contentItem];
-    [self.mainContent addObjectsFromArray:sortedArray];
+//    NSArray *sortedArray;
+//    
+//    sortedArray = [self.mainContent sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+//        NSDate *first = [(LFSContent*)a updatedAt];
+//        NSDate *second=[(LFSContent*)b updatedAt];
+//        return [second compare:first];
+//    }];
+//    
+//    [self.mainContent removeAllObjects];
+    [self.mainContent insertObject:self.contentItem atIndex:0];
+//    [self.mainContent addObjectsFromArray:sortedArray];
     return [self.mainContent count];
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    if (indexPath.row ==0) {
+    LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
+
+    if ([contentValues.parentId isEqualToString:@""]) {
         
-        LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
         LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
     
     NSMutableAttributedString *attributedTitle=[cell getAttributedTextWithFormat:contentValues.title :24 :@"Georgia" :14];
@@ -153,7 +153,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         return titleSize.height+137+bodySize.height;
     }
     else{
-        LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
         LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
         
         NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
@@ -172,7 +171,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         if (cell == nil) {
             cell = [[LFRDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
-            if (indexPath.row ==0) {
+            if ([contentValues.parentId isEqualToString:@""]) {
                  [self configureAttributedCell:cell forContent:contentValues];
             }
             else{
@@ -230,7 +229,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         }[voteObject valueForKey:@"value"];
     }
     
-    cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %d found helpful",count,[[content.annotations valueForKey:@"vote"] count]] ;
+    cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %lu found helpful",count,(unsigned long)[[content.annotations valueForKey:@"vote"] count]] ;
     cell.footerLeftView.frame=CGRectMake(160,41, 180, 20);
     
     //date

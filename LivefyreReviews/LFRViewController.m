@@ -64,6 +64,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     UIActivityIndicatorView *_activityIndicator;
     UIView *_container;
     CGPoint _scrollOffset;
+    NSMutableArray *chaildContent;
 }
 
 
@@ -316,6 +317,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             }
         }
         [TSMessage dismissActiveNotification];
+        [self sortReviews:_contentArray];
+
         [self.tableView reloadData];
         
     }
@@ -465,6 +468,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                                                      [_contentArray addObject:content];
                                                  }
                                              }
+                                             [self sortReviews:_contentArray];
+
                                              [tableView reloadData];
                                              [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
                                                                    atScrollPosition:UITableViewScrollPositionTop
@@ -473,7 +478,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                                          }
                                              atPosition:TSMessageNotificationPositionTop
                                    canBeDismissedByUser:YES];
-            [tableView reloadData];
+
+           // [tableView reloadData];
             
         }else{
             [_contentArray removeAllObjects];
@@ -484,7 +490,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                     [_contentArray addObject:content];
                 }
             }
-            [self sortReviews:_contentArray];
             [tableView reloadData];
         }
         //    [tableView reloadData];
@@ -514,29 +519,40 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
         
         NSArray *sortedArray;
-        
         sortedArray = [allReviewsBeforeSort sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-            //[[_content.annotations objectForKey:@"vote" ] count]
-            
-            
-                        int countA=0;
+            int countA=0;
             NSArray *votesA=[[NSArray alloc]initWithArray:[[(LFSContent*)a annotations]objectForKey:@"vote" ]];
             for (NSDictionary *voteObject in votesA) {
                 if ([[voteObject valueForKey:@"value"] integerValue] ==1) {
                     countA++;
-                }[voteObject valueForKey:@"value"];
+                }
+            }
+            float percentageA;
+            if ([[[(LFSContent*)a annotations]objectForKey:@"vote" ] count]!=0) {
+                percentageA=countA/[[[(LFSContent*)a annotations]objectForKey:@"vote" ] count];
+
+            }
+            else{
+                percentageA=0.0f;
             }
             int countB=0;
             NSArray *votesB=[[NSArray alloc]initWithArray:[[(LFSContent*)b annotations]objectForKey:@"vote" ]];
             for (NSDictionary *voteObject in votesB) {
                 if ([[voteObject valueForKey:@"value"] integerValue] ==1) {
                     countB++;
-                }[voteObject valueForKey:@"value"];
+                }
             }
-
+            float percentageB;
+            if ([[[(LFSContent*)b annotations]objectForKey:@"vote" ] count]!=0) {
+                percentageB=countB/[[[(LFSContent*)b annotations]objectForKey:@"vote" ] count];
+                
+            }
+            else{
+                percentageB=0.0f;
+            }
             
-            NSString *first=[NSString stringWithFormat:@"%d",countA];
-            NSString *second=[NSString stringWithFormat:@"%d",countB];
+            NSString *first=[NSString stringWithFormat:@"%f",percentageA];
+            NSString *second=[NSString stringWithFormat:@"%f",percentageB];
             return [second compare:first options:NSNumericSearch];
         }];
         [_contentArray removeAllObjects];
@@ -651,20 +667,32 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         detailViewController.collectionId=self.collectionId;
         detailViewController.contentItem=content;
         detailViewController.user=self.user;
-        NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-        for (int i=0; i<[_content count]; i++) {
-            LFSContent *singleContent=[_content objectAtIndex:i];
-            if ([singleContent.parentId isEqual:content.idString]) {
-                [chaildContent addObject:singleContent];
-            }
-        }
-        detailViewController.mainContent=chaildContent;
+        
+        NSMutableArray *test=[[NSMutableArray alloc]init];
+        [self recursiveChilds:content.children :test];
+        detailViewController.mainContent=test;
+        
         [self.navigationController setToolbarHidden:YES animated:YES];
 
 
     }
 }
-
+-(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
+    NSEnumerator *enumerator = [hashtable objectEnumerator];
+    id value;
+    
+    while ((value = [enumerator nextObject])) {
+        /* code that acts on the hash table's values */
+        [test addObject:value];
+        if([value isKindOfClass:[LFSContent class]])
+        {
+            
+            [self recursiveChilds:((LFSContent*)value).children :test];
+        }
+        
+            }
+    return test;
+}
 -(void)viewReviewButtonSelected
 {
 
@@ -681,14 +709,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 detailViewController.collectionId=self.collectionId;
                 detailViewController.contentItem=content;
                 detailViewController.user=self.user;
-                NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-                for (int i=0; i<[_content count]; i++) {
-                    LFSContent *singleContent=[_content objectAtIndex:i];
-                    if ([singleContent.parentId isEqual:content.idString]) {
-                        [chaildContent addObject:singleContent];
-                    }
-                }
-                detailViewController.mainContent=chaildContent;
+                NSMutableArray *test=[[NSMutableArray alloc]init];
+                [self recursiveChilds:content.children :test];
+                detailViewController.mainContent=test;
                 [self.navigationController setToolbarHidden:YES animated:YES];
 
                 
@@ -700,7 +723,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 }
 
-
+//-(void)generateChildData:(NS)
 
 
 
@@ -985,7 +1008,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 vc.collection=self.collection;
                 vc.collectionId=self.collectionId;
                 vc.contentItem=contentItem;
-                NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+                chaildContent=[[NSMutableArray alloc]init];
                 [chaildContent addObject:contentItem];
                 for (int i=0; i<[_content count]; i++) {
                     LFSContent *singleContent=[_content objectAtIndex:i];
@@ -1010,7 +1033,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 vc.collection=self.collection;
                 vc.collectionId=self.collectionId;
                 vc.contentItem=contentItem;
-                NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+                chaildContent=[[NSMutableArray alloc]init];
                 [chaildContent addObject:sender];
                 for (int i=0; i<[_content count]; i++) {
                     LFSContent *singleContent=[_content objectAtIndex:i];

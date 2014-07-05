@@ -24,6 +24,7 @@
 
 @property (nonatomic, readonly) NSNumber *lastEventId;
 @property (nonatomic, weak) id<LFSContentCollectionDelegate> delegate;
+@property (nonatomic, strong) NSMutableDictionary *mapping;
 
 
 + (id)dictionaryWithCapacity:(NSUInteger)count;
