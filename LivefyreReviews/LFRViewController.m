@@ -308,11 +308,12 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 #pragma mark - Toolbar behavior
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (scrollView.contentOffset.y == 0){
-        [_contentArray removeAllObjects];
         
+        
+        [_contentArray removeAllObjects];
         for (int index=0;index<[_content count] ; index++) {
             LFSContent *content=[_content objectAtIndex:index];
-            if ([content.parentId isEqual:@""]) {
+            if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
                 [_contentArray addObject:content];
             }
         }
@@ -464,7 +465,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                                              
                                              for (int index=0;index<[_content count] ; index++) {
                                                  LFSContent *content=[_content objectAtIndex:index];
-                                                 if ([content.parentId isEqual:@""]) {
+                                                 if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
                                                      [_contentArray addObject:content];
                                                  }
                                              }
@@ -486,7 +487,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             
             for (int index=0;index<[_content count] ; index++) {
                 LFSContent *content=[_content objectAtIndex:index];
-                if ([content.parentId isEqual:@""]) {
+                if ([content.parentId isEqual:@""] && content.visibility == LFSContentVisibilityEveryone) {
                     [_contentArray addObject:content];
                 }
             }
@@ -671,7 +672,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         NSMutableArray *test=[[NSMutableArray alloc]init];
         [self recursiveChilds:content.children :test];
         detailViewController.mainContent=test;
-        
         [self.navigationController setToolbarHidden:YES animated:YES];
 
 
@@ -683,11 +683,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     while ((value = [enumerator nextObject])) {
         /* code that acts on the hash table's values */
-        [test addObject:value];
-        if([value isKindOfClass:[LFSContent class]])
+                if([value isKindOfClass:[LFSContent class]])
         {
-            
-            [self recursiveChilds:((LFSContent*)value).children :test];
+            if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
+                [test addObject:value];
+                [self recursiveChilds:((LFSContent*)value).children :test];
+
+            }
         }
         
             }
@@ -818,8 +820,12 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //            }
 //    }
 //
-    
-    return [_contentArray count];
+    int count=0;
+    for (LFSContent *content in _contentArray) {
+        if(content.visibility==LFSContentVisibilityEveryone)
+            count++;
+    }
+    return count;//[_contentArray count];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -873,27 +879,20 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                        parameters:nil
                         onSuccess:^(NSOperation *operation, id responseObject)
      {
-         /*
-          NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
-          @"Wrong content Id received");
-          
-          // Note: sometimes we get an object like this:
-          {
-          collections =     (
-          10726472
-          );
-          messageId = "051d17a631d943f58705e4ad974f4131@livefyre.com";
-          }
-          */
-         
          NSUInteger row = [_content indexOfKey:contentId];
          if (row != NSNotFound) {
              [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
+             [_contentArray removeAllObjects];
+             for (int index=0;index<[_content count] ; index++) {
+                 LFSContent *content=[_content objectAtIndex:index];
+                 if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+                     [_contentArray addObject:content];
+                 }
+             }
          }
          
      }
-     ////////////////////////////////////////////////////////////////
-                        onFailure:^(NSOperation *operation, NSError *error)
+     onFailure:^(NSOperation *operation, NSError *error)
      {
          // show an error message
          [[[UIAlertView alloc]
@@ -902,21 +901,16 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
            delegate:nil
            cancelButtonTitle:@"OK"
            otherButtonTitles:nil] show];
-         
-         // check if an object with the cached id still exists in the model
-         // and if so, revert to its previous visibility state. This check is necessary
-         // because it is conceivable that the streaming client has already deleted
-         // the content object
-         NSUInteger newContentIndex = [_content indexOfKey:contentId];
-         if (newContentIndex != NSNotFound)
-         {
-             [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
-             
-             // obtain new index path since it could have changed during the time
-             // it toook for the error response to come back
-             [self didUpdateModelWithDeletes:nil
-                                     updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
-                                     inserts:nil];
+        NSUInteger newContentIndex = [_content indexOfKey:contentId];
+        if (newContentIndex != NSNotFound)
+        {
+//            [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
+//             
+//            // obtain new index path since it could have changed during the time
+//            // it toook for the error response to come back
+//            [self didUpdateModelWithDeletes:nil
+//                                     updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
+//                                     inserts:nil];
          }
      }];
     
@@ -926,13 +920,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     // the block below will result in the standard content cell being replaced by a
     // "this comment has been removed" cell.
-    [content setVisibility:LFSContentVisibilityPendingDelete];
+    //[content setVisibility:LFSContentVisibilityPendingDelete];
     
-    UITableView *tableView = self.tableView;
-    [tableView beginUpdates];
-    [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
-                     withRowAnimation:UITableViewRowAnimationFade];
-    [tableView endUpdates];
+//    UITableView *tableView = self.tableView;
+//    [tableView beginUpdates];
+//    [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
+//                     withRowAnimation:UITableViewRowAnimationFade];
+//    [tableView endUpdates];
 }
 
 
