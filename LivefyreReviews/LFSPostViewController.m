@@ -341,6 +341,8 @@
                                cancelButtonTitle:@"OK"
                                otherButtonTitles:nil] show];
                            }];
+            
+     
 
         if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
             [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
@@ -357,8 +359,6 @@
           otherButtonTitles:nil] show];
         [self dismissViewControllerAnimated:YES completion:nil];
     }
-        
-    
     ;
 }
 

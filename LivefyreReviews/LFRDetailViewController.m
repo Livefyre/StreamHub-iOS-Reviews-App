@@ -340,7 +340,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     NSMutableAttributedString *attributedBody=[ cell getAttributedTextWithFormat:content.bodyHtml :18.0f :@"Georgia" :5];
     [cell.body setAttributedText:attributedBody];
     CGSize bodySize = [attributedBody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
-    cell.body.frame=CGRectMake(15+([content.datePath count] - 2) * kGenerationOffset, 48, 290, bodySize.height);
+    cell.body.frame=CGRectMake(15+([content.datePath count] - 2) * kGenerationOffset, 48, 290-([content.datePath count] - 2) * kGenerationOffset, bodySize.height);
     
     [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
                   forState:UIControlStateNormal];
@@ -357,7 +357,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [cell.button2 setTitle:@""
                   forState:UIControlStateNormal];
     [cell.button2 addTarget:self action:@selector(didSelectButton2:content:) forControlEvents:UIControlEventTouchUpInside];
-    cell.button2.frame=CGRectMake(cell.button1.frame.size.width+15+([content.datePath count] - 2) * kGenerationOffset, 23+cell.body.frame.size.height, 50, 100);
+    cell.button2.frame=CGRectMake(cell.button1.frame.origin.x+cell.button1.frame.size.width+15, 23+cell.body.frame.size.height, 50, 100);
     [cell addSubview:cell.button2];
     
     [cell.button3 setImage:[UIImage imageNamed:@"More"]
@@ -366,7 +366,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                   forState:UIControlStateNormal];
     [cell.button3 addTarget:self action:@selector(didSelectButton3:)
            forControlEvents:UIControlEventTouchUpInside];
-    cell.button3.frame=CGRectMake(cell.button2.frame.origin.x+cell.button2.frame.size.width+15+([content.datePath count] - 2) * kGenerationOffset, 23+cell.title.frame.size.height+cell.body.frame.size.height, 100, 100);
+    cell.button3.frame=CGRectMake(cell.button2.frame.origin.x+cell.button2.frame.size.width+15, 23+cell.title.frame.size.height+cell.body.frame.size.height, 100, 100);
     [cell addSubview:cell.button3];
     
     
