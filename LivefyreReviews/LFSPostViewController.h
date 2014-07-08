@@ -20,10 +20,10 @@
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
 @property (nonatomic, strong) LFSContent *replyToContent;
-
+@property (nonatomic, weak) LFSContent *content;
 @property (nonatomic, strong) LFSUser *user;
 @property (nonatomic, strong) UIImage *avatarImage;
-
+@property (nonatomic, assign) BOOL isEdit;
 
 @property (nonatomic, weak) id<LFSPostViewControllerDelegate> delegate;
 @end

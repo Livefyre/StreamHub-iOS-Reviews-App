@@ -15,6 +15,7 @@
 #import "LFRConfig.h"
 #import "DYRateView.h"
 #import "LFSWriteCommentView.h"
+#import "LFSBasicHTMLParser.h"
 @interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
@@ -128,6 +129,16 @@
         if (replyPrefix != nil) {
             [self.writeCommentView.textView setText:replyPrefix];
         }
+    }
+    if(_isEdit){
+        ;
+
+        [self.writeCommentView.textView setAttributedText:[LFSBasicHTMLParser attributedStringByProcessingMarkupInString:_content.bodyHtml]];
+        [self.writeCommentView.titleTextField setText:_content.title];
+        self.writeCommentView.starView.rating=[[[_content.annotations valueForKey:@"rating"] objectAtIndex:0] floatValue]/20;
+        self.writeCommentView.starView.userInteractionEnabled=NO;
+
+        
     }
     
     
@@ -327,6 +338,43 @@
         NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey, nil ];
         
         
+            if(self.isEdit){
+                [self.writeClient postMessage:LFSMessageEdit
+                                   forContent:self.content.idString
+                                 inCollection:self.collectionId
+                                    userToken:userToken
+                                   parameters:dict
+                                    onSuccess:^(NSOperation *operation, id responseObject) {
+                                        if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+                                        {
+                                            [collectionViewController didPostContentWithOperation:operation response:responseObject];
+                                        }
+                                    } onFailure:^(NSOperation *operation, NSError *error) {
+                                        [[[UIAlertView alloc]
+                                          initWithTitle:kFailurePostTitle
+                                          message:[error localizedRecoverySuggestion]
+                                          delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil] show];
+                                    }];
+
+//                [self.writeClient postContentType:13 forCollection:self.collectionId parameters:dict
+//                                        onSuccess:^(NSOperation *operation, id responseObject) {
+//                                            if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+//                                            {
+//                                                [collectionViewController didPostContentWithOperation:operation response:responseObject];
+//                                            }
+//                                        } onFailure:^(NSOperation *operation, NSError *error) {
+//                                            [[[UIAlertView alloc]
+//                                              initWithTitle:kFailurePostTitle
+//                                              message:[error localizedRecoverySuggestion]
+//                                              delegate:nil
+//                                              cancelButtonTitle:@"OK"
+//                                              otherButtonTitles:nil] show];
+//                                        }];
+
+            }else{
+        
         [self.writeClient postContentType:2 forCollection:self.collectionId parameters:dict
                            onSuccess:^(NSOperation *operation, id responseObject) {
                                if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
@@ -341,7 +389,7 @@
                                cancelButtonTitle:@"OK"
                                otherButtonTitles:nil] show];
                            }];
-
+            }
         if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
             [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
         }

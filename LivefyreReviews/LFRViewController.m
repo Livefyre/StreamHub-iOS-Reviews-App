@@ -373,6 +373,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
      {
          self.user = [[LFSUser alloc] initWithObject:responseObject];
         [self showStatusBarWithReview];
+         [self sortReviews:_contentArray];
+         [self.tableView reloadData];
+
      
      }
       onFailure:^(NSOperation *operation, NSError *error)
@@ -403,7 +406,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [headDocument objectForKey:@"event"];
-             _oldCount=_content.count;
+           
              //NSLog(@"%@", responseObject);
              
              // we are already on the main queue...
@@ -445,7 +448,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         int newCount=0;
         for (int index=0;index<[_content count] ; index++) {
             LFSContent *content=[_content objectAtIndex:index];
-            if ([content.parentId isEqual:@""]) {
+            if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
                 newCount++;
             }
         }
@@ -491,7 +494,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                     [_contentArray addObject:content];
                 }
             }
-            [tableView reloadData];
+            [self sortReviews:_contentArray];
+            [self showStatusBarWithReview ];
+            [self.tableView reloadData];
         }
         //    [tableView reloadData];
         [[NSNotificationCenter defaultCenter]
@@ -499,10 +504,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
          object:_content];
         [self showStatusBarWithReview];
         
-            }
-    
-    
-    
+    }
+
     [tableView reloadData];
 
 }
@@ -687,9 +690,10 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         {
             if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
                 [test addObject:value];
-                [self recursiveChilds:((LFSContent*)value).children :test];
 
             }
+            [self recursiveChilds:((LFSContent*)value).children :test];
+
         }
         
             }
@@ -724,9 +728,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 
 }
-
-//-(void)generateChildData:(NS)
-
 
 
 #pragma mark - Table view data source
@@ -869,7 +870,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     NSUInteger row = indexPath.row;
     LFSContent *content = [_content objectAtIndex:row];
     
-    LFSContentVisibility visibility = content.visibility;
     NSString *contentId = content.idString;
     
     [self.writeClient postMessage:message
@@ -889,6 +889,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                      [_contentArray addObject:content];
                  }
              }
+             [self.tableView reloadData];
          }
          
      }
@@ -946,7 +947,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             cell = [[LFSAttributedTextCell alloc]
                     initWithReuseIdentifier:kAttributedCellReuseIdentifier];
             [cell.bodyView setDelegate:self.attributedLabelDelegate];
+
         }
+        
       [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
   }
@@ -1380,18 +1383,19 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 -(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
 {
-    if (content.authorIsModerator && content.author.self) {
+    if (content.authorIsModerator || content.author.self) {
         NSLog(@"%@",content);
         [self.postViewController setCollection:self.collection];
        
         [self.postViewController setCollectionId:self.collectionId];
         [self.postViewController setAvatarImage:self.placeholderImage];
         [self.postViewController setUser:self.user];
-                
+        [self.postViewController setContent:content];
+        [self.postViewController setIsEdit:YES];
+        
         [self.navigationController presentViewController:self.postViewController
                                                 animated:YES
                                               completion:nil];
-         self.postViewController =[content valueForKey:@"title"];
     }
 }
 #pragma mark - LFSPostViewControllerDelegate
@@ -1409,6 +1413,18 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     // decide whether to scroll to the top row or to whichever row we are
     // replying to
     NSUInteger row = (replyTo != nil) ? [_content indexOfKey:replyTo] : 0;
+    [_contentArray removeAllObjects];
+    for (int index=0;index<[_content count] ; index++) {
+        LFSContent *content=[_content objectAtIndex:index];
+        if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+            [_contentArray addObject:content];
+        }
+    }
+    [TSMessage dismissActiveNotification];
+    [self sortReviews:_contentArray];
+    
+    [self.tableView reloadData];
+
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]
                           atScrollPosition:UITableViewScrollPositionTop
                                   animated:NO];
@@ -1419,6 +1435,18 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     // 200 OK received, post was successful
     [_content addContent:[responseObject objectForKey:@"messages"]
              withAuthors:[responseObject objectForKey:@"authors"]];
+    [_contentArray removeAllObjects];
+    for (int index=0;index<[_content count] ; index++) {
+        LFSContent *content=[_content objectAtIndex:index];
+        if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+            [_contentArray addObject:content];
+        }
+    }
+    [TSMessage dismissActiveNotification];
+    [self sortReviews:_contentArray];
+    
+    [self.tableView reloadData];
+    
 }
 -(LFSPostViewController*)postViewController
 {

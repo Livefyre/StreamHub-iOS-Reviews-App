@@ -41,7 +41,7 @@ static const CGFloat kCellHeaderAdjust = 2.f;
 
 static const CGFloat kCellHeaderAttributeAdjust = -1.f;
 static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
-static const CGFloat kCellHeaderAttributeTopFontSize = 10.f;
+static const CGFloat kCellHeaderAttributeTopFontSize = 12.f;
 
 static const CGFloat kCellHeaderAccessoryRightAdjust = 1.f;
 static const CGFloat kCellHeaderAccessoryRightFontSize = 11.f;
@@ -364,7 +364,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         [_headerAttributeTopView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
         [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kCellHeaderAttributeTopFontSize]];
-        [_headerAttributeTopView setTextColor:[UIColor blueColor]];
+        [_headerAttributeTopView setTextColor:UIColorFromRGB(0x0F98EC)];
         
         // add to superview
         [self.contentView addSubview:_headerAttributeTopView];
@@ -754,7 +754,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }else if (_content.nodeCount-1 ==1){
         replyString=@"1 Reply";
     }else{
-        replyString=[NSString stringWithFormat:@"%ld Replies",_content.nodeCount-1];
+        replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
     }
     
     
@@ -804,7 +804,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     textTitleContentFrame.origin = CGPointMake(leftTitleColumn,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
     textTitleContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
-                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(290.0f)]);
+                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(320.0f - leftTitleColumn - rightTitleColumn)]);
     [self.bodyTitleView setFrame:textTitleContentFrame];
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
@@ -829,7 +829,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     textContentFrame.origin = CGPointMake(leftTitleColumn,
                                                kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator+textTitleContentFrame.size.height+15);
     textContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
-                                            [LFSAttributedTextCell cellHeightForAttributedTitle:attributedbodyString hasAttachment:NO width:(290.0f)]);
+                                            [LFSAttributedTextCell cellHeightForAttributedTitle:attributedbodyString hasAttachment:NO width:(320.0f - leftTitleColumn - rightTitleColumn)]);
     
 
     

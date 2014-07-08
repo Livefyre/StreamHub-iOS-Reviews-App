@@ -18,4 +18,6 @@
 @property (readonly, nonatomic) UITextField *prosTextField;
 @property (readonly, nonatomic) UITextField *consTextField;
 @property (readonly, nonatomic) NSString *ratingPost;
+@property (readonly, nonatomic) DLStarRatingControl *starView;
+
 @end

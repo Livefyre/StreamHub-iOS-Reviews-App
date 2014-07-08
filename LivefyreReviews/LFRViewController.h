@@ -21,7 +21,7 @@
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
 
--(void)viewReviewSelected;
+//-(void)viewReviewSelected;
 
 
 @end

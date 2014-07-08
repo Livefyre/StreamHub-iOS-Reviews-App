@@ -284,7 +284,14 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)configureAttributedCell1:(LFRDetailTableViewCell*)cell forContent:(LFSContent*)content
 {
     //((CGFloat)([content.datePath count] - 1) * kGenerationOffset
+    float dateCount;
     
+    if([content.datePath count] <=6){
+        dateCount=([content.datePath count] - 2)* kGenerationOffset;
+    }
+    else{
+        dateCount=4*kGenerationOffset;
+    }
     //profile image
     UIImage *placeholder=[UIImage imageWithColor:
                           [UIColor colorWithRed:232.f / 255.f
@@ -295,26 +302,29 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //setting profile pic
     [cell.profileImage  setImageWithURL:[NSURL URLWithString:content.author.avatarUrlString75]
                        placeholderImage:placeholder];
-    [cell.profileImage setFrame:CGRectMake(15+([content.datePath count] - 2) * kGenerationOffset, 10, 28, 28)];
+    [cell.profileImage setFrame:CGRectMake(15+dateCount, 10, 28, 28)];
     //user name
     cell.userName.text=content.author.displayName ?: @"";
-    cell.userName.frame=CGRectMake(51+([content.datePath count] - 2) * kGenerationOffset, 8, 200, 16);
     
-    //    //if moderator
-    //    if (content.authorIsModerator) {
-    //        cell.moderator.text=@"Moderator";
-    //        cell.moderator.frame=CGRectMake(73,10, 80, 18);
-    //    }
-    //    else{
-    //        cell.moderator.text=nil;
-    //    }
-    //    if (content.isFeatured){
-    //        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
-    //        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
-    //    }
-    //    else{
-    //        cell.featuredImage.image=nil;
-    //    }
+    
+    cell.userName.frame=CGRectMake(51+dateCount, 8, 200, 16);
+    CGSize headerTestSize = [[cell.userName text] sizeWithAttributes:@{NSFontAttributeName:[cell.userName font]}];
+    CGFloat headerStrikeWidth = headerTestSize.width;
+        //if moderator
+        if (content.authorIsModerator) {
+            cell.moderator.text=@"Moderator";
+            cell.moderator.frame=CGRectMake(headerStrikeWidth+15+cell.userName.frame.origin.x,8, 80, 18);
+        }
+        else{
+            cell.moderator.text=nil;
+        }
+        if (content.isFeatured){
+            cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
+            cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+        }
+        else{
+        cell.featuredImage.image=nil;
+        }
     //rating
     cell.rateView.frame=CGRectMake(0, 0, 0, 0);
     
@@ -328,7 +338,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
     
     cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %lu found helpful",count,(unsigned long)[[content.annotations valueForKey:@"vote"] count]] ;
-    cell.footerLeftView.frame=CGRectMake(51+([content.datePath count] - 2) * kGenerationOffset,24,150,14);
+    cell.footerLeftView.frame=CGRectMake(51+dateCount,24,150,14);
     
     //date
     NSDateFormatter *format=[[NSDateFormatter alloc]init];
@@ -340,7 +350,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     NSMutableAttributedString *attributedBody=[ cell getAttributedTextWithFormat:content.bodyHtml :18.0f :@"Georgia" :5];
     [cell.body setAttributedText:attributedBody];
     CGSize bodySize = [attributedBody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
-    cell.body.frame=CGRectMake(15+([content.datePath count] - 2) * kGenerationOffset, 48, 290, bodySize.height);
+    cell.body.frame=CGRectMake(15+dateCount, 48, 290-dateCount, bodySize.height);
     
     [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
                   forState:UIControlStateNormal];
@@ -349,7 +359,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [cell.button1 addTarget:self action:@selector(didSelectButton1:)
            forControlEvents:UIControlEventTouchUpInside];
     
-    cell.button1.frame=CGRectMake(10+([content.datePath count] - 2) * kGenerationOffset, 23+cell.body.frame.size.height, 50, 100);
+    cell.button1.frame=CGRectMake(10+dateCount, 23+cell.body.frame.size.height, 50, 100);
     [cell addSubview:cell.button1];
     
     [cell.button2 setImage:[UIImage imageNamed:@"ActionReply"]
@@ -357,7 +367,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [cell.button2 setTitle:@""
                   forState:UIControlStateNormal];
     [cell.button2 addTarget:self action:@selector(didSelectButton2:content:) forControlEvents:UIControlEventTouchUpInside];
-    cell.button2.frame=CGRectMake(cell.button1.frame.size.width+15+([content.datePath count] - 2) * kGenerationOffset, 23+cell.body.frame.size.height, 50, 100);
+    cell.button2.frame=CGRectMake(cell.button1.frame.origin.x+cell.button1.frame.size.width+15, 23+cell.body.frame.size.height, 50, 100);
     [cell addSubview:cell.button2];
     
     [cell.button3 setImage:[UIImage imageNamed:@"More"]
@@ -366,11 +376,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                   forState:UIControlStateNormal];
     [cell.button3 addTarget:self action:@selector(didSelectButton3:)
            forControlEvents:UIControlEventTouchUpInside];
-    cell.button3.frame=CGRectMake(cell.button2.frame.origin.x+cell.button2.frame.size.width+15+([content.datePath count] - 2) * kGenerationOffset, 23+cell.title.frame.size.height+cell.body.frame.size.height, 100, 100);
+    cell.button3.frame=CGRectMake(cell.button2.frame.origin.x+cell.button2.frame.size.width+15, 23+cell.title.frame.size.height+cell.body.frame.size.height, 100, 100);
     [cell addSubview:cell.button3];
     
     
-    CAShapeLayer *line5=[self drawline:CGPointMake(0, 43+cell.body.frame.size.height+cell.body.frame.origin.y) :CGPointMake(320,43+cell.body.frame.size.height+cell.body.frame.origin.y)];
+    CAShapeLayer *line5=[self drawline:CGPointMake(dateCount+10, 43+cell.body.frame.size.height+cell.body.frame.origin.y) :CGPointMake(320,43+cell.body.frame.size.height+cell.body.frame.origin.y)];
     [cell.layer addSublayer:line5];
     
     //    CGFloat leftDistence=((CGFloat)([content.datePath count] - 2) * kGenerationOffset);
@@ -457,71 +467,100 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         
         if ([action isEqualToString:@"Yes"])
         {
-//            NSString *userToken = [self.collection objectForKey:@"lftoken"];
-//                if (userToken != nil) {
-//                    LFSMessageAction action;
-//                    action = LFSMessageLike;
-//                    
-//                    [self.writeClient postMessage:action
-//                                       forContent:self.contentItem.idString
-//                                     inCollection:self.collectionId
-//                                        userToken:userToken
-//                                       parameters:nil
-//                                        onSuccess:^(NSOperation *operation, id responseObject)
-//                     {
-//                         NSLog(@"success posting opine %d", action);
-//                     }
-//                                        onFailure:^(NSOperation *operation, NSError *error)
-//                     {
-//                         NSLog(@"failed posting opine %d", action);
-//                     }];
-//                 
-//                }
-//            
-//                else {
-//                    // userToken is nil -- show an error message
-//                    [[[UIAlertView alloc]
-//                      initWithTitle:kFailureModifyTitle
-//                      message:@"You do not have permission to like comments in this collection"
-//                      delegate:nil
-//                      cancelButtonTitle:@"OK"
-//                      otherButtonTitles:nil] show];
-//                }
+            NSString *userToken = [self.collection objectForKey:@"lftoken"];
+                if (userToken != nil) {
+                    LFSMessageAction action;
+                    action = LFSMessageVote;
+                    
+                    
+//                    NSDictionary *parameters=[[NSDictionary alloc]initWithObjectsAndKeys:@1,@"value", nil];
+                NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:userToken,LFSCollectionPostUserTokenKey,@1,@"value",self.contentItem.idString,@"message_id",nil ];
+                    
+//                [self.writeClient postMessage:action
+//                forContent:self.contentItem.idString
+//                inCollection:self.collectionId
+//                userToken:userToken
+//                parameters:parameters
+//                onSuccess:^(NSOperation *operation, id responseObject)
+//                 {
+//                     NSLog(@"success posting opine %d", action);
+//                 }
+//                onFailure:^(NSOperation *operation, NSError *error)
+//                 {
+//                     NSLog(@"failed posting opine %d", action);
+//                 }];
+                    
+                    [self.writeClient postMessage:action
+                                       forContent:self.contentItem.idString
+                                     inCollection:self.collectionId
+                                        userToken:userToken
+                                       parameters:dict
+                                        onSuccess:^(NSOperation *operation, id responseObject) {
+//                                            if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+//                                            {
+//                                                [collectionViewController didPostContentWithOperation:operation response:responseObject];
+//                                            }
+                                        } onFailure:^(NSOperation *operation, NSError *error) {
+                                            [[[UIAlertView alloc]
+                                              initWithTitle:@"Livefyre Reviews says:"
+                                              message:[error localizedRecoverySuggestion]
+                                              delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil] show];
+                                        }];
+
+                    
+                    
+                }
+            
+                else {
+                    // userToken is nil -- show an error message
+                    [[[UIAlertView alloc]
+                      initWithTitle:@"Livefyre Reviews says:"
+                      message:@"You do not have permission to like comments in this collection"
+                      delegate:nil
+                      cancelButtonTitle:@"OK"
+                      otherButtonTitles:nil] show];
+                }
 
             
         }
         else if ([action isEqualToString:@"No"])
       {
-//                NSString *userToken = [self.collection objectForKey:@"lftoken"];
-//                if (userToken != nil) {
-//                        LFSMessageAction action;
-//                        action = LFSMessageUnlike;
-//                    
-//                    [self.writeClient postMessage:action
-//                                       forContent:self.contentItem.idString
-//                                     inCollection:self.collectionId
-//                                        userToken:userToken
-//                                       parameters:nil
-//                                        onSuccess:^(NSOperation *operation, id responseObject)
-//                     {
-//                         //NSLog(@"success posting opine %d", action);
-//                     }
-//                                        onFailure:^(NSOperation *operation, NSError *error)
-//                     {
-//                         //NSLog(@"failed posting opine %d", action);
-//                     }];
-//                    
-//                }
-//                
-//                else {
-//                    // userToken is nil -- show an error message
-//                    [[[UIAlertView alloc]
-//                      initWithTitle:kFailureModifyTitle
-//                      message:@"You do not have permission to like comments in this collection"
-//                      delegate:nil
-//                      cancelButtonTitle:@"OK"
-//                      otherButtonTitles:nil] show];
-//                }
+          NSString *userToken = [self.collection objectForKey:@"lftoken"];
+          if (userToken != nil) {
+              LFSMessageAction action;
+              action = LFSMessageVote;
+              
+              
+              NSDictionary *parameters=[[NSDictionary alloc]initWithObjectsAndKeys:@2,@"value", nil];
+              
+              
+              [self.writeClient postMessage:action
+                                 forContent:self.contentItem.idString
+                               inCollection:self.collectionId
+                                  userToken:userToken
+                                 parameters:parameters
+                                  onSuccess:^(NSOperation *operation, id responseObject)
+               {
+                   NSLog(@"success posting opine %d", action);
+               }
+                                  onFailure:^(NSOperation *operation, NSError *error)
+               {
+                   NSLog(@"failed posting opine %d", action);
+               }];
+              
+          }
+          
+          else {
+              // userToken is nil -- show an error message
+              [[[UIAlertView alloc]
+                initWithTitle:@"Livefyre Reviews says:"
+                message:@"You do not have permission to like comments in this collection"
+                delegate:nil
+                cancelButtonTitle:@"OK"
+                otherButtonTitles:nil] show];
+          }
           
         }
         else if ([action isEqualToString:@"Cancel"])
