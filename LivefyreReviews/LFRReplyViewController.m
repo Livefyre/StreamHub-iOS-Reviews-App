@@ -118,11 +118,9 @@
   
     
 
-    LFSAuthorProfile *author = self.user.profile;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     self.navigationController.navigationBar.barTintColor=UIColorFromRGB(0xF6F3F1);
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
-    [self.WriteCommentView.textView becomeFirstResponder];
     
     if (self.replyToContent != nil) {
         [self.postNavbar.topItem setTitle:@"Reply"];
@@ -134,16 +132,11 @@
             NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
             paragraphStyle.alignment = NSTextAlignmentCenter;
             paragraphStyle.lineSpacing = REPLY_FONT_SIZE/2;
-            UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
-            NSRange range=NSMakeRange(0, replyPrefix.length);
-            NSMutableAttributedString *replyPrefixAttribute = [[NSMutableAttributedString alloc]initWithString : replyPrefix ] ;
-            [replyPrefixAttribute addAttribute:NSFontAttributeName value:labelFont range:range];
-            [replyPrefixAttribute addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x007aff) range:NSRangeFromString(author.displayName)];
-            
-            [self.WriteCommentView.textView setAttributedText:replyPrefixAttribute];
-            
+            [self.WriteCommentView.textView setText:replyPrefix];
         }
     }
+    [self.WriteCommentView.textView becomeFirstResponder];
+
 }
 
 - (NSString*)replyPrefixFromContent:(LFSContent*)content

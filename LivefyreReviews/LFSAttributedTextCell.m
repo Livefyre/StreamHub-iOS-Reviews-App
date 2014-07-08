@@ -41,7 +41,7 @@ static const CGFloat kCellHeaderAdjust = 2.f;
 
 static const CGFloat kCellHeaderAttributeAdjust = -1.f;
 static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
-static const CGFloat kCellHeaderAttributeTopFontSize = 10.f;
+static const CGFloat kCellHeaderAttributeTopFontSize = 12.f;
 
 static const CGFloat kCellHeaderAccessoryRightAdjust = 1.f;
 static const CGFloat kCellHeaderAccessoryRightFontSize = 11.f;
@@ -364,7 +364,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         [_headerAttributeTopView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
         [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kCellHeaderAttributeTopFontSize]];
-        [_headerAttributeTopView setTextColor:[UIColor blueColor]];
+        [_headerAttributeTopView setTextColor:UIColorFromRGB(0x0F98EC)];
         
         // add to superview
         [self.contentView addSubview:_headerAttributeTopView];
@@ -376,25 +376,25 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
 - (UIImageView*)headerAttributeTopImageView
 {
-    if (_headerAttributeTopImageView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
-                                      kCellHeaderAttributeTopHeight);
-        CGRect frame;
-        frame.size = labelSize;
-        frame.origin = CGPointMake(leftColumnWidth,
-                                   kCellPadding.top); // size.y will be changed in layoutSubviews
-        // initialize
-        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
-        
-        // configure
-        [_headerAttributeTopImageView
-         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerAttributeTopImageView setContentMode:UIViewContentModeTopLeft];
-        
-        // add to superview
-        [self.contentView addSubview:_headerAttributeTopImageView];
-    }
+//    if (_headerAttributeTopImageView == nil) {
+//        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
+//        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+//                                      kCellHeaderAttributeTopHeight);
+//        CGRect frame;
+//        frame.size = labelSize;
+//        frame.origin = CGPointMake(leftColumnWidth,
+//                                   kCellPadding.top); // size.y will be changed in layoutSubviews
+//        // initialize
+//        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
+//        
+//        // configure
+//        [_headerAttributeTopImageView
+//         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//        [_headerAttributeTopImageView setContentMode:UIViewContentModeTopLeft];
+//        
+//        // add to superview
+//        [self.contentView addSubview:_headerAttributeTopImageView];
+//    }
     return _headerAttributeTopImageView;
 }
 
@@ -437,10 +437,10 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
                                   kCellPadding.top - kCellHeaderAdjust+_headerTitleView.frame.size.height,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
                                   kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust-_headerTitleView.frame.size.height);
-        NSLog(@"%f %f",frame.size.width,frame.size.height);
+//        NSLog(@"%f %f",frame.size.width,frame.size.height);
         // initialize
 
-        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_small"] emptyStar:[UIImage imageNamed:@"icon_star_empty_small"]];
+        _headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_small.png"] emptyStar:[UIImage imageNamed:@"icon_star_empty_small.png"]];
         _headerRatingView.padding = 3;
         _headerRatingView.alignment = RateViewAlignmentLeft;
         _headerRatingView.userInteractionEnabled = NO;
@@ -748,9 +748,21 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
             count++;
         }[voteObject valueForKey:@"value"];
     }
+    NSString *replyString=nil;
+    if(_content.nodeCount-1 ==0){
+        replyString=@"No Replies";
+    }else if (_content.nodeCount-1 ==1){
+        replyString=@"1 Reply";
+    }else{
+        replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
+    }
+    
+    
+    
+    
     [self.footerLeftView setText:[NSString stringWithFormat:@"%d of %ld found helpful",count,(unsigned long)[[_content.annotations objectForKey:@"vote" ] count]]];
     [self.footerLeftView resizeVerticalBottomRightTrim];
-    [self.footerRightView setText:[NSString stringWithFormat:@"%lu Replies",(long)_content.nodeCount-1 ] ];
+    [self.footerRightView setText:[NSString stringWithFormat:@"%@",replyString ]];
     [self.footerRightView resizeVerticalBottomRightTrim];
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
@@ -792,7 +804,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     textTitleContentFrame.origin = CGPointMake(leftTitleColumn,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
     textTitleContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
-                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(290.0f)]);
+                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(320.0f - leftTitleColumn - rightTitleColumn)]);
     [self.bodyTitleView setFrame:textTitleContentFrame];
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
@@ -817,7 +829,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     textContentFrame.origin = CGPointMake(leftTitleColumn,
                                                kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator+textTitleContentFrame.size.height+15);
     textContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
-                                            [LFSAttributedTextCell cellHeightForAttributedTitle:attributedbodyString hasAttachment:NO width:(290.0f)]);
+                                            [LFSAttributedTextCell cellHeightForAttributedTitle:attributedbodyString hasAttachment:NO width:(320.0f - leftTitleColumn - rightTitleColumn)]);
     
 
     

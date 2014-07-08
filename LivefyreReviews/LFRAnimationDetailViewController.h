@@ -1,9 +1,9 @@
 //
-//  LFRDetailViewController.h
-//  LiveFyreReviewsIOS2
+//  LFRAnimationDetailViewController.h
+//  LivefyreReviews
 //
-//  Created by kvana inc on 28/06/14.
-//  Copyright (c) 2014 kvana inc. All rights reserved.
+//  Created by Kvana Inc 2 on 04/07/14.
+//  Copyright (c) 2014 Kvana Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -13,7 +13,8 @@
 #import "LFSContentCollection.h"
 #import "LFSUser.h"
 
-@protocol LFRDetailTableViewCellDelegate;
+
+@protocol LFRAnimationDetailTableViewCellDelegate;
 
 @protocol Delete <NSObject>
 -(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content;
@@ -24,11 +25,11 @@
 
 @end
 
-@interface LFRDetailViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIActionSheetDelegate>
-@property (weak, nonatomic) id <Delete> deletedContent;
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
- @property (nonatomic, copy) NSDictionary *collection;
+@interface LFRAnimationDetailViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIActionSheetDelegate>
+@property (weak, nonatomic) id <Delete> deletedContent;
+@property (weak, nonatomic) IBOutlet UITableView *detailTable;
+@property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
 @property (retain, nonatomic) UIActionSheet *actionSheet;
 @property (retain, nonatomic) UIActionSheet *actionSheet1;
@@ -36,4 +37,9 @@
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, strong) NSMutableArray *mainContent;
 @property (nonatomic, weak)LFSUser *user;
+
+- (IBAction)cancelButton:(id)sender;
+
+
+
 @end

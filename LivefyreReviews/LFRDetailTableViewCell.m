@@ -44,7 +44,7 @@
         [self addSubview:self.rateView];
 
         //User name
-        self.userName= [[UILabel alloc]initWithFrame:CGRectMake(73, 28, 200, 14)];
+        self.userName= [[UILabel alloc]initWithFrame:CGRectMake(73, 26, 200, 18)];
         self.userName.font=[UIFont fontWithName:@"helveticaNeue-Bold" size:16];
         self.userName.textColor=UIColorFromRGB(0x2F3440);
         [self addSubview:self.userName];
