@@ -350,9 +350,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     NSMutableAttributedString *attributedBody=[ cell getAttributedTextWithFormat:content.bodyHtml :18.0f :@"Georgia" :5];
     [cell.body setAttributedText:attributedBody];
     CGSize bodySize = [attributedBody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+
     cell.body.frame=CGRectMake(15+dateCount, 48, 290-dateCount, bodySize.height);
-    
-    [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
+
+        [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
                   forState:UIControlStateNormal];
     [cell.button1 setTitle:@""
                   forState:UIControlStateNormal];

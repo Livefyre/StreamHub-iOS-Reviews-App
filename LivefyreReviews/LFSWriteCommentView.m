@@ -321,7 +321,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   95+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
+                                   90+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -=  kPostContentInset.top;
@@ -359,7 +359,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   95+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
+                                   92+kDetailHeaderTitleHeight); // size.y will be changed in layoutSubviews
 
         
         // initialize
@@ -389,7 +389,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kDetailHeaderTitleHeight+145); // size.y will be changed in layoutSubviews
+                                   kDetailHeaderTitleHeight+150); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -=  kPostContentInset.top;
@@ -428,7 +428,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kDetailHeaderTitleHeight+145); // size.y will be changed in layoutSubviews
+                                   kDetailHeaderTitleHeight+152); // size.y will be changed in layoutSubviews
         if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
             // iOS6
             frame.origin.y -= kPostContentInset.top;
