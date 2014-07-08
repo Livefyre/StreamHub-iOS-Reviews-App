@@ -64,7 +64,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 @property (readonly, nonatomic) UILabel *headerTitleLable;
-@property (readonly, nonatomic) DLStarRatingControl *starView;
 
 @property (readonly, nonatomic) UILabel *headerProsLable;
 @property (readonly, nonatomic) UILabel *consTitleLable;
@@ -224,7 +223,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     if (_headerTitleLable == nil) {
         
         CGFloat leftColumnWidth = kDetailPadding.left;
-        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+//        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
         CGSize labelSize = CGSizeMake(0, kDetailHeaderTitleHeight);
         CGRect frame;
         frame.size = labelSize;

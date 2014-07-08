@@ -99,7 +99,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 #pragma mark - LFSContentCollection
 @interface LFSContentCollection ()
 
-@property (nonatomic, strong) NSMutableDictionary *mapping;
 @property (nonatomic, strong) NSMutableArray *array;
 @property (nonatomic, strong) NSMutableDictionary *likes;
 

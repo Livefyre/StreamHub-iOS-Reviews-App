@@ -67,6 +67,7 @@
 		6DA898CA19475570000585A4 /* DLStarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C619475570000585A4 /* DLStarView.m */; };
 		6DA898CB19475570000585A4 /* UIView+Subviews.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C819475570000585A4 /* UIView+Subviews.m */; };
 		6DA898D919475778000585A4 /* DLStarRatingDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898D819475778000585A4 /* DLStarRatingDemoViewController.xib */; };
+		7178E78F19667AB0006BF6F6 /* LFRAnimationDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7178E78E19667AB0006BF6F6 /* LFRAnimationDetailViewController.m */; };
 		71BFFDE31962E44A007F953F /* LFRDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71BFFDDF1962E44A007F953F /* LFRDetailViewController.m */; };
 		71BFFDE41962E44A007F953F /* LFRDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 71BFFDE11962E44A007F953F /* LFRDetailTableViewCell.m */; };
 		71BFFE3C19630ACC007F953F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 71BFFE1E19630ACC007F953F /* LICENSE */; };
@@ -200,6 +201,8 @@
 		6DA898C719475570000585A4 /* UIView+Subviews.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Subviews.h"; sourceTree = "<group>"; };
 		6DA898C819475570000585A4 /* UIView+Subviews.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Subviews.m"; sourceTree = "<group>"; };
 		6DA898D819475778000585A4 /* DLStarRatingDemoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DLStarRatingDemoViewController.xib; sourceTree = "<group>"; };
+		7178E78D19667AB0006BF6F6 /* LFRAnimationDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRAnimationDetailViewController.h; sourceTree = "<group>"; };
+		7178E78E19667AB0006BF6F6 /* LFRAnimationDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRAnimationDetailViewController.m; sourceTree = "<group>"; };
 		71BFFDDF1962E44A007F953F /* LFRDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRDetailViewController.m; sourceTree = "<group>"; };
 		71BFFDE01962E44A007F953F /* LFRDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRDetailViewController.h; sourceTree = "<group>"; };
 		71BFFDE11962E44A007F953F /* LFRDetailTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRDetailTableViewCell.m; sourceTree = "<group>"; };
@@ -301,12 +304,14 @@
 				220F5C0919444C8B0067B251 /* LFRViewController.m */,
 				71BFFDE01962E44A007F953F /* LFRDetailViewController.h */,
 				71BFFDDF1962E44A007F953F /* LFRDetailViewController.m */,
+				7178E78D19667AB0006BF6F6 /* LFRAnimationDetailViewController.h */,
+				7178E78E19667AB0006BF6F6 /* LFRAnimationDetailViewController.m */,
+				6DA463761952E3790012F7FB /* LFRReplyViewController.h */,
+				6DA463741952E36F0012F7FB /* LFRReplyViewController.m */,
 				71BFFDE21962E44A007F953F /* LFRDetailTableViewCell.h */,
 				71BFFDE11962E44A007F953F /* LFRDetailTableViewCell.m */,
 				6DA120DF1945E1AE009084EC /* LFSPostViewController.h */,
 				6DA120E01945E1AE009084EC /* LFSPostViewController.m */,
-				6DA463761952E3790012F7FB /* LFRReplyViewController.h */,
-				6DA463741952E36F0012F7FB /* LFRReplyViewController.m */,
 				6DA3A45D19446F2400AF54AB /* LFRConfig.h */,
 				6DA3A45E19446F2400AF54AB /* LFRConfig.m */,
 				6DA898C319475570000585A4 /* DLStarRatingControl.h */,
@@ -324,7 +329,6 @@
 				6DA43AD91949E6590066DB73 /* StarEmpty.png */,
 				6DA43ADA1949E6590066DB73 /* StarEmpty@2x.png */,
 				6DA43ADB1949E6590066DB73 /* StarEmptyLarge.png */,
-				6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */,
 				6DA43ADC1949E6590066DB73 /* StarEmptyLarge@2x.png */,
 				6DA43ADD1949E6590066DB73 /* StarFull.png */,
 				6DA43ADE1949E6590066DB73 /* StarFull@2x.png */,
@@ -374,6 +378,7 @@
 			isa = PBXGroup;
 			children = (
 				6DA4637A1952F4E50012F7FB /* LFSReplyWriteCommentView.h */,
+				6DA4637B1952F4E50012F7FB /* LFSReplyWriteCommentView.m */,
 				6DA43AEC1949FAF70066DB73 /* LFSRightAlignedButton.h */,
 				6DA43AED1949FAF70066DB73 /* LFSRightAlignedButton.m */,
 				6DA66A07194B2C3F00590F96 /* LFSContentActions.h */,
@@ -698,6 +703,7 @@
 				6DA898CB19475570000585A4 /* UIView+Subviews.m in Sources */,
 				6DA1EED21944D6C1008E4AD3 /* LFSContentCollection.m in Sources */,
 				6DA1EEED1944DB5C008E4AD3 /* UIImage+LFSColor.m in Sources */,
+				7178E78F19667AB0006BF6F6 /* LFRAnimationDetailViewController.m in Sources */,
 				6DA43AEE1949FAF70066DB73 /* LFSRightAlignedButton.m in Sources */,
 				6DA120E41945E2FA009084EC /* LFSWriteCommentView.m in Sources */,
 				6DA1EED51944D757008E4AD3 /* LFSTextField.m in Sources */,
