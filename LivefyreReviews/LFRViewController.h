@@ -14,6 +14,7 @@
 #import "DYRateView.h"
 #import "TSMessage.h"
 #import "TSMessageView.h"
+#import "LFREditViewViewController.h"
 
 @interface LFRViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,LFSContentCollectionDelegate,LFSPostViewControllerDelegate,LFSContentCollectionDelegate,Delete>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;

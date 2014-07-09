@@ -529,7 +529,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         {
             if ([self.deletedContent respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
                 [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem];
-                [self.navigationController popToRootViewControllerAnimated:YES];
+//                [self.navigationController popToRootViewControllerAnimated:YES];
             }
         }
         else if ([action isEqualToString:@"Feature"])

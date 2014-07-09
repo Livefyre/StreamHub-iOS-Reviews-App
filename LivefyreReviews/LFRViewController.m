@@ -1385,15 +1385,19 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 {
     if (content.authorIsModerator || content.author.self) {
         NSLog(@"%@",content);
-        [self.postViewController setCollection:self.collection];
-       
-        [self.postViewController setCollectionId:self.collectionId];
-        [self.postViewController setAvatarImage:self.placeholderImage];
-        [self.postViewController setUser:self.user];
-        [self.postViewController setContent:content];
-        [self.postViewController setIsEdit:YES];
+        LFREditViewViewController *EditViewController=[[LFREditViewViewController alloc]init];
         
-        [self.navigationController presentViewController:self.postViewController
+        EditViewController.content=content;
+        EditViewController.collection=self.collection;
+        EditViewController.collectionId=self.collectionId;
+//        [self.postViewController setCollection:self.collection];
+//        [self.postViewController setCollectionId:self.collectionId];
+//        [self.postViewController setAvatarImage:self.placeholderImage];
+//        [self.postViewController setUser:self.user];
+//        [self.postViewController setContent:content];
+//        [self.postViewController setIsEdit:YES];
+        
+        [self.navigationController presentViewController:EditViewController
                                                 animated:YES
                                               completion:nil];
     }

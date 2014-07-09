@@ -131,18 +131,15 @@
         }
     }
     if(_isEdit){
-        ;
 
         [self.writeCommentView.textView setAttributedText:[LFSBasicHTMLParser attributedStringByProcessingMarkupInString:_content.bodyHtml]];
         [self.writeCommentView.titleTextField setText:_content.title];
-        self.writeCommentView.starView.rating=[[[_content.annotations valueForKey:@"rating"] objectAtIndex:0] floatValue]/20;
+        NSNumber *rating=[[_content.annotations objectForKey:@"rating"] objectAtIndex:0];
+        //[cell.rateView setRate:[rating floatValue]/20];
+        self.writeCommentView.starView.rating=[rating floatValue]/20;
         self.writeCommentView.starView.userInteractionEnabled=NO;
-
         
     }
-    
-    
-    
 }
 
 - (NSString*)replyPrefixFromContent:(LFSContent*)content
@@ -283,7 +280,9 @@
         NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
         [f setNumberStyle:NSNumberFormatterNoStyle];
         NSNumber * value = [f numberFromString:self.writeCommentView.ratingPost];
-        
+        if(self.isEdit){
+           value=[[_content.annotations objectForKey:@"rating"] objectAtIndex:0];
+         }
 
         if (title.length == 0 ) {
             UIAlertView * alertView=[[UIAlertView alloc]initWithTitle:@"alert" message:@"Your review must include a title" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
@@ -326,18 +325,14 @@
             NSString *bodyofReview=[NSString stringWithFormat:@"%@%@%@",pros,cons,text];
 
         [textView setText:@""];
-        
-        
-        
-        
+          
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
             collectionViewController = [self.delegate collectionViewController];
         }
         
         NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey, nil ];
-        
-        
+         
             if(self.isEdit){
                 [self.writeClient postMessage:LFSMessageEdit
                                    forContent:self.content.idString
@@ -375,6 +370,7 @@
 
             }else{
         
+                
         [self.writeClient postContentType:2 forCollection:self.collectionId parameters:dict
                            onSuccess:^(NSOperation *operation, id responseObject) {
                                if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
