@@ -103,6 +103,7 @@
     
     return attributedText;
 }
+
 @synthesize button1=_button1;
 -(UIButton*)button1{
     if (_button1 == nil) {
