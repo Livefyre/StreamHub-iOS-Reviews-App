@@ -184,6 +184,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [self.tableView reloadData];
     // {{{ Navigation bar
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
@@ -515,7 +516,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
-            if ([content.parentId isEqual:@""] & [content.author.idString isEqual:self.user.idString]) {
+            if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && content.visibility==LFSContentVisibilityEveryone) {
                 ownReview=content;
                 [allReviewsBeforeSort removeObjectAtIndex:index];
         }
@@ -705,7 +706,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
-            if ([content.parentId isEqual:@""] & [content.author.idString isEqual:self.user.idString]) {
+            if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && content.visibility==LFSContentVisibilityEveryone) {
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
 //                [self.navigationController presentViewController:detailViewController animated:YES completion:nil];
@@ -760,7 +761,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
     CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
     LFSContentVisibility visibility = content.visibility;
-    if (visibility == LFSContentVisibilityEveryone || visibility == LFSContentVisibilityPendingDelete)
+    if (visibility == LFSContentVisibilityEveryone)
     {
         NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
         if (cellHeight == nil)
@@ -822,11 +823,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //    }
 //
     int count=0;
+    if(_contentArray.count!=0)
     for (LFSContent *content in _contentArray) {
-        if(content.visibility==LFSContentVisibilityEveryone)
+        if(content.visibility==LFSContentVisibilityEveryone && content.parentId)
             count++;
     }
-    return count;//[_contentArray count];
+   return count;
+    //return [_contentArray count];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -1267,8 +1270,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
          {
              // show an error message
              [[[UIAlertView alloc]
-               initWithTitle:kFailureModifyTitle
-               message:[error localizedRecoverySuggestion]
+               initWithTitle:nil
+               message:@"An error has occurred. Please try again. "
                delegate:nil
                cancelButtonTitle:@"OK"
                otherButtonTitles:nil] show];
@@ -1289,8 +1292,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
          {
              // show an error message
              [[[UIAlertView alloc]
-               initWithTitle:kFailureModifyTitle
-               message:[error localizedRecoverySuggestion]
+               initWithTitle:nil
+               message:@"An error has occurred. Please try again."
                delegate:nil
                cancelButtonTitle:@"OK"
                otherButtonTitles:nil] show];
@@ -1312,8 +1315,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
          {
              // show an error message
              [[[UIAlertView alloc]
-               initWithTitle:kFailureModifyTitle
-               message:[error localizedRecoverySuggestion]
+               initWithTitle:nil
+               message:@"An error has occurred. Please try again."
                delegate:nil
                cancelButtonTitle:@"OK"
                otherButtonTitles:nil] show];
@@ -1358,8 +1361,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
      {
          // show an error message
          [[[UIAlertView alloc]
-           initWithTitle:kFailureModifyTitle
-           message:[error localizedRecoverySuggestion]
+           initWithTitle:nil
+           message:@"An error has occurred. Please try again."
            delegate:nil
            cancelButtonTitle:@"OK"
            otherButtonTitles:nil] show];

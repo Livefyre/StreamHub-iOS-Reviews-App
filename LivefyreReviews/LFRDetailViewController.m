@@ -195,41 +195,71 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //setting profile pic
     [cell.profileImage  setImageWithURL:[NSURL URLWithString:content.author.avatarUrlString75]
                        placeholderImage:placeholder];
-    //user name
-    cell.userName.text=content.author.displayName ?: @"";
+//    //user name
+//    cell.userName.text=content.author.displayName ?: @"";
+//    
+//    //if moderator
+//    if (content.authorIsModerator) {
+//        cell.moderator.text=@"Moderator";
+//        cell.moderator.frame=CGRectMake(73,10, 80, 18);
+//    }
+//    else{
+//        cell.moderator.text=nil;
+//    }
+//    if (content.isFeatured){
+//        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
+//        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+//    }
+//    else{
+//        cell.featuredImage.image=nil;
+//    }
+//    
+//    
+//    
+//    //    ////if self
+//    if (content.authorId) {
+//        cell.moderator.frame=CGRectMake(73,8, 80, 18);
+//        cell.moderator.text=@"";
+////        heightForModeFeat=10;
+//        cell.featuredImage.frame=CGRectMake(73,8, 80, 18);
+//        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+//    }else if (content.isFeatured){
+//        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
+//        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+//    }
     
+    ///////
+    //user name
+    int heightForModeFeat=0;
     //if moderator
-    if (content.authorIsModerator) {
+    if (content.authorIsModerator && content.isFeatured) {
+        cell.moderator.frame=CGRectMake(168,8, 80, 18);
         cell.moderator.text=@"Moderator";
-        cell.moderator.frame=CGRectMake(73,10, 80, 18);
-    }
-    else{
-        cell.moderator.text=nil;
-    }
-    if (content.isFeatured){
-        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
+        heightForModeFeat=10;
+        cell.featuredImage.frame=CGRectMake(73,8, 80, 18);
         cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+    }
+    else if(content.authorIsModerator&& !content.isFeatured ){
+        cell.moderator.frame=CGRectMake(73,8, 80, 18);
+        cell.moderator.text=@"Moderator";
+        heightForModeFeat=10;
+        
+    }
+    else if (content.isFeatured){
+        cell.featuredImage.frame=CGRectMake(73,8, 80, 18);
+        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+        heightForModeFeat=10;
+        
     }
     else{
         cell.featuredImage.image=nil;
+        cell.moderator.text=nil;
+        heightForModeFeat=0;
     }
+    cell.userName.frame=CGRectMake(73, 15+heightForModeFeat, 200, 16);
+    cell.userName.text=content.author.displayName ?: @"";
     
-    
-    
-    //    ////if self
-    if (content.authorId) {
-        cell.moderator.frame=CGRectMake(73,8, 80, 18);
-        cell.moderator.text=@"";
-//        heightForModeFeat=10;
-        cell.featuredImage.frame=CGRectMake(73,8, 80, 18);
-        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
-    }else if (content.isFeatured){
-        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
-        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
-    }
-    
-    
-    
+    /////
     //rating
     [cell.rateView
      setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
@@ -370,7 +400,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
     cell.body.frame=CGRectMake(15+dateCount, 48, 290-dateCount, bodySize.height);
 
-        [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
+    [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
                   forState:UIControlStateNormal];
     [cell.button1 setTitle:@""
                   forState:UIControlStateNormal];
@@ -425,12 +455,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
     NSLog(@" Index path is %ld",(long)indexPath.row);
     
+    
     self.actionSheet=[[UIActionSheet alloc]initWithTitle:@"Was this helpful?" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Yes" otherButtonTitles:@"No", nil];
          self.actionSheet.destructiveButtonIndex=1;
         [ self.actionSheet showInView:self.view];
 }
-
-
 
 -(void)didSelectButton2:(id)sender content:(id)content  {
     
@@ -496,6 +525,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                     
                     LFRDetailTableViewCell *detailCell=[[LFRDetailTableViewCell alloc]init];
                     [detailCell.button1 setImage:[UIImage imageNamed:@"StateLiked"] forState:UIControlStateNormal];
+                    
                     
 //                [self.writeClient postMessage:action
 //                forContent:self.contentItem.idString
