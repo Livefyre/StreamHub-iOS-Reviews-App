@@ -217,9 +217,11 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 {
     // hide the navigation controller here
     [super viewWillDisappear:animated];
-    [self.streamClient stopStream];
-    [self.operationQueue cancelAllOperations];
+//    [self.streamClient stopStream];
+//    [self.operationQueue cancelAllOperations];
     [self.navigationController setToolbarHidden:YES animated:animated];
+    
+    
 }
 
 
@@ -595,7 +597,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [viewButton.titleLabel setFont:[UIFont fontWithName:@"helvetica neue medium" size:16]];
         [viewButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
         
-        self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440);
+//        self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440);
         [viewButton addTarget:self action:@selector(viewReviewButtonSelected) forControlEvents:UIControlEventTouchUpInside];
         
         
@@ -1387,7 +1389,6 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 -(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
 {
     if (content.authorIsModerator || content.author.self) {
-        NSLog(@"%@",content);
         LFREditViewViewController *EditViewController=[[LFREditViewViewController alloc]init];
         
         EditViewController.content=content;

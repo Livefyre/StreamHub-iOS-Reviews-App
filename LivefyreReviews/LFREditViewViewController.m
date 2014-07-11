@@ -303,7 +303,7 @@ static const UIEdgeInsets kPostContentInset = {
     }
     
     else{
-        _bodyofReview=[NSString stringWithFormat:@"<p><strong>Pros:</strong>%@</p><p><strong>Cons:</strong>%@</p><p><strong>Description:</strong>%@</p>", self.prosTextField.text,self.consTextField.text,_description.text];
+        _bodyofReview=[NSString stringWithFormat:@"<p><strong></strong>%@</p>",_description.text];
         
         NSString *userToken = [self.collection objectForKey:@"lftoken"];
         if (userToken != nil) {
@@ -326,8 +326,8 @@ static const UIEdgeInsets kPostContentInset = {
                                     {
                                         [collectionViewController didPostContentWithOperation:operation response:responseObject];
                                     }
-//                                    [_content1 addContent:[responseObject objectForKey:@"messages"]
-//                                             withAuthors:[responseObject objectForKey:@"authors"]];
+                                    [_content1 addContent:[responseObject objectForKey:@"messages"]
+                                             withAuthors:[responseObject objectForKey:@"authors"]];
 
                                 } onFailure:^(NSOperation *operation, NSError *error) {
                                     [[[UIAlertView alloc]

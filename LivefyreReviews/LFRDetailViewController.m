@@ -49,12 +49,22 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if ([[notification name] isEqualToString:@"ToDetail"]){
         
         NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-        [chaildContent addObject:[self.mainContent objectAtIndex:0]];
+        //[chaildContent addObject:[self.mainContent objectAtIndex:0]];
+        
+        
+        
+        
         LFSContent *rootContent=[self.mainContent objectAtIndex:0];
+        
+        
+        
+        
         for (int i=0; i<[[notification object] count]; i++) {
             LFSContent *singleContent=[[notification object] objectAtIndex:i];
-            if ([singleContent.parentId isEqual:rootContent.idString]) {
-                [chaildContent addObject:singleContent];
+            if ([singleContent.idString isEqual:rootContent.idString]) {
+                //NSMutableArray *test=[[NSMutableArray alloc]init];
+                [self recursiveChilds:singleContent.children :chaildContent];
+                break;
             }
         }
         _mainContent=nil;
@@ -64,6 +74,27 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
 }
 
+
+
+-(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
+    NSEnumerator *enumerator = [hashtable objectEnumerator];
+    id value;
+    
+    while ((value = [enumerator nextObject])) {
+        /* code that acts on the hash table's values */
+        if([value isKindOfClass:[LFSContent class]])
+        {
+            if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
+                [test addObject:value];
+                
+            }
+            [self recursiveChilds:((LFSContent*)value).children :test];
+            
+        }
+        
+    }
+    return test;
+}
 @synthesize writeClient = _writeClient;
 - (LFSWriteClient*)writeClient
 {
@@ -83,6 +114,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     self.tableView.delegate=self;
     self.tableView.dataSource=self;
     self.title=@"Review";
+    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
+
     self.contentDictionary=[[NSMutableDictionary alloc]initWithObjectsAndKeys:self.contentItem,@"content",nil];
     //self.navigationController.navigationBarHidden=YES;
      self.view.backgroundColor=UIColorFromRGB(0xF3F3F3);
@@ -96,9 +129,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 -(void)viewWillAppear:(BOOL)animated{
          [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    [self.navigationController setToolbarHidden:YES animated:YES];
+    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
 
-     self.navigationController.navigationBarHidden=NO;
+    [self.navigationController setToolbarHidden:YES animated:YES];
+    self.navigationController.navigationBarHidden=NO;
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
     if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
@@ -199,23 +233,23 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 //    cell.userName.text=content.author.displayName ?: @"";
 //    
 //    //if moderator
-//    if (content.authorIsModerator) {
-//        cell.moderator.text=@"Moderator";
-//        cell.moderator.frame=CGRectMake(73,10, 80, 18);
-//    }
-//    else{
-//        cell.moderator.text=nil;
-//    }
-//    if (content.isFeatured){
-//        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
-//        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
-//    }
-//    else{
-//        cell.featuredImage.image=nil;
-//    }
-//    
-//    
-//    
+    if (content.authorIsModerator) {
+        cell.moderator.text=@"Moderator";
+        cell.moderator.frame=CGRectMake(73,10, 80, 18);
+    }
+    else{
+        cell.moderator.text=nil;
+    }
+    if (content.isFeatured){
+        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
+        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
+    }
+    else{
+        cell.featuredImage.image=nil;
+    }
+    
+    
+    
 //    //    ////if self
 //    if (content.authorId) {
 //        cell.moderator.frame=CGRectMake(73,8, 80, 18);
@@ -233,8 +267,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     int heightForModeFeat=0;
     //if moderator
     if (content.authorIsModerator && content.isFeatured) {
-        cell.moderator.frame=CGRectMake(168,8, 80, 18);
-        cell.moderator.text=@"Moderator";
+//        cell.moderator.frame=CGRectMake(168,8, 80, 18);
+//        cell.moderator.text=@"Moderator";
         heightForModeFeat=10;
         cell.featuredImage.frame=CGRectMake(73,8, 80, 18);
         cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
@@ -259,6 +293,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     cell.userName.frame=CGRectMake(73, 15+heightForModeFeat, 200, 16);
     cell.userName.text=content.author.displayName ?: @"";
     
+//    [cell.rateView setFrame:CGRectMake(73, 41+heightForModeFeat, 200, 16)];
+//    cell.footerLeftView.frame=CGRectMake(160, 40+heightForModeFeat, 200, 16);
     /////
     //rating
     [cell.rateView
@@ -273,7 +309,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     for (NSDictionary *voteObject in votes) {
         if ([[voteObject valueForKey:@"value"] integerValue] ==1) {
             count++;
-        }[voteObject valueForKey:@"value"];
+        }
+        [voteObject valueForKey:@"value"];
     }
     
     cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %lu found helpful",count,(unsigned long)[[content.annotations valueForKey:@"vote"] count]] ;
@@ -333,11 +370,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //((CGFloat)([content.datePath count] - 1) * kGenerationOffset
     float dateCount;
     
-    if([content.datePath count] <=6){
+    if([content.datePath count] <=5){
         dateCount=([content.datePath count] - 2)* kGenerationOffset;
     }
     else{
-        dateCount=4*kGenerationOffset;
+        dateCount=3*kGenerationOffset;
     }
     //profile image
     UIImage *placeholder=[UIImage imageWithColor:
@@ -524,7 +561,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                 NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:userToken,LFSCollectionPostUserTokenKey,@1,@"value",self.contentItem.idString,@"message_id",nil ];
                     
                     LFRDetailTableViewCell *detailCell=[[LFRDetailTableViewCell alloc]init];
-                    [detailCell.button1 setImage:[UIImage imageNamed:@"StateLiked"] forState:UIControlStateNormal];
+                    [detailCell.button1 setImage:[UIImage imageNamed:@"StateLiked.png"] forState:UIControlStateNormal];
                     
                     
 //                [self.writeClient postMessage:action
