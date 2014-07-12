@@ -77,11 +77,15 @@ static const CGFloat kPostContentFontSize = 18.0f;
         NSArray *words=[_textView.text componentsSeparatedByString:@" "];
         
         for (NSString *word in words) {
+            NSRange range=[_textView.text rangeOfString:word];
+
             if ([word hasPrefix:@"@"]) {
-                NSRange range=[_textView.text rangeOfString:word];
                 UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
                 [string addAttribute:NSFontAttributeName value:labelFont range:range];
                 [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x0f98ec) range:range];
+            }else{
+                UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
+                [string addAttribute:NSFontAttributeName value:labelFont range:range];
             }
         }
         [_textView setAttributedText:string];

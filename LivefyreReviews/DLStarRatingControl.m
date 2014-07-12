@@ -62,7 +62,7 @@
 	self = [super initWithFrame:frame];
 	if (self) {
         isFractionalRatingEnabled = isFract;
-		numberOfStars = _numberOfStars;
+		numberOfStars = (int)_numberOfStars;
         if (isFractionalRatingEnabled)
             numberOfStars *=kNumberOfFractions;
 		[self setupView];
@@ -81,7 +81,7 @@
 
 - (void)setStar:(UIImage*)defaultStarImage highlightedStar:(UIImage*)highlightedStarImage {
   for(NSInteger i = 0; i < numberOfStars; i++){
-    [self setStar:defaultStarImage highlightedStar:highlightedStarImage atIndex:i];
+    [self setStar:defaultStarImage highlightedStar:highlightedStarImage atIndex:(int)i];
   }
 }
 
@@ -136,7 +136,7 @@
 	CGPoint point = [touch locationInView:self];	
 	UIButton *pressedButton = [self starForPoint:point];
 	if (pressedButton) {
-		int idx = pressedButton.tag;
+		int idx = (int)pressedButton.tag;
 		if (pressedButton.highlighted) {
 			[self disableStarsDownToExclusive:idx];
 		} else {
@@ -156,7 +156,7 @@
 	
 	UIButton *pressedButton = [self starForPoint:point];
 	if (pressedButton) {
-		int idx = pressedButton.tag;
+		int idx = (int)pressedButton.tag;
 		UIButton *currentButton = (UIButton*)[self subViewWithTag:currentIdx];
 		
 		if (idx < currentIdx) {

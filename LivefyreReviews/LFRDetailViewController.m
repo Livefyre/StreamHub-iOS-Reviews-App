@@ -438,7 +438,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
     if ([content.annotations objectForKey:@"vote"]) {
         for ( NSString *voteString in [[content.annotations objectForKey:@"vote"]valueForKey:@"author"]) {
-            if ([voteString isEqualToString:self.user.idString])
+            if ([[voteString valueForKey:@"author"] isEqualToString:self.user.idString] && [[voteString valueForKey:@"value"] integerValue]==1 )
                 [cell.button1 setImage:[UIImage imageNamed:@"StateLiked"]
                               forState:UIControlStateNormal];
             else
@@ -571,11 +571,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                     
 //                    NSDictionary *parameters=[[NSDictionary alloc]initWithObjectsAndKeys:@1,@"value", nil];
                 NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:userToken,LFSCollectionPostUserTokenKey,@1,@"value",self.contentItem.idString,@"message_id",nil ];
-                    
-                    LFRDetailTableViewCell *detailCell=[[LFRDetailTableViewCell alloc]init];
-                    [detailCell.button1 setImage:[UIImage imageNamed:@"StateLiked.png"] forState:UIControlStateNormal];
-                    
-                    
+    
 //                [self.writeClient postMessage:action
 //                forContent:self.contentItem.idString
 //                inCollection:self.collectionId
@@ -689,8 +685,14 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             }
             else if ([action isEqualToString:@"Edit"])
             {
-                if ([self.deletedContent respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
-                    [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem];
+                if ([self.contentItem.parentId isEqualToString:@""]) {
+                    if ([self.deletedContent respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
+                        [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem];
+                }
+                 
+                    else{
+                        
+                    }
 //                    [self.navigationController popToRootViewControllerAnimated:YES];
                 }
             }

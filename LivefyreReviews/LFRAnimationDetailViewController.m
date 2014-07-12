@@ -218,7 +218,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         }[voteObject valueForKey:@"value"];
     }
     
-    cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %d found helpful",count,[[content.annotations valueForKey:@"vote"] count]] ;
+    cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %lu found helpful",count,(unsigned long)[[content.annotations valueForKey:@"vote"] count]] ;
     cell.footerLeftView.frame=CGRectMake(160,41, 180, 20);
     
     //date
@@ -314,7 +314,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         }[voteObject valueForKey:@"value"];
     }
     
-    cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %d found helpful",count,[[content.annotations valueForKey:@"vote"] count]] ;
+    cell.footerLeftView.text=[NSString stringWithFormat:@"%d of %lu found helpful",count,(unsigned long)[[content.annotations valueForKey:@"vote"] count]] ;
     cell.footerLeftView.frame=CGRectMake(51,24,150,20);
     
     //date

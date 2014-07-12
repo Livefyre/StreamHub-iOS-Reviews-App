@@ -50,9 +50,9 @@
 static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
 static NSString* const kFailureModifyTitle = @"Failed to modify content";
 const static CGFloat kGenerationOffset = 20.f;
-const static char kAttributedTextValueKey;
-const static char kAttributedTitleValueKey;
-const static char kAtttributedTextHeightKey;
+//const static char kAttributedTextValueKey;
+//const static char kAttributedTitleValueKey;
+//const static char kAtttributedTextHeightKey;
 static NSString* const kCellSelectSegue = @"detailView";
 
 

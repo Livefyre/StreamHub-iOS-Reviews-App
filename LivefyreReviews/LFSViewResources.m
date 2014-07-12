@@ -20,12 +20,13 @@ static const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
 
 id AttributeObjectFromContent(LFSContent* content)
 {
-    if (content.authorIsModerator) {
-        return @"Moderator";
-    }
-    else if (content.isFeatured) {
+    if (content.isFeatured) {
         return [UIImage imageNamed:@"Featured"];
     }
+   else if (content.authorIsModerator) {
+        return @"Moderator";
+    }
+    
     else {
         return @"";
     }
