@@ -249,19 +249,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
     
     
-    
-//    //    ////if self
-//    if (content.authorId) {
-//        cell.moderator.frame=CGRectMake(73,8, 80, 18);
-//        cell.moderator.text=@"";
-////        heightForModeFeat=10;
-//        cell.featuredImage.frame=CGRectMake(73,8, 80, 18);
-//        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
-//    }else if (content.isFeatured){
-//        cell.featuredImage.frame=CGRectMake(73,10, 80, 18);
-//        cell.featuredImage.image=[UIImage imageNamed:@"Featured"];
-//    }
-    
     ///////
     //user name
     int heightForModeFeat=0;
@@ -336,9 +323,21 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     CGSize bodySize = [attributedBody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
     cell.body.frame=CGRectMake(15, 63+cell.title.frame.size.height+10, 290, bodySize.height);
     
-    
-    [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
-                  forState:UIControlStateNormal];
+    if ([content.annotations objectForKey:@"vote"]) {
+        for ( NSDictionary *voteString in [content.annotations objectForKey:@"vote"] ) {
+            if ([[voteString valueForKey:@"author"] isEqualToString:self.user.idString] && [[voteString valueForKey:@"value"] integerValue]==1 )
+                [cell.button1 setImage:[UIImage imageNamed:@"StateLiked"]
+                              forState:UIControlStateNormal];
+            else
+                [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
+                              forState:UIControlStateNormal];
+            
+        }
+    }
+    else{
+        [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
+                      forState:UIControlStateNormal];
+    }
     [cell.button1 setTitle:@"Helpful"
                   forState:UIControlStateNormal];
     [cell.button1 addTarget:self action:@selector(didSelectButton1:)
@@ -437,8 +436,21 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
     cell.body.frame=CGRectMake(15+dateCount, 48, 290-dateCount, bodySize.height);
 
-    [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
-                  forState:UIControlStateNormal];
+    if ([content.annotations objectForKey:@"vote"]) {
+        for ( NSString *voteString in [[content.annotations objectForKey:@"vote"]valueForKey:@"author"]) {
+            if ([voteString isEqualToString:self.user.idString])
+                [cell.button1 setImage:[UIImage imageNamed:@"StateLiked"]
+                              forState:UIControlStateNormal];
+            else
+                [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
+                              forState:UIControlStateNormal];
+            
+        }
+    }
+    else{
+        [cell.button1 setImage:[UIImage imageNamed:@"icon_heart_initial"]
+                      forState:UIControlStateNormal];
+    }
     [cell.button1 setTitle:@""
                   forState:UIControlStateNormal];
     [cell.button1 addTarget:self action:@selector(didSelectButton1:)
@@ -630,11 +642,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                  parameters:parameters
                                   onSuccess:^(NSOperation *operation, id responseObject)
                {
-                   NSLog(@"success posting opine %d", action);
+                   NSLog(@"success posting opine %lu", action);
                }
                                   onFailure:^(NSOperation *operation, NSError *error)
                {
-                   NSLog(@"failed posting opine %d", action);
+                   NSLog(@"failed posting opine %lu", action);
                }];
               
           }

@@ -16,7 +16,7 @@
 static const UIEdgeInsets kPostContentInset = {
     .top=15.f, .left=7.f, .bottom=20.f, .right=5.f
 };
-static const CGFloat kPostKeyboardMarginTop = 10.0f;
+static const CGFloat kPostKeyboardMarginTop = 0.0f;
 static NSString* const kPostContentFontName = @"Georgia";
 static const CGFloat kPostContentFontSize = 18.0f;
 

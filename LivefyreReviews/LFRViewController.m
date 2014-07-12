@@ -576,8 +576,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         if ([content.parentId isEqual:@""] && [content.author.idString isEqual: self.user.idString]) {
             count++;
             rating=[[[content.annotations objectForKey:@"rating"]objectAtIndex:0] floatValue]/20;
-            NSLog(@"%f",rating);
-        }
+         }
     }
     if (count == 1) {
         DYRateView *headerRatingView=[[DYRateView alloc]init];
@@ -744,69 +743,36 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             : nil);
 }
 
-//-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
-//    LFSContentVisibility visibility = content.visibility;
-//    if (visibility == LFSContentVisibilityEveryone)
-//    {
-//        // TODO: no need to get cell from index and back if we are not using segues
-//        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-//        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
-//    }
-//}
-
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CGFloat cellHeightValue;
     LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
-    CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
+//    CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
     LFSContentVisibility visibility = content.visibility;
     if (visibility == LFSContentVisibilityEveryone)
     {
-        NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
-        if (cellHeight == nil)
-        {
-            NSMutableAttributedString *attributedString =
-            [LFSAttributedTextCell attributedStringFromHTMLString:(content.bodyHtml ?: @"")];
-            
-            NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(content.title ?: @"")];
-            
-            objc_setAssociatedObject(content, &kAttributedTextValueKey,
-                                     attributedString,
-                                     OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            
-            
-            objc_setAssociatedObject(content, &kAttributedTitleValueKey,
-                                     attributedTitleString,
-                                     OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            
-            cellHeightValue = [LFSAttributedTextCell
-                               cellHeightForAttributedString:attributedString                               hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil)
-                               width:(tableView.bounds.size.width - leftOffset)];
-           
-            
-            cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(tableView.bounds.size.width)];
-            
-            
-            objc_setAssociatedObject(content, &kAtttributedTextHeightKey,
-                                     [NSNumber numberWithFloat:cellHeightValue],
-                                     OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        else
-        {
-            cellHeightValue = [cellHeight floatValue];
-        }
-    }
+        
+        NSMutableAttributedString *attributedString =
+        [LFSAttributedTextCell attributedStringFromHTMLString:(content.bodyHtml ?: @"")];
+        
+        NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(content.title ?: @"")];
+        
+        cellHeightValue = [LFSAttributedTextCell
+                           cellHeightForAttributedString:attributedString hasAttachment:NO width:(tableView.bounds.size.width )];
+        
+        
+        cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(tableView.bounds.size.width)];
+        
+        
+          }
     else
     {
-//        cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
-//                                                    withLeftOffset:leftOffset];
+        //        cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
+        //                                                    withLeftOffset:leftOffset];
     }
     return cellHeightValue+45;
 }
-
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
 }
@@ -814,16 +780,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     
-//    int i=0;
-//
-//         for (NSString *contentUrl in _content) {
-//            if ( [[_content valueForKey:contentUrl] valueForKey:@"title"] != nil) {
-//                i++;
-//                NSLog(@" i count %d",i);
-//                NSLog(@"count count %d",i);
-//            }
-//    }
-//
     int count=0;
     if(_contentArray.count!=0)
     for (LFSContent *content in _contentArray) {
@@ -958,8 +914,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
       [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
   }
-//    }
-    else
+     else
     {
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
                                                   kDeletedCellReuseIdentifier];
@@ -1073,37 +1028,54 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     // configure the rest of the cell
     [cell setContentDate:content.createdAt];
-    UIImage *iconSmall = SmallImageForContentSource(content.contentSource);
-    [cell.headerAccessoryRightImageView setImage:iconSmall];
+    //    UIImage *iconSmall = SmallImageForContentSource(content.contentSource);
+    //    [cell.headerAccessoryRightImageView setImage:iconSmall];
     
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
-    NSMutableAttributedString *attributedString = objc_getAssociatedObject(content, &kAttributedTextValueKey);
+    
+    
+    NSMutableAttributedString *attributedString =
+    [LFSAttributedTextCell attributedStringFromHTMLString:(content.bodyHtml ?: @"")];
+    
+    NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(content.title ?: @"")];
+    
+    
+    
+    
+    //    NSMutableAttributedString *attributedString = objc_getAssociatedObject(content, &kAttributedTextValueKey);
     [cell setAttributedString:attributedString];
     
-    NSMutableAttributedString *attributedTitle=objc_getAssociatedObject(content, &kAttributedTitleValueKey);
-    [cell setAttributedTitleString:attributedTitle];
+    //    NSMutableAttributedString *attributedTitle=objc_getAssociatedObject(content, &kAttributedTitleValueKey);
+    [cell setAttributedTitleString:attributedTitleString];
     
-    NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
-    [cell setRequiredBodyHeight:[cellHeight floatValue]];
+    CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
+    
+    float cellHeightValue = [LFSAttributedTextCell
+                             cellHeightForAttributedString:attributedString                               hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil)
+                             width:(self.tableView.bounds.size.width - leftOffset)];
+    
+    
+    
+    
+    [cell setRequiredBodyHeight: cellHeightValue+35];
     
     // always set an object
     LFSAuthorProfile *author = content.author;
-
+    
     NSNumber *rating=[[content.annotations objectForKey:@"rating"]objectAtIndex:0];
     NSString *title = author.displayName ?: @"";
     
     cell.content=content;
-//    [cell setProfileLocal:[[LFSResource alloc]
-//                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
-//                           attribute:AttributeObjectFromContent(content)
-//                           displayString:title
-//                           icon:nil]];
+    //    [cell setProfileLocal:[[LFSResource alloc]
+    //                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
+    //                           attribute:AttributeObjectFromContent(content)
+    //                           displayString:title
+    //                           icon:nil]];
     
     
     [cell setProfileLocal:[[LFSResource alloc]initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")attribute:AttributeObjectFromContent(content)displayString:title icon:nil rating:rating]];
 }
-
 
 UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 {
@@ -1247,16 +1219,6 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 
 
-//#pragma mark - LFSContentActionsDelegate
-//-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
-//{
-//    if (content != nil) {
-//        NSUInteger row = [_content indexOfObject:content];
-//        [self postDestructiveMessage:message
-//                        forIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
-//        [self popDetailControllerForContent:content];
-//    }
-//}
 
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag
 {
@@ -1394,13 +1356,6 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
         EditViewController.content=content;
         EditViewController.collection=self.collection;
         EditViewController.collectionId=self.collectionId;
-//        [self.postViewController setCollection:self.collection];
-//        [self.postViewController setCollectionId:self.collectionId];
-//        [self.postViewController setAvatarImage:self.placeholderImage];
-//        [self.postViewController setUser:self.user];
-//        [self.postViewController setContent:content];
-//        [self.postViewController setIsEdit:YES];
-        
         [self.navigationController presentViewController:EditViewController
                                                 animated:YES
                                               completion:nil];

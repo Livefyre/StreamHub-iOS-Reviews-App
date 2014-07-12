@@ -10,6 +10,7 @@
 #import "LFSBasicHTMLParser.h"
 #import "LFSContentCollection.h"
 
+
 @interface LFREditViewViewController ()
 @property (nonatomic, strong) LFSContentCollection *content1;
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -25,8 +26,9 @@
 @implementation LFREditViewViewController
 @synthesize writeClient = _writeClient;
 static const UIEdgeInsets kPostContentInset = {
-    .top=240.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=130.f, .left=7.f, .bottom=20.f, .right=5.f
 };
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -87,13 +89,22 @@ static const UIEdgeInsets kPostContentInset = {
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
-    UIView *Scrool=[[UIView alloc]initWithFrame:CGRectMake(0, 62, 320, screenHeight-290)];
+    UIView *Scrool=[[UIView alloc]initWithFrame:CGRectMake(0, 62, 320, screenHeight-330)];
     
     //description textarea
-    self.description=[[UITextView alloc]initWithFrame:CGRectMake(0,0, 320, screenHeight-290)];
-    [_description setAttributedText:[LFSBasicHTMLParser attributedStringByProcessingMarkupInString:_content.bodyHtml]];
-    [self.description
-     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+    self.description=[[UITextView alloc]initWithFrame:CGRectMake(0,0, 320, screenHeight-330)];
+    
+    
+    NSAttributedString *text=[LFSBasicHTMLParser attributedStringByProcessingMarkupInString:_content.bodyHtml];
+    if (text.length) {
+        NSAttributedString *last = [text attributedSubstringFromRange:NSMakeRange(text.length - 1, 1)];
+        if ([[last string] isEqualToString:@"\n"]) {
+            text = [text attributedSubstringFromRange:NSMakeRange(0, text.length - 1)];
+        }
+    }
+
+    [_description setAttributedText:text];
+    [self.description setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
     [_description setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
     [_description setTextColor:UIColorFromRGB(0x474C52)];
     
@@ -141,7 +152,7 @@ static const UIEdgeInsets kPostContentInset = {
     DYRateView *headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_large"] emptyStar:[UIImage imageNamed:@"icon_star_empty_large"]];
     headerRatingView.padding = 12;
     headerRatingView.alignment = RateViewAlignmentLeft;
-    headerRatingView.editable = NO;
+    headerRatingView.editable = YES;
     NSNumber *rating=[[_content.annotations objectForKey:@"rating"] objectAtIndex:0];
     headerRatingView.rate=[rating floatValue]/20;
     headerRatingView.delegate = self;
@@ -153,48 +164,50 @@ static const UIEdgeInsets kPostContentInset = {
     
     [_description addSubview:headerRatingView];
     
-    //pros
-    UILabel *headerProsLable = [[UILabel alloc] initWithFrame:CGRectMake(15, 136, 30, 28)];
-    [headerProsLable
-     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-    [headerProsLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
-    [headerProsLable setTextColor:UIColorFromRGB(0x969696)];
-    [headerProsLable setText:@"Pros"];
-    [_description addSubview:headerProsLable];
-    
-    //pros TextField
-    CGSize prosTestSize = [[headerProsLable text] sizeWithAttributes:@{NSFontAttributeName:[headerProsLable font]}];
-    CGFloat ProsStrikeWidth = prosTestSize.width;
-    self.prosTextField = [[UITextField alloc] initWithFrame:CGRectMake(ProsStrikeWidth+25, 136, 260, 28)];
-    [self.prosTextField
-     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-    [self.prosTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
-    [self.prosTextField setTextColor:UIColorFromRGB(0x474C52)];
-    [self.prosTextField setPlaceholder:@"Enter Pros"];
-    [_description addSubview:self.prosTextField];
-    
-    //cons
-    // initialize
-    UILabel *consTitleLable = [[UILabel alloc] initWithFrame:CGRectMake(15, 196, 40, 28)];
-    [consTitleLable
-     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-    [consTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
-    [consTitleLable setTextColor:UIColorFromRGB(0x969696)];
-    [consTitleLable setText:@"Cons"];
-    [_description addSubview:consTitleLable];
-    
-    //cons TextField
-    CGSize consTestSize = [[consTitleLable text] sizeWithAttributes:@{NSFontAttributeName:[consTitleLable font]}];
-    CGFloat consStrikeWidth = consTestSize.width;
-    self.consTextField = [[UITextField alloc] initWithFrame:CGRectMake(consStrikeWidth+25, 196, 260, 28)];
-    
-    [self.consTextField
-     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-    [self.consTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
-    [self.consTextField setTextColor:UIColorFromRGB(0x474C52)];
-    [self.consTextField setPlaceholder:@"Enter Cons"];
-    [_description addSubview:self.consTextField];
-    
+//    //pros
+//    UILabel *headerProsLable = [[UILabel alloc] initWithFrame:CGRectMake(15, 136, 30, 28)];
+//    [headerProsLable
+//     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//    [headerProsLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
+//    [headerProsLable setTextColor:UIColorFromRGB(0x969696)];
+//    [headerProsLable setText:@"Pros"];
+//    [_description addSubview:headerProsLable];
+//    
+//    //pros TextField
+//    CGSize prosTestSize = [[headerProsLable text] sizeWithAttributes:@{NSFontAttributeName:[headerProsLable font]}];
+//    CGFloat ProsStrikeWidth = prosTestSize.width;
+//    self.prosTextField = [[UITextField alloc] initWithFrame:CGRectMake(ProsStrikeWidth+25, 136, 260, 28)];
+//    [self.prosTextField
+//     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//    [self.prosTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
+//    [self.prosTextField setTextColor:UIColorFromRGB(0x474C52)];
+////    [self.prosTextField setPlaceholder:@"Enter Pros"];
+//    
+//    [_description addSubview:self.prosTextField];
+//
+//    
+//    //cons
+//    // initialize
+//    UILabel *consTitleLable = [[UILabel alloc] initWithFrame:CGRectMake(15, 196, 40, 28)];
+//    [consTitleLable
+//     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//    [consTitleLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
+//    [consTitleLable setTextColor:UIColorFromRGB(0x969696)];
+//    [consTitleLable setText:@"Cons"];
+//    [_description addSubview:consTitleLable];
+//    
+//    //cons TextField
+//    CGSize consTestSize = [[consTitleLable text] sizeWithAttributes:@{NSFontAttributeName:[consTitleLable font]}];
+//    CGFloat consStrikeWidth = consTestSize.width;
+//    self.consTextField = [[UITextField alloc] initWithFrame:CGRectMake(consStrikeWidth+25, 196, 260, 28)];
+//    
+//    [self.consTextField
+//     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//    [self.consTextField setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
+//    [self.consTextField setTextColor:UIColorFromRGB(0x474C52)];
+//    [self.consTextField setPlaceholder:@"Enter Cons"];
+//    [_description addSubview:self.consTextField];
+//    
     
     
     UIView *addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-265, 320, 50)];
@@ -219,11 +232,11 @@ static const UIEdgeInsets kPostContentInset = {
     CAShapeLayer *line2=[self drawline:CGPointMake(0, 120) :CGPointMake(320, 120)];
     [_description.layer addSublayer:line2];
     
-    CAShapeLayer *line3=[self drawline:CGPointMake(0, 180) :CGPointMake(320, 180)];
-    [_description.layer addSublayer:line3];
-    
-    CAShapeLayer *line5=[self drawline:CGPointMake(0, 240) :CGPointMake(320, 240)];
-    [_description.layer addSublayer:line5];
+//    CAShapeLayer *line3=[self drawline:CGPointMake(0, 180) :CGPointMake(320, 180)];
+//    [_description.layer addSublayer:line3];
+//    
+//    CAShapeLayer *line5=[self drawline:CGPointMake(0, 240) :CGPointMake(320, 240)];
+//    [_description.layer addSublayer:line5];
     
     [self.view addSubview:Scrool];
     [self.view addSubview:addPhotoImageView];
@@ -303,8 +316,9 @@ static const UIEdgeInsets kPostContentInset = {
     }
     
     else{
-        _bodyofReview=[NSString stringWithFormat:@"<p><strong></strong>%@</p>",_description.text];
-        
+        [ _description.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+
+    _bodyofReview=[NSString stringWithFormat:@"%@",_description.text];
         NSString *userToken = [self.collection objectForKey:@"lftoken"];
         if (userToken != nil) {
             NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:_ratingjsonString, LFSCollectionPostRatingKey,_bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,self.titleTextField.text,LFSCollectionPostTitleKey, nil ];
@@ -331,8 +345,8 @@ static const UIEdgeInsets kPostContentInset = {
 
                                 } onFailure:^(NSOperation *operation, NSError *error) {
                                     [[[UIAlertView alloc]
-                                      initWithTitle:kFailurePostTitle
-                                      message:[error localizedRecoverySuggestion]
+                                      initWithTitle:nil
+                                      message:@"An error has occurred. Please try again."
                                       delegate:nil
                                       cancelButtonTitle:@"OK"
                                       otherButtonTitles:nil] show];
