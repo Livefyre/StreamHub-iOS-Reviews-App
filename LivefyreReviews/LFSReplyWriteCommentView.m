@@ -165,7 +165,7 @@ static const CGFloat kPostContentFontSize = 18.0f;
     
     CGRect viewFrame = self.frame;
     
-    // convert to window base coordinates
+    // convert to window base coordinate
     CGRect keyboardFrame = [self convertRect:keyboardEndFrame toView:nil];
     
     // calculate overlap height
