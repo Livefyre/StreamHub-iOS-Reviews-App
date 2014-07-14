@@ -16,7 +16,7 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSContentCollection.h"
-
+#import "TSMessage.h"
 
 @interface LFRDetailViewController ()
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -45,6 +45,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 - (void) receiveTestNotification:(NSNotification *) notification
 {
+    [TSMessage dismissActiveNotification];
+
     // [notification name] should always be @"TestNotification"
     // unless you use this method for observation of other notifications
     // as well.
@@ -70,7 +72,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             updateCount=0;
             oldCount=(int)[_mainContent count];
         }
-        NSLog(@"%d",updateCount);
+//        NSLog(@"%d",updateCount);
         if (updateCount>0 && isAlertAdded==NO) {
             [_mainContent insertObject:@"Alert Notification" atIndex:1];
             isAlertAdded=YES;
