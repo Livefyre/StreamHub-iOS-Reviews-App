@@ -49,7 +49,7 @@ static const CGFloat kPostContentFontSize = 18.0f;
     if (_textView == nil) {
         CGRect frame = self.bounds;
         frame.origin.y+=0;
-        frame.size.height-=0;
+        frame.size.height-=15;
         NSLog(@"%f %f",self.bounds.origin.x, self.bounds.origin.y);
         _textView = [[UITextView alloc] initWithFrame:frame];
         
@@ -68,7 +68,7 @@ static const CGFloat kPostContentFontSize = 18.0f;
         [_textView setDelegate:self];
         
         [_textView
-         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin)];
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin-15)];
         
         [self addSubview:_textView];
     }else{

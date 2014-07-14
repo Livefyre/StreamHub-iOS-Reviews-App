@@ -398,7 +398,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [_content removeAllObjects];
         
         //[self startSpinning];
-             
+        
         [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"] article:[self.collection objectForKey:@"articleId"] onSuccess:^(NSOperation *operation, id responseObject)
 
          {
@@ -673,13 +673,12 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         detailViewController.collectionId=self.collectionId;
         detailViewController.contentItem=content;
         detailViewController.user=self.user;
-        
-        NSMutableArray *test=[[NSMutableArray alloc]init];
+         NSMutableArray *test=[[NSMutableArray alloc]init];
+        [test addObject:content];
         [self recursiveChilds:content.children :test];
         detailViewController.mainContent=test;
         [self.navigationController setToolbarHidden:YES animated:YES];
-
-
+ 
     }
 }
 -(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
@@ -711,13 +710,16 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
 //                [self.navigationController presentViewController:detailViewController animated:YES completion:nil];
-                [self.navigationController pushViewController:detailViewController animated:YES];
+                detailViewController.navigationHideen=[[NSString alloc]init];
+                detailViewController.navigationHideen=@"YES";
+                [self presentViewController:detailViewController animated:YES completion:nil];
                 detailViewController.deletedContent=self;
                 detailViewController.collection=self.collection;
                 detailViewController.collectionId=self.collectionId;
                 detailViewController.contentItem=content;
                 detailViewController.user=self.user;
                 NSMutableArray *test=[[NSMutableArray alloc]init];
+                [test addObject:content];
                 [self recursiveChilds:content.children :test];
                 detailViewController.mainContent=test;
                 [self.navigationController setToolbarHidden:YES animated:YES];

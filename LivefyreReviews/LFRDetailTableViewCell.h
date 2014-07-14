@@ -28,6 +28,7 @@
 @property (readonly, nonatomic) UIButton *button1;
 @property (readonly, nonatomic) UIButton *button2;
 @property (readonly, nonatomic) UIButton *button3;
+@property (nonatomic, strong) UIButton *repliesCount;
 @property (nonatomic, strong) UIImageView *featuredImage;
 
 -(void)layoutsets;

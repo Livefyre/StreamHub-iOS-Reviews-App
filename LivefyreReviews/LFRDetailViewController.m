@@ -19,15 +19,18 @@
 
 
 @interface LFRDetailViewController ()
-@property (nonatomic, copy) NSMutableDictionary *contentDictionary;
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 @property (nonatomic, weak) LFSContentCollection *content1;
 @end
 
-@implementation LFRDetailViewController
+@implementation LFRDetailViewController{
+    int updateCount;
+    int oldCount;
+    BOOL isAlertAdded;
+}
 
 const static CGFloat kGenerationOffset = 20.f;
- // hardcode author id for now
+// hardcode author id for now
 static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (id)initWithCoder:(NSCoder*)aDecoder
 {
@@ -49,19 +52,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if ([[notification name] isEqualToString:@"ToDetail"]){
         
         NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-        //[chaildContent addObject:[self.mainContent objectAtIndex:0]];
-        
-        
-        
-        
-        LFSContent *rootContent=[self.mainContent objectAtIndex:0];
-        
-        
-        
+        [chaildContent addObject:self.contentItem];
         
         for (int i=0; i<[[notification object] count]; i++) {
             LFSContent *singleContent=[[notification object] objectAtIndex:i];
-            if ([singleContent.idString isEqual:rootContent.idString]) {
+            if ([singleContent.idString isEqual:self.contentItem.idString]) {
                 //NSMutableArray *test=[[NSMutableArray alloc]init];
                 [self recursiveChilds:singleContent.children :chaildContent];
                 break;
@@ -70,10 +65,20 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         _mainContent=nil;
         _mainContent=[[NSMutableArray alloc]initWithArray:chaildContent];
         _mainContent=chaildContent;
+        updateCount=(int)(_mainContent.count-oldCount);
+        if (updateCount<0) {
+            updateCount=0;
+            oldCount=(int)[_mainContent count];
+        }
+        NSLog(@"%d",updateCount);
+        if (updateCount>0 && isAlertAdded==NO) {
+            [_mainContent insertObject:@"Alert Notification" atIndex:1];
+            isAlertAdded=YES;
+        }
+        
         [self.tableView reloadData];
     }
 }
-
 
 
 -(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
@@ -114,23 +119,38 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     self.tableView.delegate=self;
     self.tableView.dataSource=self;
     self.title=@"Review";
+    isAlertAdded=NO;
+//    _update=NO;
+    oldCount= (int)[self.mainContent count] ;
+    updateCount=1;
     self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
 
-    self.contentDictionary=[[NSMutableDictionary alloc]initWithObjectsAndKeys:self.contentItem,@"content",nil];
     //self.navigationController.navigationBarHidden=YES;
      self.view.backgroundColor=UIColorFromRGB(0xF3F3F3);
    
-    //[self.contentDictionary setObject:self.content forKey:@"content"];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
 }
 -(void)viewWillAppear:(BOOL)animated{
          [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
+    if ([self.navigationHideen isEqualToString:@"YES"]) {
+        self.view.backgroundColor= UIColorFromRGB(0xF3F3F3);
+        CGRect screenRect = [[UIScreen mainScreen] bounds];
+        CGFloat screenHeight = screenRect.size.height;
+        [self.tableView setFrame:CGRectMake(0, 60, 320, screenHeight-60)];
+        UINavigationBar *navBar = [[UINavigationBar alloc] init];
+        [navBar setFrame:CGRectMake(0,20,CGRectGetWidth(self.view.frame),44)];
+        [self.view addSubview: navBar];
+        UIButton *cancelButton=[[UIButton alloc]initWithFrame:CGRectMake(15, 6,60,40)];
+        [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+        [cancelButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
+        [cancelButton addTarget:self action:@selector(cancelClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [navBar addSubview:cancelButton];
+        UILabel *review=[[UILabel alloc]initWithFrame:CGRectMake(130, 6, 60, 40)];
+        [review setText:@"Review"];
+        [navBar addSubview:review];
 
+      }
+    else{
+    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
     [self.navigationController setToolbarHidden:YES animated:YES];
     self.navigationController.navigationBarHidden=NO;
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
@@ -139,10 +159,14 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
         [navigationBar setTranslucent:NO];
         self.navigationController.title=@"Review";
+     }
     }
 
 }
 
+- (IBAction)cancelClicked:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (void)didReceiveMemoryWarning
 {
@@ -160,26 +184,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    // Return the number of rows in the section.
-//    NSArray *sortedArray;
-//    
-//    sortedArray = [self.mainContent sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-//        NSDate *first = [(LFSContent*)a updatedAt];
-//        NSDate *second=[(LFSContent*)b updatedAt];
-//        return [second compare:first];
-//    }];
-//    
-//    [self.mainContent removeAllObjects];
-    [self.mainContent insertObject:self.contentItem atIndex:0];
-//    [self.mainContent addObjectsFromArray:sortedArray];
-    return [self.mainContent count];
+//    [self.mainContent insertObject:self.contentItem atIndex:0];
+     return [self.mainContent count];
+    
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
 
-    if ([contentValues.parentId isEqualToString:@""]) {
-        
-        LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
+    if (indexPath.row ==1 && isAlertAdded){
+         return 60;
+    }
+    else if ([contentValues.parentId isEqualToString:@""]){
+          LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
     
     NSMutableAttributedString *attributedTitle=[cell getAttributedTextWithFormat:contentValues.title :24 :@"Georgia" :14];
     CGSize titleSize = [attributedTitle sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
@@ -190,7 +206,29 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
     else{
         LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
+        NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
+        CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+        return 91+bodySize.height;
+    }
+}
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
+    
+    if (indexPath.row ==1 && isAlertAdded){
+        return 60;
+    }
+    else if ([contentValues.parentId isEqualToString:@""]){
+        LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
         
+        NSMutableAttributedString *attributedTitle=[cell getAttributedTextWithFormat:contentValues.title :24 :@"Georgia" :14];
+        CGSize titleSize = [attributedTitle sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+        
+        NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
+        CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+        return titleSize.height+137+bodySize.height;
+    }
+    else{
+        LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
         NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
         CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
         return 91+bodySize.height;
@@ -207,9 +245,13 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         if (cell == nil) {
             cell = [[LFRDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
-            if ([contentValues.parentId isEqualToString:@""]) {
+            if (indexPath.row ==1 && isAlertAdded){
+                [self configureAttributedCell2:cell forCount:@"2"];
+                }
+           else  if ([contentValues.parentId isEqualToString:@""]) {
                  [self configureAttributedCell:cell forContent:contentValues];
             }
+    
             else{
                 [self configureAttributedCell1:cell forContent:contentValues];
             }
@@ -484,6 +526,24 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //    [cell layoutsetsForSubcell:&leftDistence];
     
 }
+- (void)configureAttributedCell2:(LFRDetailTableViewCell*)cell forCount:(NSString *)count{
+    [cell.rateView setFrame:CGRectMake(0, 0, 0, 0)];
+    [cell.repliesCount setTitle:[NSString stringWithFormat: @"%d New Replies",updateCount] forState:UIControlStateNormal];
+    cell.repliesCount.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+
+    [cell.repliesCount addTarget:self action:@selector(countButtonClicked) forControlEvents:UIControlEventTouchUpInside];
+    [cell.repliesCount setFrame:CGRectMake(15, 10, 290, 40)];
+    [cell addSubview:cell.repliesCount];
+}
+-(void)countButtonClicked{
+    
+    [_mainContent removeObjectAtIndex:1];
+    updateCount=0;
+    oldCount= (int)_mainContent.count;
+    isAlertAdded=NO;
+    [self.tableView reloadData];
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.mainContent.count-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
 -(CAShapeLayer*)drawline:(CGPoint)from :(CGPoint)to{
     UIBezierPath *path = [UIBezierPath bezierPath];
     [path moveToPoint:from];
@@ -741,4 +801,19 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         }
     }
 }
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    [self.tableView setEditing:editing animated:animated]; // not needed if super is a UITableViewController
+    
+    NSMutableArray* paths = [[NSMutableArray alloc] init];
+
+    // fill paths of insertion rows here
+    
+    if( editing )
+        [self.tableView insertRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationBottom];
+    else
+        [self.tableView deleteRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationBottom];
+    
+ }
+
 @end

@@ -207,7 +207,7 @@ static const UIEdgeInsets kPostContentInset = {
 //    [self.consTextField setTextColor:UIColorFromRGB(0x474C52)];
 //    [self.consTextField setPlaceholder:@"Enter Cons"];
 //    [_description addSubview:self.consTextField];
-//    
+//
     
     
     UIView *addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-265, 320, 50)];
@@ -246,6 +246,8 @@ static const UIEdgeInsets kPostContentInset = {
     
     //Do any additional setup after loading the view.
 }
+
+
 -(void)addPhotoClicked{
     
     

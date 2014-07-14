@@ -168,6 +168,30 @@ return _button1;
     return _button3;
     
 }
+@synthesize repliesCount=_repliesCount;
+-(UIButton*)repliesCount{
+    if (_repliesCount == nil) {
+        
+        CGRect frame = CGRectMake(0.f, 0.f,
+                                  0.f,
+                                  0.f);
+        // initialize
+        _repliesCount = [[UIButton alloc] initWithFrame:frame];
+        _repliesCount.backgroundColor=UIColorFromRGB(0x0F98EC);
+        [_repliesCount.titleLabel setFont:[UIFont boldSystemFontOfSize:18.f]];
+        [_repliesCount setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//        [_repliesCount setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+//                       forState:UIControlStateHighlighted];
+        CALayer *btnLayer1 = [self.repliesCount layer];
+        [btnLayer1 setMasksToBounds:YES];
+        [btnLayer1 setCornerRadius:6.0f];
+        // Set the amount of space to appear between image and title
+        _repliesCount.imageEdgeInsets = UIEdgeInsetsMake(0, 8.0f, 0, 0);
+        _repliesCount.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * 8.0f, 0, 0);
+        [_repliesCount setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+    }
+    return _repliesCount;
+}
 @synthesize toolbar = _toolbar;
 -(LFSContentToolbar*)toolbar
 {

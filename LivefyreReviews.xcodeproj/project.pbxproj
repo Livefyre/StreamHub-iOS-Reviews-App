@@ -69,7 +69,6 @@
 		6DA898CA19475570000585A4 /* DLStarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C619475570000585A4 /* DLStarView.m */; };
 		6DA898CB19475570000585A4 /* UIView+Subviews.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA898C819475570000585A4 /* UIView+Subviews.m */; };
 		6DA898D919475778000585A4 /* DLStarRatingDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6DA898D819475778000585A4 /* DLStarRatingDemoViewController.xib */; };
-		7178E78F19667AB0006BF6F6 /* LFRAnimationDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7178E78E19667AB0006BF6F6 /* LFRAnimationDetailViewController.m */; };
 		71BFFDE41962E44A007F953F /* LFRDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 71BFFDE11962E44A007F953F /* LFRDetailTableViewCell.m */; };
 		71BFFE3C19630ACC007F953F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 71BFFE1E19630ACC007F953F /* LICENSE */; };
 		71BFFE3D19630ACC007F953F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 71BFFE1F19630ACC007F953F /* README.md */; };
@@ -205,8 +204,6 @@
 		6DA898C819475570000585A4 /* UIView+Subviews.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Subviews.m"; sourceTree = "<group>"; };
 		6DA898D819475778000585A4 /* DLStarRatingDemoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DLStarRatingDemoViewController.xib; sourceTree = "<group>"; };
 		6DCDDD55196D4BAE0029CEAC /* LFREditViewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFREditViewViewController.h; sourceTree = "<group>"; };
-		7178E78D19667AB0006BF6F6 /* LFRAnimationDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRAnimationDetailViewController.h; sourceTree = "<group>"; };
-		7178E78E19667AB0006BF6F6 /* LFRAnimationDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRAnimationDetailViewController.m; sourceTree = "<group>"; };
 		71BFFDE01962E44A007F953F /* LFRDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRDetailViewController.h; sourceTree = "<group>"; };
 		71BFFDE11962E44A007F953F /* LFRDetailTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRDetailTableViewCell.m; sourceTree = "<group>"; };
 		71BFFDE21962E44A007F953F /* LFRDetailTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRDetailTableViewCell.h; sourceTree = "<group>"; };
@@ -307,8 +304,6 @@
 				6D60508E1970338A0068C4CC /* LFRViewController.m */,
 				71BFFDE01962E44A007F953F /* LFRDetailViewController.h */,
 				6D6050901970339A0068C4CC /* LFRDetailViewController.m */,
-				7178E78D19667AB0006BF6F6 /* LFRAnimationDetailViewController.h */,
-				7178E78E19667AB0006BF6F6 /* LFRAnimationDetailViewController.m */,
 				6DA463761952E3790012F7FB /* LFRReplyViewController.h */,
 				6DA463741952E36F0012F7FB /* LFRReplyViewController.m */,
 				6DCDDD55196D4BAE0029CEAC /* LFREditViewViewController.h */,
@@ -710,7 +705,6 @@
 				6DA898CB19475570000585A4 /* UIView+Subviews.m in Sources */,
 				6DA1EED21944D6C1008E4AD3 /* LFSContentCollection.m in Sources */,
 				6DA1EEED1944DB5C008E4AD3 /* UIImage+LFSColor.m in Sources */,
-				7178E78F19667AB0006BF6F6 /* LFRAnimationDetailViewController.m in Sources */,
 				6DA43AEE1949FAF70066DB73 /* LFSRightAlignedButton.m in Sources */,
 				6DA120E41945E2FA009084EC /* LFSWriteCommentView.m in Sources */,
 				6DA1EED51944D757008E4AD3 /* LFSTextField.m in Sources */,
@@ -848,6 +842,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};

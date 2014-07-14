@@ -35,5 +35,6 @@
 @property (retain, nonatomic) UIActionSheet *actionSheet2;
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, strong) NSMutableArray *mainContent;
+@property (nonatomic, retain) NSString *navigationHideen;
 @property (nonatomic, weak)LFSUser *user;
 @end
