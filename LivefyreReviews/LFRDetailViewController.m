@@ -16,7 +16,7 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSContentCollection.h"
-
+#import "TSMessage.h"
 
 @interface LFRDetailViewController ()
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -45,6 +45,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 - (void) receiveTestNotification:(NSNotification *) notification
 {
+    [TSMessage dismissActiveNotification];
+
     // [notification name] should always be @"TestNotification"
     // unless you use this method for observation of other notifications
     // as well.
@@ -70,7 +72,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             updateCount=0;
             oldCount=(int)[_mainContent count];
         }
-        NSLog(@"%d",updateCount);
+//        NSLog(@"%d",updateCount);
         if (updateCount>0 && isAlertAdded==NO) {
             [_mainContent insertObject:@"Alert Notification" atIndex:1];
             isAlertAdded=YES;
@@ -528,9 +530,13 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 - (void)configureAttributedCell2:(LFRDetailTableViewCell*)cell forCount:(NSString *)count{
     [cell.rateView setFrame:CGRectMake(0, 0, 0, 0)];
-    [cell.repliesCount setTitle:[NSString stringWithFormat: @"%d New Replies",updateCount] forState:UIControlStateNormal];
+    if (updateCount == 1) {
+        [cell.repliesCount setTitle:[NSString stringWithFormat: @"%d New Reply",updateCount] forState:UIControlStateNormal];
+    }
+    else{
+        [cell.repliesCount setTitle:[NSString stringWithFormat: @"%d New Replies",updateCount] forState:UIControlStateNormal];
+    }
     cell.repliesCount.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
-
     [cell.repliesCount addTarget:self action:@selector(countButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     [cell.repliesCount setFrame:CGRectMake(15, 10, 290, 40)];
     [cell addSubview:cell.repliesCount];
