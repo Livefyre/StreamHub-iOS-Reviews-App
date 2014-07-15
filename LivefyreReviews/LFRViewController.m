@@ -831,7 +831,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     ////////////////////////////////////////////////////////////////
     // cache current visibility state in case we need to revert
     NSUInteger row = indexPath.row;
-    LFSContent *content = [_content objectAtIndex:row];
+    LFSContent *content = [_contentArray objectAtIndex:row];
     
     NSString *contentId = content.idString;
     

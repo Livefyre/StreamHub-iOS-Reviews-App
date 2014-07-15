@@ -24,7 +24,7 @@
         return _collections;
     }
     
-    NSArray *objects=[[NSArray alloc]initWithObjects:@"~Writable",@"livefyre.com",@"client-solutions.fyre.co",@"360354",@"custom-1402701825509",@"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkb21haW4iOiJjbGllbnQtc29sdXRpb25zLmZ5cmUuY28iLCJ1c2VyX2lkIjoicmV2aWV3VGVzdDE3NDg2MjIyNTk1MTk0ODgiLCJkaXNwbGF5X25hbWUiOiJyZXZpZXdUZXN0MTc0ODYyMjI1OTUxOTQ4OCIsImV4cGlyZXMiOjE0MDE0NjQ4MjQzMTUuNzA5fQ.Cso_nHLYx_1lFqhaK_dR2wo4SPhd7EJXh1L-Liw6d38",@"84194121",nil];
+    NSArray *objects=[[NSArray alloc]initWithObjects:@"~Writable",@"livefyre.com",@"client-solutions.fyre.co",@"360354",@"custom-1402701825509",@"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkb21haW4iOiJjbGllbnQtc29sdXRpb25zLmZ5cmUuY28iLCJ1c2VyX2lkIjoicmV2aWV3VGVzdDQ3OTEyNTkwNDg3MDYwNDgiLCJkaXNwbGF5X25hbWUiOiJyZXZpZXdUZXN0NDc5MTI1OTA0ODcwNjA0OCIsImV4cGlyZXMiOjE0MDE0NjQ4MjQ5NDQuODY5fQ.F4SOolohqY2ORc4I5gt5X4t7E5XmmECubuk6AXuRRb4",@"84194121",nil];
     NSArray *keys=[[NSArray alloc]initWithObjects:@"_name",@"environment",@"network",@"siteId",@"articleId",@"lftoken",@"CollectionId",nil];
     NSDictionary *defaults =[[NSDictionary alloc]initWithObjects:objects forKeys:keys];
     
