@@ -152,8 +152,10 @@ static const UIEdgeInsets kPostContentInset = {
     DYRateView *headerRatingView = [[DYRateView alloc] initWithFrame:frame fullStar:[UIImage imageNamed:@"icon_star_large"] emptyStar:[UIImage imageNamed:@"icon_star_empty_large"]];
     headerRatingView.padding = 12;
     headerRatingView.alignment = RateViewAlignmentLeft;
-    headerRatingView.editable = YES;
-    NSNumber *rating=[[_content.annotations objectForKey:@"rating"] objectAtIndex:0];
+    if ([self.user.idString isEqualToString:self.content.author.idString])
+        headerRatingView.editable = YES;
+    else
+        headerRatingView.editable = NO;    NSNumber *rating=[[_content.annotations objectForKey:@"rating"] objectAtIndex:0];
     headerRatingView.rate=[rating floatValue]/20;
     headerRatingView.delegate = self;
     
