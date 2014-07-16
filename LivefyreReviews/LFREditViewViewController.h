@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DYRateView.h"
 #import "LFSContent.h"
-
+#import "LFSUser.h"
 @protocol LFSEditViewControllerDelegate;
 
 
@@ -17,7 +17,7 @@
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
 @property (nonatomic, weak) LFSContent *content;
-
+@property (nonatomic, weak) LFSUser *user;
 - (IBAction)cancelClicked:(id)sender;
 - (IBAction)actionClicked:(id)sender;
 
