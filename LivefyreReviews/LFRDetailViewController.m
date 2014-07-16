@@ -54,19 +54,24 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if ([[notification name] isEqualToString:@"ToDetail"]){
         
         NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
-        [chaildContent addObject:self.contentItem];
+//        [chaildContent addObject:self.contentItem];
         
         for (int i=0; i<[[notification object] count]; i++) {
             LFSContent *singleContent=[[notification object] objectAtIndex:i];
-            if ([singleContent.idString isEqual:self.contentItem.idString]) {
+            if ([singleContent.idString isEqual:self.contentItem.idString] && singleContent.visibility==LFSContentVisibilityEveryone) {
                 //NSMutableArray *test=[[NSMutableArray alloc]init];
+                [chaildContent addObject:singleContent];
+
                 [self recursiveChilds:singleContent.children :chaildContent];
                 break;
             }
         }
         _mainContent=nil;
         _mainContent=[[NSMutableArray alloc]initWithArray:chaildContent];
-        _mainContent=chaildContent;
+        
+        
+        
+        
         updateCount=(int)(_mainContent.count-oldCount);
         if (updateCount<0) {
             updateCount=0;
@@ -93,9 +98,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         {
             if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
                 [test addObject:value];
-                
+                [self recursiveChilds:((LFSContent*)value).children :test];
+
             }
-            [self recursiveChilds:((LFSContent*)value).children :test];
             
         }
         
@@ -133,25 +138,26 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 -(void)viewWillAppear:(BOOL)animated{
          [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    if ([self.navigationHideen isEqualToString:@"YES"]) {
-        self.view.backgroundColor= UIColorFromRGB(0xF3F3F3);
-        CGRect screenRect = [[UIScreen mainScreen] bounds];
-        CGFloat screenHeight = screenRect.size.height;
-        [self.tableView setFrame:CGRectMake(0, 60, 320, screenHeight-60)];
-        UINavigationBar *navBar = [[UINavigationBar alloc] init];
-        [navBar setFrame:CGRectMake(0,20,CGRectGetWidth(self.view.frame),44)];
-        [self.view addSubview: navBar];
-        UIButton *cancelButton=[[UIButton alloc]initWithFrame:CGRectMake(15, 6,60,40)];
-        [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-        [cancelButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
-        [cancelButton addTarget:self action:@selector(cancelClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [navBar addSubview:cancelButton];
-        UILabel *review=[[UILabel alloc]initWithFrame:CGRectMake(130, 6, 60, 40)];
-        [review setText:@"Review"];
-        [navBar addSubview:review];
-
-      }
-    else{
+//    if ([self.navigationHideen isEqualToString:@"YES"]) {
+//        self.view.backgroundColor= UIColorFromRGB(0xF3F3F3);
+//        CGRect screenRect = [[UIScreen mainScreen] bounds];
+//        CGFloat screenHeight = screenRect.size.height;
+//        [self.tableView setFrame:CGRectMake(0, 60, 320, screenHeight-60)];
+//        UINavigationBar *navBar = [[UINavigationBar alloc] init];
+//        [navBar setFrame:CGRectMake(0,20,CGRectGetWidth(self.view.frame),44)];
+//        [self.view addSubview: navBar];
+//        UIButton *cancelButton=[[UIButton alloc]initWithFrame:CGRectMake(15, 6,60,40)];
+//        [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+//        [cancelButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
+//        [cancelButton addTarget:self action:@selector(cancelClicked:) forControlEvents:UIControlEventTouchUpInside];
+//        [navBar addSubview:cancelButton];
+//        UILabel *review=[[UILabel alloc]initWithFrame:CGRectMake(130, 6, 60, 40)];
+//        [review setText:@"Review"];
+//        [navBar addSubview:review];
+//
+//      }
+//    else{
+    isAlertAdded=NO;
     self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
     [self.navigationController setToolbarHidden:YES animated:YES];
     self.navigationController.navigationBarHidden=NO;
@@ -162,7 +168,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         [navigationBar setTranslucent:NO];
         self.navigationController.title=@"Review";
      }
-    }
+//    }
 
 }
 
@@ -193,8 +199,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
 
-    if (indexPath.row ==1 && isAlertAdded){
-         return 60;
+    if (indexPath.row ==1 && ![[_mainContent objectAtIndex:1] isKindOfClass:[LFSContent class]] ){
+        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
+            return 0;
+        }
+        return 60;
     }
     else if ([contentValues.parentId isEqualToString:@""]){
           LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
@@ -216,9 +225,13 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
     LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
     
-    if (indexPath.row ==1 && isAlertAdded){
+    if (indexPath.row ==1 && ![[_mainContent objectAtIndex:1] isKindOfClass:[LFSContent class]] && isAlertAdded){
+        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
+            return 0;
+        }
         return 60;
     }
+
     else if ([contentValues.parentId isEqualToString:@""]){
         LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
         
@@ -247,10 +260,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         if (cell == nil) {
             cell = [[LFRDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
-            if (indexPath.row ==1 && isAlertAdded){
-                [self configureAttributedCell2:cell forCount:@"2"];
-                }
-           else  if ([contentValues.parentId isEqualToString:@""]) {
+    if (indexPath.row ==1 && ![[_mainContent objectAtIndex:1] isKindOfClass:[LFSContent class]] ){
+        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
+            return nil;
+        }
+        [self configureAttributedCell2:cell forCount:@"2"];
+    }
+
+    
+            else  if ([contentValues.parentId isEqualToString:@""]) {
                  [self configureAttributedCell:cell forContent:contentValues];
             }
     
@@ -704,11 +722,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                  parameters:parameters
                                   onSuccess:^(NSOperation *operation, id responseObject)
                {
-                   NSLog(@"success posting opine %lu", action);
+                   NSLog(@"success posting opine %u", action);
                }
                                   onFailure:^(NSOperation *operation, NSError *error)
                {
-                   NSLog(@"failed posting opine %lu", action);
+                   NSLog(@"failed posting opine %u", action);
                }];
               
           }
@@ -734,7 +752,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             {
                 if ([self.deletedContent respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
                     [self.deletedContent postDestructiveMessage:LFSMessageDelete forContent:self.contentItem];
-                    [self.navigationController popToRootViewControllerAnimated:YES];
+//                    [self.navigationController popToRootViewControllerAnimated:YES];
                 }
             }
             else if ([action isEqualToString:@"Ban User"])

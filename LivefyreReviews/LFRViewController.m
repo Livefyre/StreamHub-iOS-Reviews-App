@@ -709,10 +709,10 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && content.visibility==LFSContentVisibilityEveryone) {
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
-//                [self.navigationController presentViewController:detailViewController animated:YES completion:nil];
-                detailViewController.navigationHideen=[[NSString alloc]init];
-                detailViewController.navigationHideen=@"YES";
-                [self presentViewController:detailViewController animated:YES completion:nil];
+                [self.navigationController pushViewController:detailViewController animated:YES];
+//                detailViewController.navigationHideen=[[NSString alloc]init];
+//                detailViewController.navigationHideen=@"YES";
+               // [self presentViewController:detailViewController animated:YES completion:nil];
                 detailViewController.deletedContent=self;
                 detailViewController.collection=self.collection;
                 detailViewController.collectionId=self.collectionId;
@@ -1027,55 +1027,21 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 {
     // load image first
     [self loadImagesForAttributedCell:cell withContent:content];
-    
-    // configure the rest of the cell
     [cell setContentDate:content.createdAt];
-    //    UIImage *iconSmall = SmallImageForContentSource(content.contentSource);
-    //    [cell.headerAccessoryRightImageView setImage:iconSmall];
-    
-    [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
-    
-    
-    
     NSMutableAttributedString *attributedString =
     [LFSAttributedTextCell attributedStringFromHTMLString:(content.bodyHtml ?: @"")];
-    
     NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(content.title ?: @"")];
-    
-    
-    
-    
-    //    NSMutableAttributedString *attributedString = objc_getAssociatedObject(content, &kAttributedTextValueKey);
+    CGFloat cellHeightValue;
+    cellHeightValue = [LFSAttributedTextCell
+                       cellHeightForAttributedString:attributedString hasAttachment:NO width:(self.tableView.bounds.size.width )];
+    cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(self.tableView.bounds.size.width)];
     [cell setAttributedString:attributedString];
-    
-    //    NSMutableAttributedString *attributedTitle=objc_getAssociatedObject(content, &kAttributedTitleValueKey);
     [cell setAttributedTitleString:attributedTitleString];
-    
-    CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
-    
-    float cellHeightValue = [LFSAttributedTextCell
-                             cellHeightForAttributedString:attributedString                               hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil)
-                             width:(self.tableView.bounds.size.width - leftOffset)];
-    
-    
-    
-    
-    [cell setRequiredBodyHeight: cellHeightValue+35];
-    
-    // always set an object
+    [cell setRequiredBodyHeight: cellHeightValue];
     LFSAuthorProfile *author = content.author;
-    
     NSNumber *rating=[[content.annotations objectForKey:@"rating"]objectAtIndex:0];
     NSString *title = author.displayName ?: @"";
-    
     cell.content=content;
-    //    [cell setProfileLocal:[[LFSResource alloc]
-    //                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
-    //                           attribute:AttributeObjectFromContent(content)
-    //                           displayString:title
-    //                           icon:nil]];
-    
-    
     [cell setProfileLocal:[[LFSResource alloc]initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")attribute:AttributeObjectFromContent(content)displayString:title icon:nil rating:rating]];
 }
 
@@ -1249,13 +1215,20 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 {
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (content != nil && userToken != nil && self.collectionId != nil) {
-        [self.writeClient feature:YES
-                          comment:content.idString
-                     inCollection:self.collectionId
-                        userToken:userToken
-                        onSuccess:nil
-                        onFailure:^(NSOperation *operation, NSError *error)
-         {
+        [self.writeClient feature:YES comment:content.idString inCollection:self.collectionId userToken:userToken onSuccess:^(NSOperation *operation, id responseObject) {
+            NSLog(@"%@ ",responseObject);
+        } onFailure:^(NSOperation *operation, NSError *error) {
+//            <#code#>
+//        }]
+//        
+//        
+//        [self.writeClient feature:YES
+//                          comment:content.idString
+//                     inCollection:self.collectionId
+//                        userToken:userToken
+//                        onSuccess:nil
+//                        onFailure:^(NSOperation *operation, NSError *error)
+//         {
              // show an error message
              [[[UIAlertView alloc]
                initWithTitle:nil
@@ -1302,23 +1275,11 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                        parameters:nil
                         onSuccess:^(NSOperation *operation, id responseObject)
      {
-         /*
-          NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
-          @"Wrong content Id received");
-          
-          // Note: sometimes we get an object like this:
-          {
-          collections =     (
-          10726472
-          );
-          messageId = "051d17a631d943f58705e4ad974f4131@livefyre.com";
-          }
-          */
-         
+ 
          NSUInteger row = [_content indexOfKey:contentId ];
          if (row != NSNotFound) {
              [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
-             [self.navigationController popToRootViewControllerAnimated:YES];
+//             [self.navigationController popToRootViewControllerAnimated:YES];
          }
          
      }
@@ -1352,16 +1313,16 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 -(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
 {
-    if (content.authorIsModerator || content.author.self) {
         LFREditViewViewController *EditViewController=[[LFREditViewViewController alloc]init];
         
         EditViewController.content=content;
         EditViewController.collection=self.collection;
         EditViewController.collectionId=self.collectionId;
+        EditViewController.user=self.user;
         [self.navigationController presentViewController:EditViewController
                                                 animated:YES
                                               completion:nil];
-    }
+   
 }
 #pragma mark - LFSPostViewControllerDelegate
 -(id<LFSPostViewControllerDelegate>)viewController
