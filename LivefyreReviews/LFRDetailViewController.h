@@ -36,5 +36,6 @@
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, strong) NSMutableArray *mainContent;
 @property (nonatomic, retain) NSString *navigationHideen;
+@property (nonatomic, retain)  NSMutableArray *chaildContent;
 @property (nonatomic, weak)LFSUser *user;
 @end

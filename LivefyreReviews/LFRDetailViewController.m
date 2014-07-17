@@ -21,6 +21,7 @@
 @interface LFRDetailViewController ()
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 @property (nonatomic, weak) LFSContentCollection *content1;
+@property (nonatomic, weak)LFSContent *contentItem_clicked;
 @end
 
 @implementation LFRDetailViewController{
@@ -46,37 +47,31 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void) receiveTestNotification:(NSNotification *) notification
 {
     [TSMessage dismissActiveNotification];
-
-    // [notification name] should always be @"TestNotification"
-    // unless you use this method for observation of other notifications
-    // as well.
-    
     if ([[notification name] isEqualToString:@"ToDetail"]){
-        
-        NSMutableArray *chaildContent=[[NSMutableArray alloc]init];
+         self.chaildContent=[[NSMutableArray alloc]init];
 //        [chaildContent addObject:self.contentItem];
-        
+        LFSContent *singleContent;
         for (int i=0; i<[[notification object] count]; i++) {
-            LFSContent *singleContent=[[notification object] objectAtIndex:i];
-            if ([singleContent.idString isEqual:self.contentItem.idString] && singleContent.visibility==LFSContentVisibilityEveryone) {
+          singleContent=[[notification object] objectAtIndex:i];
+            LFSContentVisibility visibility=singleContent.visibility;
+            if ([singleContent.idString isEqual:self.contentItem.idString] && visibility==LFSContentVisibilityEveryone) {
                 //NSMutableArray *test=[[NSMutableArray alloc]init];
-                [chaildContent addObject:singleContent];
-
-                [self recursiveChilds:singleContent.children :chaildContent];
+                [self.chaildContent addObject:singleContent];
+                [self recursiveChilds:singleContent.children :self.chaildContent];
                 break;
             }
         }
-        _mainContent=nil;
-        _mainContent=[[NSMutableArray alloc]initWithArray:chaildContent];
+//        _mainContent=nil;
+//        _mainContent=[[NSMutableArray alloc]initWithArray:chaildContent];
         
-        
-        
-        
-        updateCount=(int)(_mainContent.count-oldCount);
+        if (singleContent != nil) {
+        updateCount=(int)(singleContent.children.count-oldCount);
         if (updateCount<0) {
             updateCount=0;
             oldCount=(int)[_mainContent count];
         }
+        }
+        
 //        NSLog(@"%d",updateCount);
         if (updateCount>0 && isAlertAdded==NO) {
             [_mainContent insertObject:@"Alert Notification" atIndex:1];
@@ -128,7 +123,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     self.title=@"Review";
     isAlertAdded=NO;
 //    _update=NO;
-    oldCount= (int)[self.mainContent count] ;
+    oldCount= (int)self.contentItem.children.count ;
     updateCount=1;
     self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0xF3F3F3) ;
 
@@ -565,6 +560,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     updateCount=0;
     oldCount= (int)_mainContent.count;
     isAlertAdded=NO;
+  
+    _mainContent=nil;
+    _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+    
     [self.tableView reloadData];
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.mainContent.count-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
@@ -587,7 +586,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.tableView];
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
     NSLog(@" Index path is %ld",(long)indexPath.row);
-    
+   
+    self.contentItem_clicked=[self.mainContent objectAtIndex:indexPath.row];
     
     self.actionSheet=[[UIActionSheet alloc]initWithTitle:@"Was this helpful?" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Yes" otherButtonTitles:@"No", nil];
          self.actionSheet.destructiveButtonIndex=1;
@@ -615,15 +615,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)didSelectButton3:(id)sender{
     CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.tableView];
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
-    self.contentItem =[self.mainContent objectAtIndex:indexPath.row];
+    _contentItem_clicked =[self.mainContent objectAtIndex:indexPath.row];
     
-    if ([self.user.permissions objectForKey:@"moderator_key"] && self.contentItem.authorIsModerator) {
+    if ([self.user.permissions objectForKey:@"moderator_key"] && _contentItem_clicked.authorIsModerator) {
         self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",@"Feature",nil];
     }
     else if([self.user.permissions objectForKey:@"moderator_key"]){
         self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Edit",@"Feature",@"Flag",nil];
     }
-    else if([self.user.idString isEqualToString:self.contentItem.author.idString]){
+    else if([self.user.idString isEqualToString:_contentItem_clicked.author.idString]){
         self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",nil];
     }
     else{
@@ -654,24 +654,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                     
                     
 //                    NSDictionary *parameters=[[NSDictionary alloc]initWithObjectsAndKeys:@1,@"value", nil];
-                NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:userToken,LFSCollectionPostUserTokenKey,@1,@"value",self.contentItem.idString,@"message_id",nil ];
-    
-//                [self.writeClient postMessage:action
-//                forContent:self.contentItem.idString
-//                inCollection:self.collectionId
-//                userToken:userToken
-//                parameters:parameters
-//                onSuccess:^(NSOperation *operation, id responseObject)
-//                 {
-//                     NSLog(@"success posting opine %d", action);
-//                 }
-//                onFailure:^(NSOperation *operation, NSError *error)
-//                 {
-//                     NSLog(@"failed posting opine %d", action);
-//                 }];
-                    
+                NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:userToken,LFSCollectionPostUserTokenKey,@1,@"value",self.contentItem_clicked.idString,@"message_id",nil ];
                     [self.writeClient postMessage:action
-                                       forContent:self.contentItem.idString
+                                       forContent:self.contentItem_clicked.idString
                                      inCollection:self.collectionId
                                         userToken:userToken
                                        parameters:dict
@@ -680,6 +665,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 //                                            {
 //                                                [collectionViewController didPostContentWithOperation:operation response:responseObject];
 //                                            }
+                                            [self.tableView reloadData];
                                        
                                         } onFailure:^(NSOperation *operation, NSError *error) {
                                             [[[UIAlertView alloc]
@@ -716,7 +702,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
               
               
               [self.writeClient postMessage:action
-                                 forContent:self.contentItem.idString
+                                 forContent:self.contentItem_clicked.idString
                                inCollection:self.collectionId
                                   userToken:userToken
                                  parameters:parameters
@@ -751,7 +737,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
              if  ([action isEqualToString:@"Delete"])
             {
                 if ([self.deletedContent respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
-                    [self.deletedContent postDestructiveMessage:LFSMessageDelete forContent:self.contentItem];
+                    [self.deletedContent postDestructiveMessage:LFSMessageDelete forContent:self.contentItem_clicked];
 //                    [self.navigationController popToRootViewControllerAnimated:YES];
                 }
             }
@@ -763,7 +749,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             else if ([action isEqualToString:@"Bozo"])
             {
                 if ([self.deletedContent respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
-                    [self.deletedContent postDestructiveMessage:LFSMessageBozo forContent:self.contentItem];
+                    [self.deletedContent postDestructiveMessage:LFSMessageBozo forContent:self.contentItem_clicked];
                     [self.navigationController popToRootViewControllerAnimated:YES];
                 }
             }
@@ -771,7 +757,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             {
                 if ([self.contentItem.parentId isEqualToString:@""]) {
                     if ([self.deletedContent respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
-                        [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem];
+                        [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem_clicked];
                 }
                  
                     else{
@@ -782,7 +768,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             }
             else if ([action isEqualToString:@"Feature"])
             {
-                [self.deletedContent featureContent:self.contentItem];
+                [self.deletedContent featureContent:self.contentItem_clicked];
 
             }
             else if ([action isEqualToString:@"Flag"])
@@ -804,19 +790,19 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         if ([self.deletedContent respondsToSelector:@selector(flagContent:withFlag:)]) {
             if  ([action isEqualToString:[LFSContentFlags[LFSFlagSpam] capitalizedString]])
             {
-                [self.deletedContent flagContent:self.contentItem withFlag:LFSFlagSpam];
+                [self.deletedContent flagContent:self.contentItem_clicked withFlag:LFSFlagSpam];
             }
             else if ([action isEqualToString:[LFSContentFlags[LFSFlagOffensive] capitalizedString]])
             {
-                [self.deletedContent flagContent:self.contentItem withFlag:LFSFlagOffensive];
+                [self.deletedContent flagContent:self.contentItem_clicked withFlag:LFSFlagOffensive];
             }
             else if ([action isEqualToString:[LFSContentFlags[LFSFlagOfftopic] capitalizedString]])
             {
-                [self.deletedContent flagContent:self.contentItem withFlag:LFSFlagOfftopic];
+                [self.deletedContent flagContent:self.contentItem_clicked withFlag:LFSFlagOfftopic];
             }
             else if ([action isEqualToString:[LFSContentFlags[LFSFlagDisagree] capitalizedString]])
             {
-                [self.deletedContent flagContent:self.contentItem withFlag:LFSFlagDisagree];
+                [self.deletedContent flagContent:self.contentItem_clicked withFlag:LFSFlagDisagree];
             }
             else if ([action isEqualToString:@"Cancel"])
             {

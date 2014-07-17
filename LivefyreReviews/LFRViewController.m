@@ -184,7 +184,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    [self.tableView reloadData];
+    [self loadNewData];
     // {{{ Navigation bar
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
@@ -200,7 +200,32 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     }
     [self authenticateUser];
     [self startStreamWithBoostrap];
+    
+    
 
+}
+-(void)loadNewData{
+    [_contentArray removeAllObjects];
+    for (int index=0;index<[_content count] ; index++) {
+        LFSContent *content=[_content objectAtIndex:index];
+        LFSContentVisibility visibility = content.visibility;
+        
+        if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
+            [_contentArray addObject:content];
+        }
+    }
+    [self sortReviews:_contentArray];
+    [self.tableView reloadData];
+}
+-(void)sortInTimeLine{
+    if(_contentArray.count!=0){
+        NSArray *temp=[[NSArray alloc]initWithArray:_contentArray];
+        temp = [_contentArray sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+            return [((LFSContent*)b).createdAt compare:((LFSContent*)a).createdAt];
+        }];
+        [_contentArray removeAllObjects];
+        [_contentArray addObjectsFromArray:temp];
+    }
 }
 -(void)viewDidAppear:(BOOL)animated
 {
@@ -219,6 +244,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     [super viewWillDisappear:animated];
 //    [self.streamClient stopStream];
 //    [self.operationQueue cancelAllOperations];
+    [TSMessage dismissActiveNotification];
     [self.navigationController setToolbarHidden:YES animated:animated];
     
     
@@ -309,31 +335,30 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
 
 #pragma mark - Toolbar behavior
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if (scrollView.contentOffset.y == 0){
-        
-        
-        [_contentArray removeAllObjects];
-        for (int index=0;index<[_content count] ; index++) {
-            LFSContent *content=[_content objectAtIndex:index];
-            if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
-                [_contentArray addObject:content];
-            }
-        }
-        [TSMessage dismissActiveNotification];
-        [self sortReviews:_contentArray];
-
-        [self.tableView reloadData];
-        
-    }
-    
-}
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+//    if (scrollView.contentOffset.y == 0){
+//        
+//        
+//        [_contentArray removeAllObjects];
+//        for (int index=0;index<[_content count] ; index++) {
+//            LFSContent *content=[_content objectAtIndex:index];
+//            if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+//                [_contentArray addObject:content];
+//            }
+//        }
+//        [TSMessage dismissActiveNotification];
+//        [self sortReviews:_contentArray];
+//
+//        [self.tableView reloadData];
+//        
+//    }
+//    
+//}
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     [self.navigationController
      setToolbarHidden:(scrollView.contentOffset.y <= _scrollOffset.y)
      animated:YES];
-//    [viewButton.titleLabel setTextColor:UIColorFromRGB(0x0F98EC)];
 }
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
@@ -375,9 +400,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
       onSuccess:^(NSOperation *operation, id responseObject)
      {
          self.user = [[LFSUser alloc] initWithObject:responseObject];
-        [self showStatusBarWithReview];
-         [self sortReviews:_contentArray];
-         [self.tableView reloadData];
+         [self showStatusBarWithReview];
+//         [self sortReviews:_contentArray];
+//         [self.tableView reloadData];
 
      
      }
@@ -400,7 +425,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         //[self startSpinning];
         
         [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"] article:[self.collection objectForKey:@"articleId"] onSuccess:^(NSOperation *operation, id responseObject)
-
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
              
@@ -409,26 +433,41 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [headDocument objectForKey:@"event"];
-           
-             //NSLog(@"%@", responseObject);
-             
              // we are already on the main queue...
+             
+             
              [self setCollectionId:collectionId];
              [self.streamClient setCollectionId:collectionId];
              [self.streamClient startStreamWithEventId:eventId];
+             
+             [_contentArray removeAllObjects];
+             for (int index=0;index<[_content count] ; index++) {
+                 LFSContent *content=[_content objectAtIndex:index];
+                 LFSContentVisibility visibility = content.visibility;
+
+                 if ([content.parentId isEqual:@""] && visibility == LFSContentVisibilityEveryone) {
+                     [_contentArray addObject:content];
+                 }
+             }
+//             [self sortReviews:_contentArray];
+             [self showStatusBarWithReview ];
+
+
              //[self stopSpinning];
           }
-                                   onFailure:^(NSOperation *operation, NSError *error)
-         {
+          onFailure:^(NSOperation *operation, NSError *error)
+          {
              NSLog(@"Error code %ld, with description %@", (long)error.code, [error localizedDescription]);
              //[self stopSpinning];
-         }];
+          }];
+
     }
     else {
         NSNumber *eventId = _content.lastEventId;
         [self.streamClient setCollectionId:self.collectionId];
         [self.streamClient startStreamWithEventId:eventId];
     }
+
 }
 -(void)didUpdateModelWithDeletes:(NSArray*)deletes updates:(NSArray*)updates inserts:(NSArray*)inserts
 {
@@ -444,63 +483,64 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
 //    [tableView endUpdates];
 
-
     if(_content.count){
         //// newCount Calculating here
-        //
         int newCount=0;
         for (int index=0;index<[_content count] ; index++) {
             LFSContent *content=[_content objectAtIndex:index];
-            if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+            LFSContentVisibility visibility = content.visibility;
+
+            if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
                 newCount++;
             }
         }
-        if (_contentArray.count<newCount && _contentArray.count!=0 && tableView.contentOffset.y!=0) {
-            [TSMessage dismissActiveNotification];
-            [TSMessage showNotificationInViewController:self
-                                                  title:[ NSString stringWithFormat:@"%lu",(unsigned long)(newCount-_contentArray.count)]
-                                               subtitle:nil//NSLocalizedString(@"Please update our app. We would be very thankful", nil)
-                                                  image:nil
-                                                   type:TSMessageNotificationTypeMessage
-                                               duration:TSMessageNotificationDurationEndless
-                                               callback:nil
-                                            buttonTitle:NSLocalizedString(@"New Reviews", nil)
-                                         buttonCallback:^{
+        if (_contentArray.count<newCount && _contentArray.count!=0){// && tableView.contentOffset.y!=0) {
+//            [TSMessage dismissActiveNotification];
+            [TSMessage showNotificationInViewController: self
+                                                  title: [ NSString stringWithFormat:@"%lu",(unsigned long)(newCount-_contentArray.count)]
+                                               subtitle: nil
+                                                  image: nil
+                                                   type: TSMessageNotificationTypeMessage
+                                               duration: TSMessageNotificationDurationEndless
+                                               callback: nil
+                                            buttonTitle: NSLocalizedString(@"New Reviews", nil)
+                                         buttonCallback: ^{
                                              
                                              [_contentArray removeAllObjects];
-                                             
                                              for (int index=0;index<[_content count] ; index++) {
                                                  LFSContent *content=[_content objectAtIndex:index];
-                                                 if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+                                                 LFSContentVisibility visibility = content.visibility;
+
+                                                 if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
                                                      [_contentArray addObject:content];
                                                  }
                                              }
-                                             [self sortReviews:_contentArray];
-
+                                             [self sortInTimeLine];
                                              [tableView reloadData];
                                              [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
                                                                    atScrollPosition:UITableViewScrollPositionTop
                                                                            animated:YES];
                                              
                                          }
-                                             atPosition:TSMessageNotificationPositionTop
-                                   canBeDismissedByUser:YES];
+                                            atPosition:TSMessageNotificationPositionTop
+                                            canBeDismissedByUser:YES];
 
            // [tableView reloadData];
             
-        }else{
-            [_contentArray removeAllObjects];
-            
-            for (int index=0;index<[_content count] ; index++) {
-                LFSContent *content=[_content objectAtIndex:index];
-                if ([content.parentId isEqual:@""] && content.visibility == LFSContentVisibilityEveryone) {
-                    [_contentArray addObject:content];
-                }
-            }
-            [self sortReviews:_contentArray];
-            [self showStatusBarWithReview ];
-            [self.tableView reloadData];
         }
+//        else{
+//            [_contentArray removeAllObjects];
+//            
+//            for (int index=0;index<[_content count] ; index++) {
+//                LFSContent *content=[_content objectAtIndex:index];
+//                if ([content.parentId isEqual:@""] && content.visibility == LFSContentVisibilityEveryone) {
+//                    [_contentArray addObject:content];
+//                }
+//            }
+//            [self sortReviews:_contentArray];
+//            [self showStatusBarWithReview ];
+//            [self.tableView reloadData];
+//        }
         //    [tableView reloadData];
         [[NSNotificationCenter defaultCenter]
          postNotificationName:@"ToDetail"
@@ -508,6 +548,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [self showStatusBarWithReview];
         
     }
+//    [self showStatusBarWithReview];
 
     [tableView reloadData];
 
@@ -518,7 +559,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
-            if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && content.visibility==LFSContentVisibilityEveryone) {
+            LFSContentVisibility visibility = content.visibility;
+
+            if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && visibility==LFSContentVisibilityEveryone) {
                 ownReview=content;
                 [allReviewsBeforeSort removeObjectAtIndex:index];
         }
@@ -571,6 +614,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 -(void)showStatusBarWithReview{
     int count=0;
     float rating=0;
+    if (_contentArray.count!=0) {
+
     for (int index=0;index<[_contentArray count] ; index++) {
         LFSContent *content=[_contentArray objectAtIndex:index];
         if ([content.parentId isEqual:@""] && [content.author.idString isEqual: self.user.idString]) {
@@ -656,6 +701,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             [toolbar setBarStyle:UIBarStyleDefault];
         }
     }
+    }
 
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -689,7 +735,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         /* code that acts on the hash table's values */
                 if([value isKindOfClass:[LFSContent class]])
         {
-            if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
+            LFSContentVisibility visibility = ((LFSContent*)value).visibility;
+
+            if(visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
                 [test addObject:value];
 
             }
@@ -706,7 +754,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if(_contentArray.count){
         for (int index=0;index<[_contentArray count] ; index++) {
             LFSContent *content=[_contentArray objectAtIndex:index];
-            if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && content.visibility==LFSContentVisibilityEveryone) {
+            LFSContentVisibility visibility = content.visibility;
+
+            if ([content.parentId isEqual:@""] && [content.author.idString isEqual:self.user.idString] && visibility==LFSContentVisibilityEveryone) {
                 UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 LFRDetailViewController *detailViewController = [storyboard instantiateViewControllerWithIdentifier:@"DetailViewController"];
                 [self.navigationController pushViewController:detailViewController animated:YES];
@@ -751,8 +801,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     CGFloat cellHeightValue;
     LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
 //    CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
-    LFSContentVisibility visibility = content.visibility;
-    if (visibility == LFSContentVisibilityEveryone)
+    LFSContentVisibility visibility=content.visibility;
+    if (visibility== LFSContentVisibilityEveryone)
     {
         
         NSMutableAttributedString *attributedString =
@@ -766,14 +816,15 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         
         cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(tableView.bounds.size.width)];
         
-        
+        return cellHeightValue+45;
           }
     else
     {
         //        cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
         //                                                    withLeftOffset:leftOffset];
+        return 0;
     }
-    return cellHeightValue+45;
+    
 }
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
@@ -783,13 +834,21 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 {
     
     int count=0;
-    if(_contentArray.count!=0)
-    for (LFSContent *content in _contentArray) {
-        if(content.visibility==LFSContentVisibilityEveryone && content.parentId)
+    NSMutableArray *tempArray=[[NSMutableArray alloc]initWithArray: _contentArray];
+    if(tempArray.count!=0){
+        [_contentArray removeAllObjects];
+
+    for (LFSContent *content in tempArray) {
+        LFSContentVisibility visibility = content.visibility;
+
+        if(visibility==LFSContentVisibilityEveryone && [content.parentId isEqualToString:@""]){
+            [_contentArray addObject:content];
             count++;
+        }
     }
-   return count;
-    //return [_contentArray count];
+    }
+//   return count;
+    return [_contentArray count];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -848,7 +907,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
              [_contentArray removeAllObjects];
              for (int index=0;index<[_content count] ; index++) {
                  LFSContent *content=[_content objectAtIndex:index];
-                 if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+                 LFSContentVisibility visibility = content.visibility;
+
+                 if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
                      [_contentArray addObject:content];
                  }
              }
@@ -897,7 +958,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
      LFSContent *content = [_contentArray objectAtIndex:indexPath.row];
-     LFSContentVisibility visibility = LFSContentVisibilityEveryone;
+     LFSContentVisibility visibility = content.visibility;
 
     id returnedCell;
 //   if ([content.parentId isEqualToString:@""]) {
@@ -918,6 +979,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
   }
      else
     {
+        
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
                                                   kDeletedCellReuseIdentifier];
         if (!cell) {
@@ -940,73 +1002,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 }
 #pragma mark - Navigation
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Make sure your segue name in storyboard is the same as this line
-    if ([[segue identifier] isEqualToString:kCellSelectSegue])
-    {
-        // Get reference to the destination view controller
-        if ([segue.destinationViewController isKindOfClass:[LFRDetailViewController class]]) {
-            if ([sender isKindOfClass:[UITableViewCell class]]) {
-                LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
-                NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-                LFRDetailViewController *vc = segue.destinationViewController;
-                
-                // assign model object(s)
-                LFSContent *contentItem = [_contentArray objectAtIndex:indexPath.row];
-//#ifdef CACHE_SCALED_IMAGES
-//                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
-//                                          ?: self.placeholderImage);
-//#else
-//                UIImage *avatarPreview = self.placeholderImage;
-//#endif
-                
-                
-                
-                vc.deletedContent=self;
-                vc.collection=self.collection;
-                vc.collectionId=self.collectionId;
-                vc.contentItem=contentItem;
-                chaildContent=[[NSMutableArray alloc]init];
-                [chaildContent addObject:contentItem];
-                for (int i=0; i<[_content count]; i++) {
-                    LFSContent *singleContent=[_content objectAtIndex:i];
-                    if ([singleContent.parentId isEqual:contentItem.idString]) {
-                        [chaildContent addObject:singleContent];
-                    }
-                }
-                vc.mainContent=chaildContent;
-                
-
-            }else if([sender isKindOfClass:[LFSContent class]]){
-                LFRDetailViewController *vc = segue.destinationViewController;
-//#ifdef CACHE_SCALED_IMAGES
-//                UIImage *avatarPreview = ([_imageCache objectForKey:sender.author.idString]
-//                                          ?: self.placeholderImage);
-//#else
-//                UIImage *avatarPreview = self.placeholderImage;
-//#endif
-                LFSContent *contentItem=(LFSContent*)sender;
-                
-                vc.deletedContent=self;
-                vc.collection=self.collection;
-                vc.collectionId=self.collectionId;
-                vc.contentItem=contentItem;
-                chaildContent=[[NSMutableArray alloc]init];
-                [chaildContent addObject:sender];
-                for (int i=0; i<[_content count]; i++) {
-                    LFSContent *singleContent=[_content objectAtIndex:i];
-                    if ([singleContent.parentId isEqual:contentItem.idString]) {
-                        [chaildContent addObject:singleContent];
-                    }
-                }
-                vc.mainContent=chaildContent;
-                
-
-            }
-        }
-    }
-}
 #pragma mark - Table and cell helpers
 
 -(void)configureDeletedCell:(LFSDeletedCell*)cell forContent:(LFSContent*)content
@@ -1039,7 +1034,11 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     [cell setAttributedTitleString:attributedTitleString];
     [cell setRequiredBodyHeight: cellHeightValue];
     LFSAuthorProfile *author = content.author;
-    NSNumber *rating=[[content.annotations objectForKey:@"rating"]objectAtIndex:0];
+    NSNumber *rating=0;
+    if ([[content.annotations objectForKey:@"rating"] count]>0) {
+       rating =[[content.annotations objectForKey:@"rating"]objectAtIndex:0];
+
+    }
     NSString *title = author.displayName ?: @"";
     cell.content=content;
     [cell setProfileLocal:[[LFSResource alloc]initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")attribute:AttributeObjectFromContent(content)displayString:title icon:nil rating:rating]];
@@ -1130,6 +1129,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                            [_imageCache setObject:image forKey:key];
 #endif
                            // we are on the main thead here -- display the image
+                           NSLog(@"Before");
                            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
                                                                        inSection:0];
                            UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
@@ -1140,6 +1140,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                                loadBlock((LFSAttributedTextCell*)cell, image);
                                [cell setNeedsLayout];
                            }
+                           NSLog(@"After");
                        }
                        failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 #ifdef CACHE_SCALED_IMAGES
@@ -1215,20 +1216,10 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 {
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (content != nil && userToken != nil && self.collectionId != nil) {
-        [self.writeClient feature:YES comment:content.idString inCollection:self.collectionId userToken:userToken onSuccess:^(NSOperation *operation, id responseObject) {
+        [self.writeClient feature:YES comment:content.idString inCollection:self.collectionId userToken:userToken
+                        onSuccess:^(NSOperation *operation, id responseObject) {
             NSLog(@"%@ ",responseObject);
         } onFailure:^(NSOperation *operation, NSError *error) {
-//            <#code#>
-//        }]
-//        
-//        
-//        [self.writeClient feature:YES
-//                          comment:content.idString
-//                     inCollection:self.collectionId
-//                        userToken:userToken
-//                        onSuccess:nil
-//                        onFailure:^(NSOperation *operation, NSError *error)
-//         {
              // show an error message
              [[[UIAlertView alloc]
                initWithTitle:nil
@@ -1342,11 +1333,13 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     [_contentArray removeAllObjects];
     for (int index=0;index<[_content count] ; index++) {
         LFSContent *content=[_content objectAtIndex:index];
-        if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+        LFSContentVisibility visibility = content.visibility;
+
+        if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
             [_contentArray addObject:content];
         }
     }
-    [TSMessage dismissActiveNotification];
+//    [TSMessage dismissActiveNotification];
     [self sortReviews:_contentArray];
     
     [self.tableView reloadData];
@@ -1364,11 +1357,13 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     [_contentArray removeAllObjects];
     for (int index=0;index<[_content count] ; index++) {
         LFSContent *content=[_content objectAtIndex:index];
-        if ([content.parentId isEqual:@""] && content.visibility==LFSContentVisibilityEveryone) {
+        LFSContentVisibility visibility = content.visibility;
+
+        if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
             [_contentArray addObject:content];
         }
     }
-    [TSMessage dismissActiveNotification];
+//    [TSMessage dismissActiveNotification];
     [self sortReviews:_contentArray];
     
     [self.tableView reloadData];
