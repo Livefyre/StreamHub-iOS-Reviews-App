@@ -80,15 +80,17 @@ static const CGFloat kPostContentFontSize = 18.0f;
             NSRange range=[_textView.text rangeOfString:word];
 
             if ([word hasPrefix:@"@"]) {
-                UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
-                [string addAttribute:NSFontAttributeName value:labelFont range:range];
+//                UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
+//                [string addAttribute:NSFontAttributeName value:labelFont range:range];
                 [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x0f98ec) range:range];
             }else{
-                UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
-                [string addAttribute:NSFontAttributeName value:labelFont range:range];
+//                UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
+//                [string addAttribute:NSFontAttributeName value:labelFont range:range];
             }
         }
         [_textView setAttributedText:string];
+        [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];
+
     }
     return _textView;
 }
@@ -107,26 +109,26 @@ static const CGFloat kPostContentFontSize = 18.0f;
         CGFloat new_offset = MAX((caret_rect.origin.y + caret_rect.size.height) - visible_rect.size.height - textView.contentInset.top,  -textView.contentInset.top);
         [textView setContentOffset:CGPointMake(0, new_offset) animated:NO];
     }
-    NSMutableAttributedString * string = [[NSMutableAttributedString alloc]initWithString:textView.text];
-    
-    NSArray *words=[textView.text componentsSeparatedByString:@" "];
-    
-    for (NSString *word in words) {
-        if ([word hasPrefix:@"@"]) {
-            NSRange range=[textView.text rangeOfString:word];
-            UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
-            [string addAttribute:NSFontAttributeName value:labelFont range:range];
-            [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x0f98ec) range:range];
-        }else
-        {
-            NSRange range=[textView.text rangeOfString:word];
-            UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
-            [string addAttribute:NSFontAttributeName value:labelFont range:range];
-            [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x474c52) range:range];
-            
-        }
-    }
-    [textView setAttributedText:string];
+//    NSMutableAttributedString * string = [[NSMutableAttributedString alloc]initWithString:textView.text];
+//    
+//    NSArray *words=[textView.text componentsSeparatedByString:@" "];
+//    
+//    for (NSString *word in words) {
+//        if ([word hasPrefix:@"@"]) {
+//            NSRange range=[textView.text rangeOfString:word];
+//            UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
+//            [string addAttribute:NSFontAttributeName value:labelFont range:range];
+//            [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x0f98ec) range:range];
+//        }else
+//        {
+//            NSRange range=[textView.text rangeOfString:word];
+//            UIFont * labelFont = [UIFont fontWithName:@"Georgia" size:18.0];
+//            [string addAttribute:NSFontAttributeName value:labelFont range:range];
+//            [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x474c52) range:range];
+//            
+//        }
+//    }
+//    [textView setAttributedText:string];
 
 }
 - (void)textFieldDidBeginEditing:(UITextView *)textView{

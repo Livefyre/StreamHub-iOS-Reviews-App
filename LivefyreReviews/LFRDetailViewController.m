@@ -48,11 +48,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     [TSMessage dismissActiveNotification];
     if ([[notification name] isEqualToString:@"ToDetail"]){
+        LFSContentCollection *contentCollection=[[notification object]objectAtIndex:0];
          self.chaildContent=[[NSMutableArray alloc]init];
 //        [chaildContent addObject:self.contentItem];
         LFSContent *singleContent;
-        for (int i=0; i<[[notification object] count]; i++) {
-          singleContent=[[notification object] objectAtIndex:i];
+        for (int i=0; i<[contentCollection count]; i++) {
+          singleContent=[contentCollection objectAtIndex:i];
             LFSContentVisibility visibility=singleContent.visibility;
             if ([singleContent.idString isEqual:self.contentItem.idString] && visibility==LFSContentVisibilityEveryone) {
                 //NSMutableArray *test=[[NSMutableArray alloc]init];
@@ -71,12 +72,37 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             oldCount=(int)[_mainContent count];
         }
         }
-        
-//        NSLog(@"%d",updateCount);
-        if (updateCount>0 && isAlertAdded==NO) {
-            [_mainContent insertObject:@"Alert Notification" atIndex:1];
-            isAlertAdded=YES;
+
+        NSArray *inserts=[[notification object]objectAtIndex:1];
+          if (inserts.count>0) {
+            for (NSIndexPath *value in inserts) {
+                LFSContent *content =[contentCollection objectAtIndex:value.row];
+                if ([content.author.idString isEqualToString:self.user.idString]) {
+                    _mainContent=nil;
+                    _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+                
+                }
+                else{
+                    [_mainContent insertObject:@"Alert Notification" atIndex:1];
+                    isAlertAdded=YES;
+                  //  updateCount=(int)(singleContent.children.count-oldCount);
+//                    if (updateCount<0) {
+//                    updateCount=0;
+//                    oldCount=(int)[_mainContent count];
+//                    }
+                }
+                
+            }
         }
+          else{
+              _mainContent=nil;
+              _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+              
+          }
+        
+//        if (updateCount>0 && isAlertAdded==NO) {
+//
+//        }
         
         [self.tableView reloadData];
     }
@@ -188,6 +214,22 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 //    [self.mainContent insertObject:self.contentItem atIndex:0];
+    
+    if (self.mainContent.count ==0) {
+        UIView *contentView=[[UIView alloc]initWithFrame:CGRectMake(15, 70, 290, 100)];
+        UILabel *contentLable=[[UILabel alloc]initWithFrame:CGRectMake(0, 0, 280, 80)];
+        contentLable.numberOfLines=2;
+        contentLable.text=@"The Content you are looking for no longer avilable.";
+        [contentLable setFont:[UIFont fontWithName:@"georgia" size:18]];
+        [contentView addSubview:contentLable];
+        UIButton *cancelButton=[[UIButton alloc]initWithFrame:CGRectMake(90,60,100,80)];
+        [cancelButton setTitle:@"Go Back" forState:UIControlStateNormal];
+        [cancelButton setTitleColor:UIColorFromRGB(0x0F98EC) forState:UIControlStateNormal];
+        [cancelButton addTarget:self action:@selector(cancelClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [contentView addSubview:cancelButton];
+        [self.view addSubview:contentView];
+        
+    }
      return [self.mainContent count];
     
 }
@@ -494,7 +536,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     cell.body.frame=CGRectMake(15+dateCount, 48, 290-dateCount, bodySize.height);
 
     if ([content.annotations objectForKey:@"vote"]) {
-        for ( NSString *voteString in [[content.annotations objectForKey:@"vote"]valueForKey:@"author"]) {
+        for ( NSDictionary *voteString in [content.annotations objectForKey:@"vote"]) {
             if ([[voteString valueForKey:@"author"] isEqualToString:self.user.idString] && [[voteString valueForKey:@"value"] integerValue]==1 )
                 [cell.button1 setImage:[UIImage imageNamed:@"StateLiked"]
                               forState:UIControlStateNormal];
@@ -617,17 +659,36 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
     _contentItem_clicked =[self.mainContent objectAtIndex:indexPath.row];
     
-    if ([self.user.permissions objectForKey:@"moderator_key"] && _contentItem_clicked.authorIsModerator) {
-        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",@"Feature",nil];
-    }
-    else if([self.user.permissions objectForKey:@"moderator_key"]){
-        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Edit",@"Feature",@"Flag",nil];
-    }
-    else if([self.user.idString isEqualToString:_contentItem_clicked.author.idString]){
-        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",nil];
+    
+    if (indexPath ==0) {
+        if ([self.user.permissions objectForKey:@"moderator_key"] && _contentItem_clicked.authorIsModerator) {
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",@"Feature",nil];
+        }
+        else if([self.user.permissions objectForKey:@"moderator_key"]){
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Edit",@"Feature",@"Flag",nil];
+        }
+        else if([self.user.idString isEqualToString:_contentItem_clicked.author.idString]){
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",nil];
+        }
+        else{
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Flag",nil];
+            
+        }
     }
     else{
-        self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Flag",nil];
+        if ([self.user.permissions objectForKey:@"moderator_key"] && _contentItem_clicked.authorIsModerator) {
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Feature",nil];
+        }
+        else if([self.user.permissions objectForKey:@"moderator_key"]){
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Feature",@"Flag",nil];
+        }
+        else if([self.user.idString isEqualToString:_contentItem_clicked.author.idString]){
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:nil];
+        }
+        else{
+            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Flag",nil];
+            
+        }
         
     }
     [ self.actionSheet1 showInView:self.view];
@@ -743,7 +804,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             }
             else if ([action isEqualToString:@"Ban User"])
             {
-                [self.deletedContent banAuthorOfContent:self.contentItem];
+                [self.deletedContent banAuthorOfContent:self.contentItem_clicked];
                  [self.navigationController popToRootViewControllerAnimated:YES];
              }
             else if ([action isEqualToString:@"Bozo"])

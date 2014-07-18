@@ -157,7 +157,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     ////notification/////
     
-    
+    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyrelogo.png"]];
+
     
 
 #ifdef CACHE_SCALED_IMAGES
@@ -192,9 +193,6 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
         self.navigationController.navigationBar.barTintColor = UIColorFromRGB(0x2F3440) ;
         [navigationBar setTranslucent:NO];
-        
-        self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"livefyrelogo.png"]];
-//        [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
         
 
     }
@@ -451,7 +449,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
              }
 //             [self sortReviews:_contentArray];
              [self showStatusBarWithReview ];
-
+             [self.tableView reloadData];
 
              //[self stopSpinning];
           }
@@ -483,27 +481,55 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 //    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
 //    [tableView endUpdates];
 
+    
+    
+    
     if(_content.count){
         //// newCount Calculating here
         int newCount=0;
+        LFSContent *authorContent;
         for (int index=0;index<[_content count] ; index++) {
             LFSContent *content=[_content objectAtIndex:index];
             LFSContentVisibility visibility = content.visibility;
-
             if ([content.parentId isEqual:@""] && visibility==LFSContentVisibilityEveryone) {
+                if ([content.author.idString isEqualToString:self.user.idString]) {
+                    authorContent=content;
+                }
                 newCount++;
             }
         }
+        int flag=1;
+        for (LFSContent *content in _contentArray) {
+            if ([content.author.idString isEqual:self.user.idString] && authorContent!=nil) {
+                flag=0;
+            }
+        }
+        if (flag==1 && authorContent!=nil) {
+            [_contentArray insertObject:authorContent atIndex:0];
+            newCount=newCount-flag;
+            [self.tableView reloadData];
+        }
+        
+        
+        
         if (_contentArray.count<newCount && _contentArray.count!=0){// && tableView.contentOffset.y!=0) {
 //            [TSMessage dismissActiveNotification];
+            int  repliesCount= newCount-_contentArray.count;
+            NSString *repliesTitle;
+            if (repliesCount == 1) {
+            repliesTitle = @"New Review";
+            }
+            else{
+                repliesTitle =@"New Reviews";
+            }
             [TSMessage showNotificationInViewController: self
-                                                  title: [ NSString stringWithFormat:@"%lu",(unsigned long)(newCount-_contentArray.count)]
+                                                  title: [ NSString stringWithFormat:@"%lu",(unsigned long)repliesCount]
                                                subtitle: nil
                                                   image: nil
                                                    type: TSMessageNotificationTypeMessage
                                                duration: TSMessageNotificationDurationEndless
                                                callback: nil
-                                            buttonTitle: NSLocalizedString(@"New Reviews", nil)
+                                            buttonTitle: NSLocalizedString(repliesTitle, nil)
                                          buttonCallback: ^{
                                              
                                              [_contentArray removeAllObjects];
@@ -526,27 +552,17 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                                             canBeDismissedByUser:YES];
 
            // [tableView reloadData];
-            
+
         }
-//        else{
-//            [_contentArray removeAllObjects];
-//            
-//            for (int index=0;index<[_content count] ; index++) {
-//                LFSContent *content=[_content objectAtIndex:index];
-//                if ([content.parentId isEqual:@""] && content.visibility == LFSContentVisibilityEveryone) {
-//                    [_contentArray addObject:content];
-//                }
-//            }
-//            [self sortReviews:_contentArray];
-//            [self showStatusBarWithReview ];
-//            [self.tableView reloadData];
-//        }
-        //    [tableView reloadData];
+        
+        NSArray *contentArray=[[NSArray alloc]initWithObjects:_content,inserts,nil];
+        
         [[NSNotificationCenter defaultCenter]
          postNotificationName:@"ToDetail"
-         object:_content];
+         object:contentArray];
         [self showStatusBarWithReview];
-        
+        [tableView reloadData];
+
     }
 //    [self showStatusBarWithReview];
 
@@ -719,12 +735,30 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         detailViewController.collectionId=self.collectionId;
         detailViewController.contentItem=content;
         detailViewController.user=self.user;
-         NSMutableArray *test=[[NSMutableArray alloc]init];
-        [test addObject:content];
-        [self recursiveChilds:content.children :test];
-        detailViewController.mainContent=test;
+        NSMutableArray *hash=[[NSMutableArray alloc]init];//=content.children;
+        NSEnumerator *enumerator = [content.children objectEnumerator];
+        id value;
+        while ((value = [enumerator nextObject])) {
+            /* code that acts on the hash table's values */
+            if([value isKindOfClass:[LFSContent class]])
+            {
+                if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
+                    [hash addObject:value];
+                    
+                }
+            }
+        }
+        NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+        [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
+        NSMutableArray *result=[[NSMutableArray alloc]init];
+        for (LFSContent *content in hash){
+            NSMutableArray *temp=[[NSMutableArray alloc]init];
+            [result addObject:content];
+            [result addObjectsFromArray: [self recursiveChilds:content.children :temp]];
+        }
+        [result insertObject:content atIndex:0];
+        detailViewController.mainContent=result;
         [self.navigationController setToolbarHidden:YES animated:YES];
- 
     }
 }
 -(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
@@ -733,21 +767,22 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     while ((value = [enumerator nextObject])) {
         /* code that acts on the hash table's values */
-                if([value isKindOfClass:[LFSContent class]])
+        if([value isKindOfClass:[LFSContent class]])
         {
             LFSContentVisibility visibility = ((LFSContent*)value).visibility;
-
+            
             if(visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
                 [test addObject:value];
-
+                
             }
             [self recursiveChilds:((LFSContent*)value).children :test];
-
+            
         }
         
-            }
+    }
     return test;
 }
+
 -(void)viewReviewButtonSelected
 {
 
@@ -768,21 +803,34 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                 detailViewController.collectionId=self.collectionId;
                 detailViewController.contentItem=content;
                 detailViewController.user=self.user;
-                NSMutableArray *test=[[NSMutableArray alloc]init];
-                [test addObject:content];
-                [self recursiveChilds:content.children :test];
-                detailViewController.mainContent=test;
+                NSMutableArray *hash=[[NSMutableArray alloc]init];//=content.children;
+                NSEnumerator *enumerator = [content.children objectEnumerator];
+                id value;
+                while ((value = [enumerator nextObject])) {
+                    /* code that acts on the hash table's values */
+                    if([value isKindOfClass:[LFSContent class]])
+                    {
+                        if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
+                            [hash addObject:value];
+                            
+                        }
+                    }
+                }
+                NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+                [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
+                NSMutableArray *result=[[NSMutableArray alloc]init];
+                for (LFSContent *content in hash){
+                    NSMutableArray *temp=[[NSMutableArray alloc]init];
+                    [result addObject:content];
+                    [result addObjectsFromArray: [self recursiveChilds:content.children :temp]];
+                }
+                [result insertObject:content atIndex:0];
+                detailViewController.mainContent=result;
                 [self.navigationController setToolbarHidden:YES animated:YES];
-
-                
             }
         }
     }
-
-
-
 }
-
 
 #pragma mark - Table view data source
 
@@ -1129,8 +1177,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                            [_imageCache setObject:image forKey:key];
 #endif
                            // we are on the main thead here -- display the image
-                           NSLog(@"Before");
-                           NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
+                            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
                                                                        inSection:0];
                            UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
                            if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
@@ -1140,8 +1187,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                                loadBlock((LFSAttributedTextCell*)cell, image);
                                [cell setNeedsLayout];
                            }
-                           NSLog(@"After");
-                       }
+                        }
                        failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 #ifdef CACHE_SCALED_IMAGES
                            // cache placeholder image instead so we don't repeatedly

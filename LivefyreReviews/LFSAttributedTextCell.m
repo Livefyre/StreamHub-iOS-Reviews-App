@@ -755,12 +755,9 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }else if (_content.nodeCount-1 ==1){
         replyString=@"1 Reply";
     }else{
-        replyString=[NSString stringWithFormat:@"%ld Replies",_content.nodeCount-1];
+        replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
     }
-    
-    
-    
-    
+     
     [self.footerLeftView setText:[NSString stringWithFormat:@"%d of %ld found helpful",count,(unsigned long)[[_content.annotations objectForKey:@"vote" ] count]]];
     [self.footerLeftView resizeVerticalBottomRightTrim];
     [self.footerRightView setText:[NSString stringWithFormat:@"%@",replyString ]];
@@ -805,7 +802,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     textTitleContentFrame.origin = CGPointMake(leftTitleColumn,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
     textTitleContentFrame.size = CGSizeMake(rect.size.width - leftTitleColumn - rightTitleColumn,
-                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(320.0f - leftTitleColumn - rightTitleColumn)]);
+                                       [LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(320.0f - rightTitleColumn)]);
     [self.bodyTitleView setFrame:textTitleContentFrame];
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds

@@ -60,7 +60,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pbN-FE-Njb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="113" y="96"/>
+            <point key="canvasLocation" x="112" y="218"/>
         </scene>
         <!--Post View Controller - New Comment-->
         <scene sceneID="gip-xf-fdg">
