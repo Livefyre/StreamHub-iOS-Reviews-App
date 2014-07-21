@@ -212,18 +212,18 @@ static const UIEdgeInsets kPostContentInset = {
 //
     
     
-    UIView *addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-265, 320, 50)];
-    [addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
-    addPhotoImageView.alpha=0.8;
-    
-    UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
-    [addImageButton setImage:[UIImage imageNamed:@"icon_photo"] forState:UIControlStateNormal];
-    [addPhotoImageView addSubview:addImageButton];
+//    UIView *addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-265, 320, 50)];
+//    [addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
+//    addPhotoImageView.alpha=0.8;
+//    
+//    UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
+//    [addImageButton setImage:[UIImage imageNamed:@"icon_photo"] forState:UIControlStateNormal];
+//    [addPhotoImageView addSubview:addImageButton];
     
     
     UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(116,11, 100, 28)];
     [addPhoto setTitle:@"Add Photo" forState:UIControlStateNormal];
-    [addPhotoImageView addSubview:addPhoto];
+//    [addPhotoImageView addSubview:addPhoto];
     addPhoto.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14];
     [addPhoto setTitleColor:UIColorFromRGB(0x80848B) forState:UIControlStateNormal];
     [addPhoto addTarget:self action:@selector(addPhotoClicked) forControlEvents:UIControlEventTouchUpInside];
@@ -241,7 +241,7 @@ static const UIEdgeInsets kPostContentInset = {
 //    [_description.layer addSublayer:line5];
     
     [self.view addSubview:Scrool];
-    [self.view addSubview:addPhotoImageView];
+//    [self.view addSubview:addPhotoImageView];
     
     CAShapeLayer *line4=[self drawline:CGPointMake(0, screenHeight-265) :CGPointMake(320, screenHeight-265)];
     [self.view.layer addSublayer:line4];

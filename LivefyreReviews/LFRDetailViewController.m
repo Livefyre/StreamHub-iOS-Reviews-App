@@ -17,6 +17,7 @@
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSContentCollection.h"
 #import "TSMessage.h"
+#import "LFSDeletedCell.h"
 
 @interface LFRDetailViewController ()
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -31,6 +32,7 @@
 }
 
 const static CGFloat kGenerationOffset = 20.f;
+static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 // hardcode author id for now
 static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (id)initWithCoder:(NSCoder*)aDecoder
@@ -48,84 +50,174 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     [TSMessage dismissActiveNotification];
     if ([[notification name] isEqualToString:@"ToDetail"]){
+        NSMutableArray *hash=[[NSMutableArray alloc]init];//=content.children;
+
         LFSContentCollection *contentCollection=[[notification object]objectAtIndex:0];
          self.chaildContent=[[NSMutableArray alloc]init];
 //        [chaildContent addObject:self.contentItem];
         LFSContent *singleContent;
         for (int i=0; i<[contentCollection count]; i++) {
-          singleContent=[contentCollection objectAtIndex:i];
+            singleContent=[contentCollection objectAtIndex:i];
             LFSContentVisibility visibility=singleContent.visibility;
             if ([singleContent.idString isEqual:self.contentItem.idString] && visibility==LFSContentVisibilityEveryone) {
                 //NSMutableArray *test=[[NSMutableArray alloc]init];
+                NSEnumerator *enumerator = [singleContent.children objectEnumerator];
+                id value;
+                while ((value = [enumerator nextObject])) {
+                    /* code that acts on the hash table's values */
+                    if([value isKindOfClass:[LFSContent class]])
+                    {
+                        if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
+                            [hash addObject:value];
+                            
+                        }
+                    }
+                }
+                NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+                [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
+                
+                
+                for (int i=0; i<hash.count; i++) {
+                    LFSContent *content=[hash objectAtIndex:i];
+                    if (content.children) {
+                        NSMutableArray *temp=[self recursiveChilds:content.children];
+                        for (int j=0,index=0; temp.count>j; j++) {
+                            //                            LFSContentVisibility tempContentVisibility=((LFSContent *)[temp objectAtIndex:j]).visibility;
+                            //                            if (tempContentVisibility==LFSContentVisibilityEveryone) {
+                            [hash insertObject:[temp objectAtIndex:index] atIndex:index+i+1];
+                            index++;
+                            //                            }
+                            
+                        }
+                    }
+                }
                 [self.chaildContent addObject:singleContent];
-                [self recursiveChilds:singleContent.children :self.chaildContent];
+                [self.chaildContent addObjectsFromArray:hash];
                 break;
             }
         }
-//        _mainContent=nil;
-//        _mainContent=[[NSMutableArray alloc]initWithArray:chaildContent];
         
-        if (singleContent != nil) {
-        updateCount=(int)(singleContent.children.count-oldCount);
-        if (updateCount<0) {
-            updateCount=0;
-            oldCount=(int)[_mainContent count];
-        }
-        }
-
+        
         NSArray *inserts=[[notification object]objectAtIndex:1];
-          if (inserts.count>0) {
+        if (inserts.count>0) {
+            
             for (NSIndexPath *value in inserts) {
                 LFSContent *content =[contentCollection objectAtIndex:value.row];
                 if ([content.author.idString isEqualToString:self.user.idString]) {
                     _mainContent=nil;
                     _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
-                
+                    NSMutableArray *temp=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+                    
+                    NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+                    [temp sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
+                    LFSContent *tempContent=[temp objectAtIndex:temp.count-1];
+                    
+                    NSInteger indexpath=[_mainContent indexOfObject:tempContent ];
+                    
+                    
+                    [self.tableView reloadData];
+                    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:indexpath inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
                 }
-                else{
-                    [_mainContent insertObject:@"Alert Notification" atIndex:1];
-                    isAlertAdded=YES;
-                  //  updateCount=(int)(singleContent.children.count-oldCount);
-//                    if (updateCount<0) {
-//                    updateCount=0;
-//                    oldCount=(int)[_mainContent count];
-//                    }
-                }
-                
             }
         }
-          else{
-              _mainContent=nil;
-              _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
-              
-          }
+        if (hash.count >_mainContent.count-1 && !isAlertAdded ) {
+          
+            updateCount =hash.count -_mainContent.count+1;
+            [_mainContent insertObject:@"Alert Notification" atIndex:1];
+            isAlertAdded=YES;
+
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1
+                                                        inSection:0];
+            [self.tableView beginUpdates];
+            [self.tableView insertRowsAtIndexPaths:[[NSArray alloc]initWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationMiddle];
+            [self.tableView endUpdates];
+//            [self.tableView reloadData];
+            
+        }
+        else if ((hash.count >_mainContent.count-1 && isAlertAdded)){
+            updateCount =hash.count -_mainContent.count+2;
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1
+                                                        inSection:0];
+            [self.tableView beginUpdates];
+            [self.tableView reloadRowsAtIndexPaths:[[NSArray alloc]initWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationMiddle];
+            [self.tableView endUpdates];
+
+        }
         
-//        if (updateCount>0 && isAlertAdded==NO) {
-//
+        else if (hash.count <_mainContent.count-1){
+            
+            _mainContent=nil;
+            _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+            isAlertAdded=NO;
+            [self.tableView reloadData];
+            
+            
+        }
+ //        _mainContent=nil;
+//        _mainContent=[[NSMutableArray alloc]initWithArray:chaildContent];
+        
+//        if (singleContent != nil) {
+//        updateCount=(int)(singleContent.children.count-oldCount);
+//        if (updateCount<0) {
+//            updateCount=0;
+//            oldCount=(int)[_mainContent count];
 //        }
-        
-        [self.tableView reloadData];
+//        }
+//
+//        NSArray *inserts=[[notification object]objectAtIndex:1];
+//          if (inserts.count>0) {
+//              
+//            for (NSIndexPath *value in inserts) {
+//                LFSContent *content =[contentCollection objectAtIndex:value.row];
+//                if ([content.author.idString isEqualToString:self.user.idString]) {
+//                    _mainContent=nil;
+//                    _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+//                
+//                }
+//                else{
+//                    [_mainContent insertObject:@"Alert Notification" atIndex:1];
+//                    isAlertAdded=YES;
+//                          [self.tableView reloadData];
+//                  //  updateCount=(int)(singleContent.children.count-oldCount);
+////                    if (updateCount<0) {
+////                    updateCount=0;
+////                    oldCount=(int)[_mainContent count];
+////                    }
+//                }
+//                
+//            }
+//        }
+//          else{
+//              _mainContent=nil;
+//              _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+//                    [self.tableView reloadData];
+//              
+//          }
+   
     }
 }
 
 
--(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
+-(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable {
+    NSMutableArray *test=[[NSMutableArray alloc]init];
     NSEnumerator *enumerator = [hashtable objectEnumerator];
     id value;
-    
     while ((value = [enumerator nextObject])) {
         /* code that acts on the hash table's values */
         if([value isKindOfClass:[LFSContent class]])
         {
-            if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                [test addObject:value];
-                [self recursiveChilds:((LFSContent*)value).children :test];
-
-            }
+            LFSContentVisibility visibility = ((LFSContent*)value).visibility;
+            
+            //            if( ((LFSContent*)value).bodyHtml && visibility==LFSContentVisibilityEveryone ){
+            [test addObject:value];
+            
+            //            }
             
         }
         
     }
+    NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+    [test sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
     return test;
 }
 @synthesize writeClient = _writeClient;
@@ -219,7 +311,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         UIView *contentView=[[UIView alloc]initWithFrame:CGRectMake(15, 70, 290, 100)];
         UILabel *contentLable=[[UILabel alloc]initWithFrame:CGRectMake(0, 0, 280, 80)];
         contentLable.numberOfLines=2;
-        contentLable.text=@"The Content you are looking for no longer avilable.";
+        contentLable.text=@"The Content you are looking for is no longer available.";
         [contentLable setFont:[UIFont fontWithName:@"georgia" size:18]];
         [contentView addSubview:contentLable];
         UIButton *cancelButton=[[UIButton alloc]initWithFrame:CGRectMake(90,60,100,80)];
@@ -234,42 +326,13 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
+    
+    if ([[_mainContent objectAtIndex:indexPath.row] isKindOfClass:[LFSContent class]] ){
+        
+        LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
+        LFSContentVisibility visibility = contentValues.visibility;
 
-    if (indexPath.row ==1 && ![[_mainContent objectAtIndex:1] isKindOfClass:[LFSContent class]] ){
-        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
-            return 0;
-        }
-        return 60;
-    }
-    else if ([contentValues.parentId isEqualToString:@""]){
-          LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
-    
-    NSMutableAttributedString *attributedTitle=[cell getAttributedTextWithFormat:contentValues.title :24 :@"Georgia" :14];
-    CGSize titleSize = [attributedTitle sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
-    
-    NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
-    CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
-        return titleSize.height+137+bodySize.height;
-    }
-    else{
-        LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
-        NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
-        CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
-        return 91+bodySize.height;
-    }
-}
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
-    
-    if (indexPath.row ==1 && ![[_mainContent objectAtIndex:1] isKindOfClass:[LFSContent class]] && isAlertAdded){
-        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
-            return 0;
-        }
-        return 60;
-    }
-
-    else if ([contentValues.parentId isEqualToString:@""]){
+     if ([contentValues.parentId isEqualToString:@""] && visibility == LFSContentVisibilityEveryone){
         LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
         
         NSMutableAttributedString *attributedTitle=[cell getAttributedTextWithFormat:contentValues.title :24 :@"Georgia" :14];
@@ -279,43 +342,145 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
         return titleSize.height+137+bodySize.height;
     }
-    else{
+    else if(visibility == LFSContentVisibilityEveryone){
         LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
         NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
         CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
         return 91+bodySize.height;
     }
+    else {
+        
+        return 40;
+    }
+    }else{
+        return 60;
+    }
+
 }
+//- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+//    
+//    if ([[_mainContent objectAtIndex:indexPath.row] isKindOfClass:[LFSContent class]] && isAlertAdded){
+//        
+//        LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
+//        LFSContentVisibility visibility = contentValues.visibility;
+//        
+//        if ([contentValues.parentId isEqualToString:@""] && visibility == LFSContentVisibilityEveryone){
+//            LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
+//            
+//            NSMutableAttributedString *attributedTitle=[cell getAttributedTextWithFormat:contentValues.title :24 :@"Georgia" :14];
+//            CGSize titleSize = [attributedTitle sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+//            
+//            NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
+//            CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+//            return titleSize.height+137+bodySize.height;
+//        }
+//        else if(visibility == LFSContentVisibilityEveryone){
+//            LFRDetailTableViewCell *cell=[[LFRDetailTableViewCell alloc]init];
+//            NSMutableAttributedString *attributedbody=[cell getAttributedTextWithFormat:contentValues.bodyHtml :18 :@"Georgia" :5];
+//            CGSize bodySize = [attributedbody sizeConstrainedToSize:CGSizeMake(290, CGFLOAT_MAX)];
+//            return 91+bodySize.height;
+//        }
+//        else {
+//            
+//            return 40;
+//        }
+//    }else{
+//        
+//        return 60;
+//    }
+//    
+//}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
-
-  static NSString *cellIdentifier = @"ConfigureCell";
+    
+    static NSString *cellIdentifier = @"ConfigureCell";
     LFRDetailTableViewCell *cell=nil;
     //(LFRDetailTableViewCell *)[self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
   
+    
+       if([[_mainContent objectAtIndex:indexPath.row] isKindOfClass:[LFSContent class]]){
+           LFSContent *contentValues = [self.mainContent objectAtIndex:indexPath.row];
+
+
+        LFSContentVisibility visibility = contentValues.visibility;
+    if (visibility == LFSContentVisibilityEveryone)
+    {
         if (cell == nil) {
-            cell = [[LFRDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-        }
-    if (indexPath.row ==1 && ![[_mainContent objectAtIndex:1] isKindOfClass:[LFSContent class]] ){
-        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
-            return nil;
-        }
-        [self configureAttributedCell2:cell forCount:@"2"];
+        cell = [[LFRDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
 
-    
-            else  if ([contentValues.parentId isEqualToString:@""]) {
+              if ([contentValues.parentId isEqualToString:@""]) {
                  [self configureAttributedCell:cell forContent:contentValues];
             }
     
             else{
                 [self configureAttributedCell1:cell forContent:contentValues];
             }
-     
+        return cell;
+    }
+    else
+    {
+        
+        LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
+                                                  kDeletedCellReuseIdentifier];
+        if (!cell) {
+            cell = [[LFSDeletedCell alloc]
+                    initWithReuseIdentifier:kDeletedCellReuseIdentifier];
+            [cell.imageView setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
+                                                               green:(217.f/255.f)
+                                                                blue:(217.f/255.f)
+                                                               alpha:1.f]];
+            [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
+            [cell.imageView setContentMode:UIViewContentModeCenter];
+            [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
+            [cell.textLabel setTextColor:[UIColor lightGrayColor]];
 
+        }
+        [self configureDeletedCell:cell forContent:contentValues];
     return cell;
+    }
+    
+
+    }
+    else {
+//        if (![[_mainContent objectAtIndex:1] isEqualToString:@"Alert Notification"]) {
+//            return nil;
+//        }
+        if (cell == nil) {
+            cell = [[LFRDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        }
+
+        [self configureAttributedCell2:cell forCount:@"2"];
+        return  cell;
+    }
 }
+-(void)configureDeletedCell:(LFSDeletedCell*)cell forContent:(LFSContent*)content
+{
+    if ([content isKindOfClass:[LFSContent class]]){
+    LFSContentVisibility visibility = content.visibility;
+        
+        float dateCount;
+        
+        if([content.datePath count] <=5){
+            dateCount=([content.datePath count] - 2)* kGenerationOffset;
+        }
+        else{
+            dateCount=3*kGenerationOffset;
+        }
+     
+        
+        
+    [cell setLeftOffset:dateCount];
+    
+    NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
+                          ? @""
+                          : @"This comment has been removed");
+    
+    [cell.textLabel setText:[NSString stringWithFormat:@"%@ (%ld)", bodyText, (long)content.nodeCount]];
+        [cell.textLabel setText:bodyText];
+    }
+}
+
 - (void)configureAttributedCell:(LFRDetailTableViewCell*)cell forContent:(LFSContent*)content
 {
     //profile image
@@ -606,8 +771,17 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     _mainContent=nil;
     _mainContent=[[NSMutableArray alloc]initWithArray:self.chaildContent];
     
+    NSMutableArray *temp=[[NSMutableArray alloc]initWithArray:self.chaildContent];
+    
+    NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+    [temp sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
+    LFSContent *tempContent=[temp objectAtIndex:temp.count-1];
+    
+    NSInteger indexpath=[_mainContent indexOfObject:tempContent ];
+    
+    
     [self.tableView reloadData];
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.mainContent.count-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:indexpath inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 -(CAShapeLayer*)drawline:(CGPoint)from :(CGPoint)to{
     UIBezierPath *path = [UIBezierPath bezierPath];
@@ -660,7 +834,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     _contentItem_clicked =[self.mainContent objectAtIndex:indexPath.row];
     
     
-    if (indexPath ==0) {
+   // if (indexPath.row == 0) {
         if ([self.user.permissions objectForKey:@"moderator_key"] && _contentItem_clicked.authorIsModerator) {
             self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Edit",@"Feature",nil];
         }
@@ -674,23 +848,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Flag",nil];
             
         }
-    }
-    else{
-        if ([self.user.permissions objectForKey:@"moderator_key"] && _contentItem_clicked.authorIsModerator) {
-            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Feature",nil];
-        }
-        else if([self.user.permissions objectForKey:@"moderator_key"]){
-            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Ban User",@"Bozo",@"Feature",@"Flag",nil];
-        }
-        else if([self.user.idString isEqualToString:_contentItem_clicked.author.idString]){
-            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:nil];
-        }
-        else{
-            self.actionSheet1=[[UIActionSheet alloc]initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Flag",nil];
-            
-        }
-        
-    }
     [ self.actionSheet1 showInView:self.view];
     
 }
@@ -816,7 +973,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             }
             else if ([action isEqualToString:@"Edit"])
             {
-                if ([self.contentItem.parentId isEqualToString:@""]) {
+                if ([self.contentItem_clicked.parentId isEqualToString:@""]) {
                     if ([self.deletedContent respondsToSelector:@selector(editReviewOfContent:forContent:)]) {
                         [self.deletedContent editReviewOfContent:LFSMessageEdit forContent:self.contentItem_clicked];
                 }

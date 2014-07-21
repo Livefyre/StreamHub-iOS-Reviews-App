@@ -564,7 +564,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         [tableView reloadData];
 
     }
-//    [self showStatusBarWithReview];
+    [self showStatusBarWithReview ];
 
     [tableView reloadData];
 
@@ -682,7 +682,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             //[toolbar setTintColor:[UIColor lightGrayColor]];
         }
     }
-    else{
+    }
+        if (count==0) {
+        {
         _scrollOffset = CGPointZero;
         
         CGFloat textFieldWidth =
@@ -742,47 +744,60 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             /* code that acts on the hash table's values */
             if([value isKindOfClass:[LFSContent class]])
             {
-                if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                    [hash addObject:value];
-                    
-                }
+                //                ((LFSContent*)value).visibility==LFSContentVisibilityEveryone &&
+                //                if( ((LFSContent*)value).bodyHtml ){
+                [hash addObject:value];
+                
+                //                }
             }
         }
         NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
         [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
-        NSMutableArray *result=[[NSMutableArray alloc]init];
-        for (LFSContent *content in hash){
-            NSMutableArray *temp=[[NSMutableArray alloc]init];
-            [result addObject:content];
-            [result addObjectsFromArray: [self recursiveChilds:content.children :temp]];
+        
+        
+        for (int i=0; i<hash.count; i++) {
+            LFSContent *content=[hash objectAtIndex:i];
+            if (content.children) {
+                NSMutableArray *temp=[self recursiveChilds:content.children];
+                for (int j=0,index=0; temp.count>j; j++) {
+                    //                    LFSContentVisibility tempContentVisibility=((LFSContent *)[temp objectAtIndex:j]).visibility;
+                    //                    if (tempContentVisibility==LFSContentVisibilityEveryone) {
+                    [hash insertObject:[temp objectAtIndex:index] atIndex:index+i+1];
+                    index++;
+                    //                    }
+                    
+                }
+            }
         }
-        [result insertObject:content atIndex:0];
-        detailViewController.mainContent=result;
+        
+        [hash insertObject:content atIndex:0];
+        detailViewController.mainContent=hash;
         [self.navigationController setToolbarHidden:YES animated:YES];
     }
 }
--(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
+
+-(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable {
+    NSMutableArray *test=[[NSMutableArray alloc]init];
     NSEnumerator *enumerator = [hashtable objectEnumerator];
     id value;
-    
     while ((value = [enumerator nextObject])) {
         /* code that acts on the hash table's values */
         if([value isKindOfClass:[LFSContent class]])
         {
             LFSContentVisibility visibility = ((LFSContent*)value).visibility;
             
-            if(visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                [test addObject:value];
-                
-            }
-            [self recursiveChilds:((LFSContent*)value).children :test];
+            //            if( ((LFSContent*)value).bodyHtml && visibility==LFSContentVisibilityEveryone ){
+            [test addObject:value];
+            
+            //            }
             
         }
         
     }
+    NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+    [test sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
     return test;
 }
-
 -(void)viewReviewButtonSelected
 {
 
@@ -810,22 +825,34 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                     /* code that acts on the hash table's values */
                     if([value isKindOfClass:[LFSContent class]])
                     {
-                        if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                            [hash addObject:value];
-                            
-                        }
+                        //                ((LFSContent*)value).visibility==LFSContentVisibilityEveryone &&
+                        //                if( ((LFSContent*)value).bodyHtml ){
+                        [hash addObject:value];
+                        
+                        //                }
                     }
                 }
                 NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
                 [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
-                NSMutableArray *result=[[NSMutableArray alloc]init];
-                for (LFSContent *content in hash){
-                    NSMutableArray *temp=[[NSMutableArray alloc]init];
-                    [result addObject:content];
-                    [result addObjectsFromArray: [self recursiveChilds:content.children :temp]];
+                
+                
+                for (int i=0; i<hash.count; i++) {
+                    LFSContent *content=[hash objectAtIndex:i];
+                    if (content.children) {
+                        NSMutableArray *temp=[self recursiveChilds:content.children];
+                        for (int j=0,index=0; temp.count>j; j++) {
+                            //                    LFSContentVisibility tempContentVisibility=((LFSContent *)[temp objectAtIndex:j]).visibility;
+                            //                    if (tempContentVisibility==LFSContentVisibilityEveryone) {
+                            [hash insertObject:[temp objectAtIndex:index] atIndex:index+i+1];
+                            index++;
+                            //                    }
+                            
+                        }
+                    }
                 }
-                [result insertObject:content atIndex:0];
-                detailViewController.mainContent=result;
+                
+                [hash insertObject:content atIndex:0];
+                detailViewController.mainContent=hash;
                 [self.navigationController setToolbarHidden:YES animated:YES];
             }
         }
@@ -1350,6 +1377,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 -(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
 {
+    
         LFREditViewViewController *EditViewController=[[LFREditViewViewController alloc]init];
         
         EditViewController.content=content;

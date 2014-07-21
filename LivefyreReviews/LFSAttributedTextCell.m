@@ -645,7 +645,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
-//    NSNumber *rating=profileLocal.rating;
+    //    NSNumber *rating=profileLocal.rating;
     id headerAccessory = profileLocal.attributeObject;
     
     CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
@@ -653,7 +653,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     if (headerTitle) {
         CGRect titleFrame = self.headerTitleView.frame;
         titleFrame.origin.x = leftColumnWidth;
-        titleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
+        titleFrame.size.width =rect.size.width - leftColumnWidth - kCellPadding.right;
         [self.headerTitleView setFrame:titleFrame];
     }
     if (headerSubtitle) {
@@ -693,7 +693,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
                                                   headerTitleFrame.size.height);
-
+        
         if ([headerAccessory isKindOfClass:[UIImage class]]) {
             [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopImageView setImage:headerAccessory];
@@ -711,35 +711,60 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         // attribute + full name + twitter handle
         [self.headerTitleView setText:headerTitle];
         [self.headerTitleView resizeVerticalTopRightTrim];
-        CGRect headerTitleFrame = self.headerTitleView.frame;
         
         [self.headerSubtitleView setText:headerSubtitle];
         [self.headerSubtitleView resizeVerticalBottomRightTrim];
-        
-        CGRect headerAttributeTopFrame;
-        headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
-                                                     + headerTitleFrame.size.width
-                                                     + kCellMinorHorizontalSeparator,
-                                                     headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
-        headerAttributeTopFrame.size = CGSizeMake(rect.size.width
-                                                  - headerTitleFrame.origin.x
-                                                  - headerTitleFrame.size.width,
-                                                  headerTitleFrame.size.height-2);
-        
         if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            
+            CGRect headerAttributeTopFrame;
+            
+            
+            CGSize textSize = [headerTitle sizeWithAttributes:@{NSFontAttributeName:[self.headerAttributeTopView font]}];
+            CGRect headerTitleFrame = self.headerTitleView.frame;
+            
+            if (textSize.width>140) {
+                headerTitleFrame.size.width=140;
+            }
+            self.headerTitleView.frame=headerTitleFrame;
+            headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
+                                                         + headerTitleFrame.size.width
+                                                         + kCellMinorHorizontalSeparator,
+                                                         headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
+            headerAttributeTopFrame.size = CGSizeMake(rect.size.width
+                                                      - headerTitleFrame.origin.x
+                                                      - headerTitleFrame.size.width,
+                                                      headerTitleFrame.size.height-2);
+            
             [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopImageView setImage:headerAccessory];
             [self.headerAttributeTopView setText:nil];
             self.headerAttributeTopImageView.contentMode=UIViewContentModeBottomLeft;
         }
         else {
+            CGRect headerAttributeTopFrame;
+            CGSize textSize = [headerTitle sizeWithAttributes:@{NSFontAttributeName:[self.headerAttributeTopView font]}];
+            CGRect headerTitleFrame = self.headerTitleView.frame;
+            
+            if (textSize.width>140) {
+                headerTitleFrame.size.width=140;
+            }
+            self.headerTitleView.frame=headerTitleFrame;
+            
+            headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
+                                                         + headerTitleFrame.size.width
+                                                         + kCellMinorHorizontalSeparator,
+                                                         headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
+            headerAttributeTopFrame.size = CGSizeMake(rect.size.width
+                                                      - headerTitleFrame.origin.x
+                                                      - headerTitleFrame.size.width,
+                                                      headerTitleFrame.size.height-2);
+            
             [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopView setText:headerAccessory];
             [self.headerAttributeTopView resizeVerticalCenterRightTrim];
             [self.headerAttributeTopImageView setImage:nil];
         }
-    }
-    else {
+    }    else {
         // no header
     }
     int count=0;

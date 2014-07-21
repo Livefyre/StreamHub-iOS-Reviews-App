@@ -8,14 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <FilepickerSDK/FPPicker.h>
 
 #import "LFSUser.h"
 #import "LFSContent.h"
 #import "DYRateView.h"
+#import "LFSWriteCommentView.h"
 
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController<DYRateViewDelegate>
+@interface LFSPostViewController : UIViewController<DYRateViewDelegate,LFSWriteCommentViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FPPickerDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;

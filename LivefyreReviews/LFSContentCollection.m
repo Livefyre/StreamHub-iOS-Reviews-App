@@ -658,11 +658,17 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         NSUInteger i = 0u, imax = [self.deleteStack count];
         for (LFSContent *ins in self.insertStack) {
             // count how many deletions are before a given index of inserted object
-            for (LFSContent *rem = [self.deleteStack objectAtIndex:i];
+            
+            ins.index -= i;
+            if(i<imax){
+for (LFSContent *rem = [self.deleteStack objectAtIndex:i];
                  i < imax && rem.index < ins.index;
                  rem = [self.deleteStack objectAtIndex:i], i++)
-            { }
-            ins.index -= i;
+            {
+            
+            }
+            }
+            
         }
         
         //////////////////////////////////////////////
