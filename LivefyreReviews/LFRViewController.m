@@ -21,7 +21,8 @@
 #import "LFRAppDelegate.h"
 #import "LFSDeletedCell.h"
 #import "DLStarRatingControl.h"
-
+#import "SVStatusHUD.h"
+#import "SVProgressHUD.h"
 
 
 
@@ -474,7 +475,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
     
     UITableView *tableView = self.tableView;
     
-    
+    if (deletes.count || inserts.count || updates.count) {
 //    [tableView beginUpdates];
 //    [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
 //    [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
@@ -555,18 +556,21 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 
         }
         
-        NSArray *contentArray=[[NSArray alloc]initWithObjects:_content,inserts,nil];
         
-        [[NSNotificationCenter defaultCenter]
-         postNotificationName:@"ToDetail"
-         object:contentArray];
+
         [self showStatusBarWithReview];
-        [tableView reloadData];
 
     }
-//    [self showStatusBarWithReview];
-
     [tableView reloadData];
+
+    }
+    NSArray *contentArray=[[NSArray alloc]initWithObjects:_content,inserts,deletes,updates, nil];
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"ToDetail"
+     object:contentArray];
+    [self showStatusBarWithReview ];
+
 
 }
 -(void)sortReviews:(NSMutableArray*)allReviewsBeforeSort{
@@ -682,7 +686,9 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             //[toolbar setTintColor:[UIColor lightGrayColor]];
         }
     }
-    else{
+    }
+        if (count==0) {
+        {
         _scrollOffset = CGPointZero;
         
         CGFloat textFieldWidth =
@@ -742,47 +748,60 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
             /* code that acts on the hash table's values */
             if([value isKindOfClass:[LFSContent class]])
             {
-                if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                    [hash addObject:value];
-                    
-                }
+                //                ((LFSContent*)value).visibility==LFSContentVisibilityEveryone &&
+                //                if( ((LFSContent*)value).bodyHtml ){
+                [hash addObject:value];
+                
+                //                }
             }
         }
         NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
         [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
-        NSMutableArray *result=[[NSMutableArray alloc]init];
-        for (LFSContent *content in hash){
-            NSMutableArray *temp=[[NSMutableArray alloc]init];
-            [result addObject:content];
-            [result addObjectsFromArray: [self recursiveChilds:content.children :temp]];
+        
+        
+        for (int i=0; i<hash.count; i++) {
+            LFSContent *content=[hash objectAtIndex:i];
+            if (content.children) {
+                NSMutableArray *temp=[self recursiveChilds:content.children];
+                for (int j=0,index=0; temp.count>j; j++) {
+                    //                    LFSContentVisibility tempContentVisibility=((LFSContent *)[temp objectAtIndex:j]).visibility;
+                    //                    if (tempContentVisibility==LFSContentVisibilityEveryone) {
+                    [hash insertObject:[temp objectAtIndex:index] atIndex:index+i+1];
+                    index++;
+                    //                    }
+                    
+                }
+            }
         }
-        [result insertObject:content atIndex:0];
-        detailViewController.mainContent=result;
+        
+        [hash insertObject:content atIndex:0];
+        detailViewController.mainContent=hash;
         [self.navigationController setToolbarHidden:YES animated:YES];
     }
 }
--(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable :(NSMutableArray*)test{
+
+-(NSMutableArray*)recursiveChilds:(NSHashTable*)hashtable {
+    NSMutableArray *test=[[NSMutableArray alloc]init];
     NSEnumerator *enumerator = [hashtable objectEnumerator];
     id value;
-    
     while ((value = [enumerator nextObject])) {
         /* code that acts on the hash table's values */
         if([value isKindOfClass:[LFSContent class]])
         {
             LFSContentVisibility visibility = ((LFSContent*)value).visibility;
             
-            if(visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                [test addObject:value];
-                
-            }
-            [self recursiveChilds:((LFSContent*)value).children :test];
+            //            if( ((LFSContent*)value).bodyHtml && visibility==LFSContentVisibilityEveryone ){
+            [test addObject:value];
+            
+            //            }
             
         }
         
     }
+    NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+    [test sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
     return test;
 }
-
 -(void)viewReviewButtonSelected
 {
 
@@ -810,22 +829,34 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                     /* code that acts on the hash table's values */
                     if([value isKindOfClass:[LFSContent class]])
                     {
-                        if(((LFSContent*)value).visibility==LFSContentVisibilityEveryone && ((LFSContent*)value).bodyHtml ){
-                            [hash addObject:value];
-                            
-                        }
+                        //                ((LFSContent*)value).visibility==LFSContentVisibilityEveryone &&
+                        //                if( ((LFSContent*)value).bodyHtml ){
+                        [hash addObject:value];
+                        
+                        //                }
                     }
                 }
                 NSSortDescriptor *lowestToHighest = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
                 [hash sortUsingDescriptors:[NSMutableArray arrayWithObject:lowestToHighest]];
-                NSMutableArray *result=[[NSMutableArray alloc]init];
-                for (LFSContent *content in hash){
-                    NSMutableArray *temp=[[NSMutableArray alloc]init];
-                    [result addObject:content];
-                    [result addObjectsFromArray: [self recursiveChilds:content.children :temp]];
+                
+                
+                for (int i=0; i<hash.count; i++) {
+                    LFSContent *content=[hash objectAtIndex:i];
+                    if (content.children) {
+                        NSMutableArray *temp=[self recursiveChilds:content.children];
+                        for (int j=0,index=0; temp.count>j; j++) {
+                            //                    LFSContentVisibility tempContentVisibility=((LFSContent *)[temp objectAtIndex:j]).visibility;
+                            //                    if (tempContentVisibility==LFSContentVisibilityEveryone) {
+                            [hash insertObject:[temp objectAtIndex:index] atIndex:index+i+1];
+                            index++;
+                            //                    }
+                            
+                        }
+                    }
                 }
-                [result insertObject:content atIndex:0];
-                detailViewController.mainContent=result;
+                
+                [hash insertObject:content atIndex:0];
+                detailViewController.mainContent=hash;
                 [self.navigationController setToolbarHidden:YES animated:YES];
             }
         }
@@ -859,10 +890,10 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
         NSMutableAttributedString *attributedTitleString=[LFSAttributedTextCell attributedStringFromTitle:(content.title ?: @"")];
         
         cellHeightValue = [LFSAttributedTextCell
-                           cellHeightForAttributedString:attributedString hasAttachment:NO width:(tableView.bounds.size.width )];
+                           cellHeightForAttributedString:attributedString hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil) width:(tableView.bounds.size.width )];
         
         
-        cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:NO width:(tableView.bounds.size.width)];
+        cellHeightValue=cellHeightValue+[LFSAttributedTextCell cellHeightForAttributedTitle:attributedTitleString hasAttachment:(content.firstOembed.contentAttachmentThumbnailUrlString != nil) width:(tableView.bounds.size.width)];
         
         return cellHeightValue+45;
           }
@@ -934,7 +965,7 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
           otherButtonTitles:nil] show];
         return;
     }
-    
+    [SVProgressHUD show];
     ////////////////////////////////////////////////////////////////
     // cache current visibility state in case we need to revert
     NSUInteger row = indexPath.row;
@@ -949,8 +980,13 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
                        parameters:nil
                         onSuccess:^(NSOperation *operation, id responseObject)
      {
+         [SVProgressHUD dismiss];
+
+         [SVStatusHUD showWithImage:[UIImage imageNamed:@"Trash_icon.png"] status:@"Content Deleted"];
+
          NSUInteger row = [_content indexOfKey:contentId];
          if (row != NSNotFound) {
+
              [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
              [_contentArray removeAllObjects];
              for (int index=0;index<[_content count] ; index++) {
@@ -967,6 +1003,8 @@ static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
      }
      onFailure:^(NSOperation *operation, NSError *error)
      {
+         [SVProgressHUD dismiss];
+
          // show an error message
          [[[UIAlertView alloc]
            initWithTitle:kFailureModifyTitle
@@ -1177,7 +1215,20 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                            [_imageCache setObject:image forKey:key];
 #endif
                            // we are on the main thead here -- display the image
-                            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
+                           
+                           
+                           int index=NSNotFound;
+                           for (int i=0; i<_contentArray.count;i++) {
+                               if ([((LFSContent*)[_contentArray objectAtIndex:i]).idString isEqualToString:contentId]) {
+                                   index=i;
+                               }
+                           }
+                           
+                           
+                           
+                           
+                           
+                            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index//[_content indexOfKey:contentId]
                                                                        inSection:0];
                            UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
                            if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
@@ -1301,8 +1352,24 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 -(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
 {
+
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
-    NSString *contentId = content.idString;
+    if (userToken == nil) {
+        // userToken is nil -- show an error message and return
+        //
+        // Note: Normally we never reach this block because we do not
+        // allow editing for cells if our user token is nil
+        [[[UIAlertView alloc]
+          initWithTitle:kFailureModifyTitle
+          message:@"You do not have permission to modify comments in this collection"
+          delegate:nil
+          cancelButtonTitle:@"OK"
+          otherButtonTitles:nil] show];
+        return;
+    }
+    [SVProgressHUD show];
+
+        NSString *contentId = content.idString;
     LFSContentVisibility visibility = content.visibility;
     
     [self.writeClient postMessage:message
@@ -1312,17 +1379,22 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                        parameters:nil
                         onSuccess:^(NSOperation *operation, id responseObject)
      {
- 
+
          NSUInteger row = [_content indexOfKey:contentId ];
          if (row != NSNotFound) {
+
              [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
 //             [self.navigationController popToRootViewControllerAnimated:YES];
          }
-         
+         [SVProgressHUD dismiss];
+
+         [SVStatusHUD showWithImage:[UIImage imageNamed:@"Trash_icon.png"] status:@"Content Deleted"];
+
      }
      
                         onFailure:^(NSOperation *operation, NSError *error)
      {
+
          // show an error message
          [[[UIAlertView alloc]
            initWithTitle:nil
@@ -1330,7 +1402,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
            delegate:nil
            cancelButtonTitle:@"OK"
            otherButtonTitles:nil] show];
-         
+         [SVProgressHUD dismiss];
+
          // check if an object with the cached id still exists in the model
          // and if so, revert to its previous visibility state. This check is necessary
          // because it is conceivable that the streaming client has already deleted
@@ -1350,6 +1423,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 -(void)editReviewOfContent:(LFSMessageAction)message forContent:(LFSContent*)content;
 {
+    
         LFREditViewViewController *EditViewController=[[LFREditViewViewController alloc]init];
         
         EditViewController.content=content;
@@ -1390,9 +1464,9 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     
     [self.tableView reloadData];
 
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]
-                          atScrollPosition:UITableViewScrollPositionTop
-                                  animated:NO];
+//    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]
+//                          atScrollPosition:UITableViewScrollPositionTop
+//                                  animated:NO];
 }
 
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject

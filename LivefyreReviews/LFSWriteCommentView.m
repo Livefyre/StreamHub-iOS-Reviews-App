@@ -11,16 +11,22 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
+#import "UIColor+CommentStream.h"
+
 #import "DLStarRatingControl.h"
 static const UIEdgeInsets kDetailPadding = {
     .top=10.0f, .left=15.0f, .bottom=115.0f, .right=15.0f
 };
 
+static const UIEdgeInsets kDetailPadding2 = {
+    .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
+};
+
 static const UIEdgeInsets kPostContentInset = {
     .top=255.f, .left=7.f, .bottom=80.f, .right=15.f
 };
-
-// header font settings
+static const CGFloat kToolbarIconLabelSpacing = 8.0f;
+ // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
 static const CGFloat kDetailHeaderTitleFontSize = 15.f;
 static const CGFloat kDetailHeaderSubtitleFontSize = 12.f;
@@ -29,7 +35,9 @@ static const CGFloat kDetailTitleTextFieldWidth=15.f;
 // content font settings
 static NSString* const kPostContentFontName = @"Georgia";
 static const CGFloat kPostContentFontSize = 18.0f;
+static const CGFloat kToolbarButtonHeight = 44.0f;
 
+static const CGFloat kToolbarButtonWidth = 120.0f;
 // header label heights
 static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
 static const CGFloat kDetailHeaderAttributeTopImageHeight = 18.0f;
@@ -64,11 +72,13 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 @property (readonly, nonatomic) UILabel *headerTitleLable;
+@property (readonly, nonatomic) UIImageView *attachmentImageView;
 
 @property (readonly, nonatomic) UILabel *headerProsLable;
 @property (readonly, nonatomic) UILabel *consTitleLable;
 
 @property (readonly, nonatomic) UIView *addPhotoImageView;
+@property (nonatomic, assign) UIEdgeInsets textContentInset;
 
 @end
 
@@ -79,7 +89,26 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 #pragma mark - Properties
 
 @synthesize profileLocal = _profileLocal;
+@dynamic attachmentImage;
+-(UIImage*)attachmentImage
+{
+    return self.attachmentImageView.image;
+}
 
+-(void)setAttachmentImage:(UIImage *)attachmentImage
+{
+    [self adjustViewsForAttachmentSize:attachmentImage.size];
+    [self.attachmentImageView setImage:attachmentImage];
+}
+
+-(void)setAttachmentImageWithURL:(NSURL *)url
+{
+    __weak typeof(self) weakSelf = self;
+    [self.attachmentImageView setImageWithURL:url completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
+     {
+         [weakSelf setAttachmentImage:image];
+     }];
+}
 #pragma mark -
 @synthesize headerImageView = _headerImageView;
 -(UIImageView*)headerImageView
@@ -157,6 +186,26 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     }
     return _headerAttributeTopView;
 }
+#pragma mark -
+
+@synthesize attachmentImageView = _attachmentImageView;
+- (UIImageView*)attachmentImageView
+{
+    if (_attachmentImageView == nil) {
+        // initialize
+        _attachmentImageView = [[UIImageView alloc] init];
+        
+        // configure
+        [_attachmentImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_attachmentImageView setContentMode:UIViewContentModeScaleAspectFit];
+        
+        // add to superview
+        [self.textView addSubview:_attachmentImageView];
+    }
+    return _attachmentImageView;
+}
+
 
 #pragma mark -
 @synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
@@ -490,52 +539,51 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     return _headerSubtitleView;
 }
 
-#pragma mark -
-@synthesize addPhotoImageView = _addPhotoImageView;
--(UIView*)addPhotoImageView
-{
-    if (_addPhotoImageView == nil) {
-        CGRect screenRect = [[UIScreen mainScreen] bounds];
-        CGFloat screenHeight = screenRect.size.height;
-        _addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-326, 320, 50)];
-        [_addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
-        
-        _addPhotoImageView.alpha=0.8;
-        
-        UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
-        CAShapeLayer *lineOnImage=[self drawline:CGPointMake(0, -3) :CGPointMake(320, -3  )];
-        lineOnImage.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
-        lineOnImage.lineWidth = 0.1;
-        lineOnImage.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
-
-        [_addPhotoImageView.layer addSublayer:lineOnImage];
-        
-        [addImageButton setImage:[UIImage imageNamed:@"image.png"] forState:UIControlStateNormal];
-        [_addPhotoImageView addSubview:addImageButton];
-        UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(136,11, 100, 28)];
-        [addPhoto setTitle:@"Add Photo" forState:UIControlStateNormal];
-        addPhoto.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:18];
-        [addPhoto setTitleColor:UIColorFromRGB(0x80848B) forState:UIControlStateNormal];
-        [addPhoto addTarget:self action:@selector(addPhotoClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [_addPhotoImageView addSubview:addPhoto];
-        [self addSubview:_addPhotoImageView];
-    }
-
-    return _addPhotoImageView;
-}
--(IBAction)addPhotoClicked:(id)sender
-{
-    UIImagePickerController *imagePicker =[[UIImagePickerController alloc] init];
-    imagePicker.delegate = self;
-    imagePicker.sourceType =UIImagePickerControllerSourceTypePhotoLibrary;
-    //imagePicker.mediaTypes = [NSArray arrayWithObjects:(NSString *) kUTTypeImage,nil];
-    imagePicker.allowsEditing = YES;
-   // [self presentViewController:imagePicker animated:YES completion:nil];
-}
--(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
-  //  [self dismissViewControllerAnimated:YES completion:nil];
-}
+//#pragma mark -
+//@synthesize addPhotoImageView = _addPhotoImageView;
+//-(UIView*)addPhotoImageView
+//{
+//    if (_addPhotoImageView == nil) {
+//        CGRect screenRect = [[UIScreen mainScreen] bounds];
+//        CGFloat screenHeight = screenRect.size.height;
+//        _addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-326, 320, 50)];
+//        [_addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
+//        
+//        _addPhotoImageView.alpha=0.8;
+//        
+//        UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
+//        CAShapeLayer *lineOnImage=[self drawline:CGPointMake(0, -3) :CGPointMake(320, -3  )];
+//        lineOnImage.strokeColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
+//        lineOnImage.lineWidth = 0.1;
+//        lineOnImage.fillColor = [[UIColor colorWithRed:160/225 green:160/225 blue:161/225 alpha:1] CGColor];
+//
+//        [_addPhotoImageView.layer addSublayer:lineOnImage];
+//        
+//        [addImageButton setImage:[UIImage imageNamed:@"image.png"] forState:UIControlStateNormal];
+//        [_addPhotoImageView addSubview:addImageButton];
+//        UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(136,11, 100, 28)];
+//        [addPhoto setTitle:@"Add Photo" forState:UIControlStateNormal];
+//        addPhoto.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:18];
+//        [addPhoto setTitleColor:UIColorFromRGB(0x80848B) forState:UIControlStateNormal];
+//        [addPhoto addTarget:self action:@selector(addPhotoClicked:) forControlEvents:UIControlEventTouchUpInside];
+//        [_addPhotoImageView addSubview:addPhoto];
+//        //[self addSubview:_addPhotoImageView];
+//    }
+// return nil;
+//}
+//-(void)addPhotoClicked:(id)sender
+//{
+//    UIImagePickerController *imagePicker =[[UIImagePickerController alloc] init];
+//    imagePicker.delegate = self;
+//    imagePicker.sourceType =UIImagePickerControllerSourceTypePhotoLibrary;
+//    //imagePicker.mediaTypes = [NSArray arrayWithObjects:(NSString *) kUTTypeImage,nil];
+//    imagePicker.allowsEditing = YES;
+//   // [self presentViewController:imagePicker animated:YES completion:nil];
+//}
+//-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+//{
+//  //  [self dismissViewControllerAnimated:YES completion:nil];
+//}
 
 
 
@@ -683,7 +731,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         self.consTextField.placeholder=@"Enter Cons Here";
         
-        [self.addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3) ];
+//        [self.addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3) ];
 
         CAShapeLayer *line1=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
         [self.textView.layer addSublayer:line1];
@@ -735,11 +783,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 -(UITextView*)textView
 {
     if (_textView == nil) {
-        CGRect frame = self.bounds;
-//        frame.origin.y+=120;
-//        frame.size.height-=120;
-        NSLog(@"%f %f",self.bounds.origin.x, self.bounds.origin.y);
-        _textView = [[UITextView alloc] initWithFrame:frame];
+         _textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 320,630)];
         
         [_textView setBackgroundColor:[UIColor whiteColor]];
         
@@ -764,6 +808,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 }
 
 
+
 #pragma mark - UITextViewDelegate
 -(void)textViewDidChange:(UITextView *)textView
 {
@@ -777,6 +822,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGFloat new_offset = MAX((caret_rect.origin.y + caret_rect.size.height) - visible_rect.size.height - textView.contentInset.top,  -textView.contentInset.top);
         [textView setContentOffset:CGPointMake(0, new_offset) animated:NO];
     }
+    
+    [self fixAttachmentImageViewFrame];
 }
 
 #pragma mark - Lifecycle
@@ -819,7 +866,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     CGRect screenBounds = [[self class] screenBounds];
     
     // view frame bottom minus keyboard top
-    CGFloat overlapHeight = viewFrame.origin.y + viewFrame.size.height - (screenBounds.size.height - keyboardFrame.size.height);
+    CGFloat overlapHeight = viewFrame.origin.y + viewFrame.size.height - (screenBounds.size.height - keyboardFrame.size.height)-50;
     if (overlapHeight > 0.f && overlapHeight < viewFrame.size.height)
     {
         // need to take action (there is an overlap and it does not cover the whole view)
@@ -855,6 +902,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self resetFields];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+           [self onInit];
     }
     return self;
 }
@@ -867,6 +915,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self resetFields];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+          [self onInit];
         _previousViewHeight = frame.size.height;
     }
     return self;
@@ -891,6 +940,152 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     _headerTitleView = nil;
     
     _profileLocal = nil;
+}
+
+
+
+-(void)onInit
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+    
+    [self.button1 setTitle:@"Add Photo" forState:UIControlStateNormal];
+    [self.button1 setImage:[UIImage imageNamed:@"AddPhoto"] forState:UIControlStateNormal];
+    
+    [self.textView setInputAccessoryView:[self createInputToolbar]];
+}
+
+#pragma mark - Create toolbar
+
+- (UIToolbar*)createInputToolbar
+{
+    UIToolbar* numberToolbar = [[UIToolbar alloc] init];
+    numberToolbar.items = [NSArray arrayWithObjects:
+                           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                           [[UIBarButtonItem alloc]
+                            initWithCustomView:self.button1],
+                           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                           nil];
+    [numberToolbar sizeToFit];
+    return numberToolbar;
+}
+-(void)didSelectAction:(id)sender {
+    if (sender == self.button1) {
+       [self.delegate didClickAddPhotoButton];
+    }
+}
+
+#pragma mark -
+@synthesize button1 = _button1;
+- (UIButton*)button1
+{
+    if (_button1 == nil) {
+        
+        CGRect frame = CGRectMake(0.f, 0.f,
+                                  kToolbarButtonWidth,
+                                  kToolbarButtonHeight);
+        // initialize
+        _button1 = [[UIButton alloc] initWithFrame:frame];
+        
+        // configure
+        [_button1.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonNormal]
+                       forState:UIControlStateNormal];
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
+                       forState:UIControlStateHighlighted];
+        
+        // Set the amount of space to appear between image and title
+        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0);
+        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kToolbarIconLabelSpacing, 0, 0);
+        
+        [_button1 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+        
+        [_button1 addTarget:self action:@selector(didSelectAction:)
+           forControlEvents:UIControlEventTouchUpInside];
+        
+        // do not add to superview...
+    }
+    return _button1;
+}
+#pragma mark -
+
+@dynamic textContentInset;
+-(UIEdgeInsets)textContentInset
+{
+    if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // iOS7
+        return _textView.textContainerInset;
+    } else {
+        // iOS6
+        return _textView.contentInset;
+    }
+}
+
+-(void)setTextContentInset:(UIEdgeInsets)inset
+{
+    if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // iOS7
+        [_textView setTextContainerInset:inset];
+    } else {
+        // iOS6
+        [_textView setContentInset:UIEdgeInsetsMake(inset.top, 0.f, inset.bottom, 0.f)];
+    }
+}
+
+
+#pragma mark - Layout
+
+-(CGPoint)attachmentOriginForImageSize:(CGSize)size
+{
+    CGFloat x;
+    CGFloat availableWidth = self.bounds.size.width - kDetailPadding2.left - kDetailPadding2.right;
+    
+    if (size.width < availableWidth) {
+        x = (self.bounds.size.width - size.width) / 2.f;
+    }
+    else {
+        x = kDetailPadding2.left;
+    }
+    
+    // now set origin
+    CGFloat y = self.textView.contentSize.height + self.textView.frame.origin.y - self.textContentInset.bottom + kDetailPadding2.top;
+    
+    return CGPointMake(x, y);
+}
+-(void)adjustViewsForAttachmentSize:(CGSize)size
+{
+    CGFloat availableWidth = self.bounds.size.width - kDetailPadding2.left - kDetailPadding2.right;
+    CGRect attachmentFrame = self.attachmentImageView.frame;
+    
+    if (size.width < availableWidth) {
+        attachmentFrame.size = size;
+    }
+    else {
+        // preserve aspect ratio
+        attachmentFrame.size = CGSizeMake(availableWidth,
+                                          availableWidth * size.height / size.width);
+    }
+    attachmentFrame.origin = [self attachmentOriginForImageSize:size];
+    
+    // increase text content insets to fit image view
+    UIEdgeInsets inset = kPostContentInset;
+    inset.bottom += (attachmentFrame.size.height + kDetailPadding.top + kDetailPadding.bottom);
+    [self setTextContentInset:inset];
+    
+    [self.attachmentImageView setFrame:attachmentFrame];
+}
+-(void)fixAttachmentImageViewFrame
+{
+    UIImageView *attachmentImageView = self.attachmentImageView;
+    if (attachmentImageView.image != nil) {
+        CGRect frame = attachmentImageView.frame;
+        frame.origin = [self attachmentOriginForImageSize:attachmentImageView.image.size];
+        [attachmentImageView setFrame:frame];
+    }
 }
 
 
