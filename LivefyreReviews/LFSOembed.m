@@ -6,16 +6,66 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <MobileCoreServices/MobileCoreServices.h>
 #import "LFSModelMacros.h"
 #import "LFSOembed.h"
 
-const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
+// http://embed.ly/docs/embed/api/endpoints/1/oembed
+const NSString* const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 {
+    @"error",
     @"photo",
     @"video",
     @"link",
     @"rich"
 };
+
+LFSOembedType attachmentCodeFromString(NSString *attachmentString) {
+    static NSDictionary *_attachmentCodeFromString = nil;
+    if (_attachmentCodeFromString == nil) {
+        _attachmentCodeFromString = @{
+                                      @"error" : [NSNumber numberWithUnsignedInteger:LFSOembedTypeUnknown],
+                                      @"photo" : [NSNumber numberWithUnsignedInteger:LFSOembedTypePhoto],
+                                      @"video" : [NSNumber numberWithUnsignedInteger:LFSOembedTypeVideo],
+                                      @"link"  : [NSNumber numberWithUnsignedInteger:LFSOembedTypeLink],
+                                      @"rich"  : [NSNumber numberWithUnsignedInteger:LFSOembedTypeRich]
+                                      };
+    }
+    NSNumber *value = [_attachmentCodeFromString objectForKey:attachmentString];
+    return  (value == nil
+             ? LFSOembedTypeUnknown
+             : (LFSOembedType)[value unsignedIntegerValue]);
+}
+
+LFSOembedType attachmentCodeFromUTType(NSString* uttypeString)
+{
+    // this function converts from UTType (e.g. "public.movie")
+    // to type used in Livefyre API.
+    if ([uttypeString isEqualToString:(NSString*)kUTTypeImage]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeJPEG]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeGIF]
+        || [uttypeString isEqualToString:(NSString*)kUTTypePNG]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeJPEG2000]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeTIFF]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeBMP]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeICO]
+        )
+    {
+        return LFSOembedTypePhoto;
+    }
+    else if ([uttypeString isEqualToString:(NSString*)kUTTypeMovie]) {
+        return LFSOembedTypeVideo;
+    }
+    else if ([uttypeString isEqualToString:(NSString*)kUTTypeHTML]) {
+        return LFSOembedTypeRich;
+    }
+    else if ([uttypeString isEqualToString:(NSString*)kUTTypeURL]) {
+        return LFSOembedTypeLink;
+    }
+    else {
+        return LFSOembedTypeUnknown;
+    }
+}
 
 @implementation LFSOembed {
     BOOL _sizeIsSet;
@@ -23,6 +73,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     BOOL _attachmentTypeIsSet;
 }
 
+#pragma mark - Lifecycle
 -(id)initWithObject:(id)object
 {
     // check if object is of appropriate type
@@ -59,6 +110,10 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 -(void)resetCached
 {
     // reset all cached properties except _object
+    _sizeIsSet = NO;
+    _thumbnailSizeIsSet = NO;
+    _attachmentTypeIsSet = NO;
+    
     _providerName = nil;
     _providerUrlString = nil;
     _embedYouTubeId = nil;
@@ -83,16 +138,21 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthesize object = _object;
 
 #pragma mark - Lazy autho-synthesized properties
-@synthLazyWithNull(NSString, providerName, _object, @"provider_name")
-@synthLazyWithNull(NSString, providerUrlString, _object, @"provider_url")
-@synthLazyWithNull(NSString, title, _object, @"title")
-@synthLazyWithNull(NSString, html, _object, @"html")
-@synthLazyWithNull(NSString, linkUrlString, _object, @"link")
 @synthLazyWithNull(NSString, authorName, _object, @"author_name")
 @synthLazyWithNull(NSString, authorUrlString, _object, @"author_url")
+
+@synthLazyWithNull(NSString, html, _object, @"html")
+@synthLazyWithNull(NSString, linkUrlString, _object, @"link")
+@synthLazyWithNull(NSString, providerName, _object, @"provider_name")
+@synthLazyWithNull(NSString, providerUrlString, _object, @"provider_url")
+@synthLazyWithNull(NSString, sourceUrlString, _object, @"source_url")
+@synthLazyWithNull(NSString, thumbnailUrlString, _object, @"thumbnail_url")
+
+@synthLazyWithNull(NSString, title, _object, @"title")
+
 @synthLazyWithNull(NSString, urlString, _object, @"url")
 @synthLazyWithNull(NSString, version, _object, @"version")
-@synthLazyWithNull(NSString, thumbnailUrlString, _object, @"thumbnail_url")
+
 
 #pragma mark -
 -(NSString*)contentAttachmentThumbnailUrlString
@@ -148,6 +208,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
         NSNumber *height = [_object objectForKey:kHeightKey] ?: @0;
         _thumbnailSize = CGSizeMake([width floatValue] / 2.f,
                                     [height floatValue] / 2.f);
+        _thumbnailSizeIsSet = YES;
     }
     return _thumbnailSize;
 }
@@ -163,6 +224,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
         NSNumber *height = [_object objectForKey:kHeightKey] ?: @0;
         _size = CGSizeMake([width floatValue] / 2.f,
                            [height floatValue] / 2.f);
+        _sizeIsSet = YES;
     }
     return _size;
 }
@@ -171,22 +233,11 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthesize oembedType = _attachmentType;
 -(LFSOembedType)oembedType
 {
-    static NSDictionary *translate = nil;
-    if (translate == nil) {
-        translate = @{
-                      @"photo" : @0,
-                      @"video" : @1,
-                      @"link"  : @2,
-                      @"rich"  : @3
-                      };
-    }
     const static NSString* const key = @"type";
     if (_attachmentTypeIsSet == NO) {
         NSString *typeString = [_object objectForKey:key];
-        NSNumber *tmp = [translate objectForKey:typeString];
-        _attachmentType = (tmp == nil
-                           ? LFSOembedTypeUnknown
-                           : (LFSOembedType)[tmp unsignedIntegerValue]);
+        _attachmentType = attachmentCodeFromString(typeString);
+        _attachmentTypeIsSet = YES;
     }
     return _attachmentType;
 }
