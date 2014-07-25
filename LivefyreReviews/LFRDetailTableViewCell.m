@@ -64,6 +64,12 @@
         self.body=[[LFSBasicHTMLLabel alloc]init];
         [self addSubview:self.body];
         
+        
+        //attachedImage
+        
+        self.attachedImage=[[UIImageView alloc]init];
+        [self addSubview:self.attachedImage];
+        
         //footer left
         self.footerLeftView = [[UILabel alloc] init];
         [self.footerLeftView setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
@@ -80,9 +86,14 @@
 }
 -(void)layoutsets{
     CGRect toolbarFrame = self.toolbar.frame;
-    toolbarFrame.origin = CGPointMake(0.f,self.title.frame.size.height+self.body.frame.size.height+83);
+    toolbarFrame.origin = CGPointMake(0.f,self.title.frame.size.height+self.body.frame.size.height+303);
     [self.toolbar setFrame:toolbarFrame];
     
+}
+-(void)layoutsets1{
+    CGRect toolbarFrame = self.toolbar.frame;
+    toolbarFrame.origin = CGPointMake(0.f,self.title.frame.size.height+self.body.frame.size.height+83);
+    [self.toolbar setFrame:toolbarFrame];
 }
 -(void)layoutsetsForSubcell{
     CGRect toolbarFrame = self.toolbar.frame;
