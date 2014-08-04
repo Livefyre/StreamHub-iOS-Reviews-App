@@ -46,7 +46,7 @@
 // other
 @property (nonatomic, readonly) LFSAuthorCollection *authors;
 
--(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors;
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors withAnnotations:(NSDictionary*)annotations withMaxEventId:(NSString*)maxEventId;
 
 -(void)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility;
 

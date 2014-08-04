@@ -20,9 +20,8 @@
 
 @property (nonatomic, strong) LFSUser *user;
 @property (nonatomic, strong) UIImage *avatarImage;
-
+@property (nonatomic, assign) BOOL isEdit;
 @property (nonatomic, weak) id<LFRReplyViewControllerDelegate> delegate;
-
 @end
 
 

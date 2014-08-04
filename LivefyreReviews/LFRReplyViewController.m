@@ -11,6 +11,7 @@
 #import "LFSReplyWriteCommentView.h"
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
+#include "LFSBasicHTMLParser.h"
 #define REPLY_FONT_SIZE 28
 
 @interface LFRReplyViewController ()
@@ -126,13 +127,28 @@
         [self.postNavbar.topItem setTitle:@"Reply"];
         
         _authorHandles = nil;
-        NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];
-        if (replyPrefix != nil) {
-            
-            NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-            paragraphStyle.alignment = NSTextAlignmentCenter;
-            paragraphStyle.lineSpacing = REPLY_FONT_SIZE/2;
-            [self.WriteCommentView.textView setText:replyPrefix];
+        if (_isEdit) {
+            NSAttributedString *replyPrefix;
+            replyPrefix = [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:self.replyToContent.bodyHtml];
+            if (replyPrefix != nil) {
+                
+                NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+                paragraphStyle.alignment = NSTextAlignmentCenter;
+                paragraphStyle.lineSpacing = REPLY_FONT_SIZE/2;
+                [self.WriteCommentView.textView setAttributedText:replyPrefix];
+            }
+
+        }else{
+            NSString *replyPrefix;
+
+         replyPrefix= [self replyPrefixFromContent:self.replyToContent];
+            if (replyPrefix != nil) {
+                
+                NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+                paragraphStyle.alignment = NSTextAlignmentCenter;
+                paragraphStyle.lineSpacing = REPLY_FONT_SIZE/2;
+                [self.WriteCommentView.textView setText:replyPrefix];
+            }
         }
     }
     [self.WriteCommentView.textView becomeFirstResponder];
@@ -270,6 +286,34 @@
         if ([self.delegate respondsToSelector:@selector(ViewController)]) {
             ViewController = [self.delegate ViewController];
         }
+        if (_isEdit) {
+             NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:text,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey, nil ];
+            [self.writeClient postMessage:LFSMessageEdit
+                               forContent:self.replyToContent.idString
+                             inCollection:self.collectionId
+                                userToken:userToken
+                               parameters:dict
+                                onSuccess:^(NSOperation *operation, id responseObject) {
+                                    
+//                                    if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
+//                                    {
+//                                        [collectionViewController didPostContentWithOperation:operation response:responseObject];
+//                                    }
+//                                    [_content1 addContent:[responseObject objectForKey:@"messages"]
+//                                              withAuthors:[responseObject objectForKey:@"authors"]
+//                                          withAnnotations:[responseObject objectForKey:@"annotations"]
+//                                           withMaxEventId:[responseObject objectForKey:@"maxEventId"]];
+                                    
+                                } onFailure:^(NSOperation *operation, NSError *error) {
+                                    [[[UIAlertView alloc]
+                                      initWithTitle:nil
+                                      message:@"An error has occurred. Please try again."
+                                      delegate:nil
+                                      cancelButtonTitle:@"OK"
+                                      otherButtonTitles:nil] show];
+                                }];
+        }
+        else{
         [self.writeClient postContent:text
                          inCollection:self.collectionId
                             userToken:userToken
@@ -293,6 +337,7 @@
          }];
         if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
             [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
+        }
         }
     } else {
         // userToken is nil -- show an error message

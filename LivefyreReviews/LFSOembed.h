@@ -10,26 +10,28 @@
 #import <UIKit/UIKit.h>
 
 // {{{
-// https://github.com/Livefyre/lfdj/blob/production/lfwrite/lfwrite/api/v3_0/urls.py#L87
-#define LFS_OEMBED_TYPES_LENGTH 4u
+// https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/content/models.proto#L286
+#define LFS_OEMBED_TYPES_LENGTH 5u
 extern const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH];
 /**
  @since Available since 0.2.1 and later
  */
 typedef NS_ENUM(NSUInteger, LFSOembedType) {
-    /*! Photographic image or raster graphic art */
-    LFSOembedTypePhoto = 0u,        // 0
-    /*! Video */
-    LFSOembedTypeVideo,             // 1
-    /*! Link */
-    LFSOembedTypeLink,              // 2
-    /*! Rich text */
-    LFSOembedTypeRich,              // 3
     /* unknown type */
-    LFSOembedTypeUnknown            // 4
+    LFSOembedTypeUnknown = 0u,      // 0
+    /*! Photographic image or raster graphic art */
+    LFSOembedTypePhoto,             // 1
+    /*! Video */
+    LFSOembedTypeVideo,             // 2
+    /*! Link */
+    LFSOembedTypeLink,              // 3
+    /*! Rich text */
+    LFSOembedTypeRich,              // 4
 };
 // }}}
 
+extern LFSOembedType attachmentCodeFromString(NSString* attachmentString);
+extern LFSOembedType attachmentCodeFromUTType(NSString* uttypeString);
 
 @interface LFSOembed : NSObject
 
@@ -48,6 +50,7 @@ typedef NS_ENUM(NSUInteger, LFSOembedType) {
 @property (nonatomic, readonly) NSString *embedYouTubeId;
 
 // image stuff
+@property (nonatomic, copy) NSString *sourceUrlString;
 @property (nonatomic, copy) NSString *thumbnailUrlString;
 @property (nonatomic, assign) CGSize thumbnailSize; // in points (1/2 pixel)
 @property (nonatomic, copy) NSString *urlString;

@@ -70,7 +70,7 @@ static const UIEdgeInsets kPostContentInset = {
 {
     [super viewDidLoad];
     
-    self.view.backgroundColor=UIColorFromRGB(0xF3F3F3);
+    self.view.backgroundColor=[UIColor whiteColor];// UIColorFromRGB(0xF3F3F3);
     
     UIView *view1=[[UIView alloc]initWithFrame:CGRectMake(0, 0, 320, 60)];
     view1.backgroundColor=UIColorFromRGB(0xF3F3F3);
@@ -89,10 +89,10 @@ static const UIEdgeInsets kPostContentInset = {
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
-    UIView *Scrool=[[UIView alloc]initWithFrame:CGRectMake(0, 62, 320, screenHeight-330)];
+    UIView *Scrool=[[UIView alloc]initWithFrame:CGRectMake(0, 52, 320, screenHeight-280)];
     
     //description textarea
-    self.description=[[UITextView alloc]initWithFrame:CGRectMake(0,0, 320, screenHeight-330)];
+    self.description=[[UITextView alloc]initWithFrame:CGRectMake(0,0, 320, screenHeight-280)];
     
     
     NSAttributedString *text=[LFSBasicHTMLParser attributedStringByProcessingMarkupInString:_content.bodyHtml];
@@ -104,7 +104,7 @@ static const UIEdgeInsets kPostContentInset = {
     }
 
     [_description setAttributedText:text];
-    [self.description setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+//    [self.description setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
     [_description setFont:[UIFont fontWithName:@"Georgia" size:18.0f]];
     [_description setTextColor:UIColorFromRGB(0x474C52)];
     
@@ -114,6 +114,8 @@ static const UIEdgeInsets kPostContentInset = {
     NSDictionary *dict = @{NSParagraphStyleAttributeName : paragraphStyle };
     [attributedString addAttributes:dict range:NSMakeRange(0, [_description.text length])];
     [_description setTextContainerInset:kPostContentInset];
+    [_description
+     setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin)];
     [Scrool addSubview:_description];
     
     // Title Lable
@@ -212,21 +214,21 @@ static const UIEdgeInsets kPostContentInset = {
 //
     
     
-    UIView *addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-265, 320, 50)];
-    [addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
-    addPhotoImageView.alpha=0.8;
+//    UIView *addPhotoImageView=[[UIView alloc]initWithFrame:CGRectMake(0, screenHeight-265, 320, 50)];
+//    [addPhotoImageView setBackgroundColor:UIColorFromRGB(0xF3F3F3)];
+//    addPhotoImageView.alpha=0.8;
+//    
+//    UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
+//    [addImageButton setImage:[UIImage imageNamed:@"icon_photo"] forState:UIControlStateNormal];
+//    [addPhotoImageView addSubview:addImageButton];
     
-    UIButton *addImageButton=[[UIButton alloc]initWithFrame:CGRectMake(100,11, 30, 24)];
-    [addImageButton setImage:[UIImage imageNamed:@"icon_photo"] forState:UIControlStateNormal];
-    [addPhotoImageView addSubview:addImageButton];
     
-    
-    UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(116,11, 100, 28)];
-    [addPhoto setTitle:@"Add Photo" forState:UIControlStateNormal];
-    [addPhotoImageView addSubview:addPhoto];
-    addPhoto.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14];
-    [addPhoto setTitleColor:UIColorFromRGB(0x80848B) forState:UIControlStateNormal];
-    [addPhoto addTarget:self action:@selector(addPhotoClicked) forControlEvents:UIControlEventTouchUpInside];
+//    UIButton *addPhoto=[[UIButton alloc]initWithFrame:CGRectMake(116,11, 100, 28)];
+//    [addPhoto setTitle:@"Add Photo" forState:UIControlStateNormal];
+////    [addPhotoImageView addSubview:addPhoto];
+//    addPhoto.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14];
+//    [addPhoto setTitleColor:UIColorFromRGB(0x80848B) forState:UIControlStateNormal];
+//    [addPhoto addTarget:self action:@selector(addPhotoClicked) forControlEvents:UIControlEventTouchUpInside];
     
     CAShapeLayer *line1=[self drawline:CGPointMake(0, 60) :CGPointMake(320, 60)];
     [_description.layer addSublayer:line1];
@@ -241,10 +243,10 @@ static const UIEdgeInsets kPostContentInset = {
 //    [_description.layer addSublayer:line5];
     
     [self.view addSubview:Scrool];
-    [self.view addSubview:addPhotoImageView];
+//    [self.view addSubview:addPhotoImageView];
     
-    CAShapeLayer *line4=[self drawline:CGPointMake(0, screenHeight-265) :CGPointMake(320, screenHeight-265)];
-    [self.view.layer addSublayer:line4];
+//    CAShapeLayer *line4=[self drawline:CGPointMake(0, screenHeight-265) :CGPointMake(320, screenHeight-265)];
+//    [self.view.layer addSublayer:line4];
     
     //Do any additional setup after loading the view.
 }
@@ -345,7 +347,9 @@ static const UIEdgeInsets kPostContentInset = {
                                         [collectionViewController didPostContentWithOperation:operation response:responseObject];
                                     }
                                     [_content1 addContent:[responseObject objectForKey:@"messages"]
-                                             withAuthors:[responseObject objectForKey:@"authors"]];
+                                             withAuthors:[responseObject objectForKey:@"authors"]
+                                     withAnnotations:[responseObject objectForKey:@"annotations"]
+                                     withMaxEventId:[responseObject objectForKey:@"maxEventId"]];
 
                                 } onFailure:^(NSOperation *operation, NSError *error) {
                                     [[[UIAlertView alloc]

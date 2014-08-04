@@ -155,7 +155,6 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     }
     _object = object;
 }
-
 -(NSString*)description
 {
     return [_object description];
