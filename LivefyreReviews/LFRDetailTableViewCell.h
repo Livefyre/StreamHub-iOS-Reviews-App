@@ -30,8 +30,10 @@
 @property (readonly, nonatomic) UIButton *button3;
 @property (nonatomic, strong) UIButton *repliesCount;
 @property (nonatomic, strong) UIImageView *featuredImage;
+@property (nonatomic, strong) UIImageView *attachedImage;
 
 -(void)layoutsets;
+-(void)layoutsets1;
 -(void)layoutsetsForSubcell;
 -(NSMutableAttributedString*)getAttributedTextWithFormat:(NSString*)text :(float) fontSize :(NSString*)fontName :(float)lineSpace;
 

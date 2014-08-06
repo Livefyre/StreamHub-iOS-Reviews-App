@@ -50,7 +50,6 @@ static const CGFloat kPostContentFontSize = 18.0f;
         CGRect frame = self.bounds;
         frame.origin.y+=0;
         frame.size.height-=15;
-        NSLog(@"%f %f",self.bounds.origin.x, self.bounds.origin.y);
         _textView = [[UITextView alloc] initWithFrame:frame];
         
         [_textView setBackgroundColor:[UIColor whiteColor]];

@@ -64,6 +64,12 @@
         self.body=[[LFSBasicHTMLLabel alloc]init];
         [self addSubview:self.body];
         
+        
+        //attachedImage
+        
+        self.attachedImage=[[UIImageView alloc]init];
+        [self addSubview:self.attachedImage];
+        
         //footer left
         self.footerLeftView = [[UILabel alloc] init];
         [self.footerLeftView setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
@@ -80,9 +86,14 @@
 }
 -(void)layoutsets{
     CGRect toolbarFrame = self.toolbar.frame;
-    toolbarFrame.origin = CGPointMake(0.f,self.title.frame.size.height+self.body.frame.size.height+83);
+    toolbarFrame.origin = CGPointMake(0.f,self.title.frame.size.height+self.body.frame.size.height+303);
     [self.toolbar setFrame:toolbarFrame];
     
+}
+-(void)layoutsets1{
+    CGRect toolbarFrame = self.toolbar.frame;
+    toolbarFrame.origin = CGPointMake(0.f,self.title.frame.size.height+self.body.frame.size.height+83);
+    [self.toolbar setFrame:toolbarFrame];
 }
 -(void)layoutsetsForSubcell{
     CGRect toolbarFrame = self.toolbar.frame;
@@ -180,8 +191,6 @@ return _button1;
         _repliesCount.backgroundColor=UIColorFromRGB(0x0F98EC);
         [_repliesCount.titleLabel setFont:[UIFont boldSystemFontOfSize:18.f]];
         [_repliesCount setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-//        [_repliesCount setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
-//                       forState:UIControlStateHighlighted];
         CALayer *btnLayer1 = [self.repliesCount layer];
         [btnLayer1 setMasksToBounds:YES];
         [btnLayer1 setCornerRadius:6.0f];

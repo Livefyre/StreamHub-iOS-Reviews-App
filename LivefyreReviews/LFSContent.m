@@ -155,7 +155,6 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     }
     _object = object;
 }
-
 -(NSString*)description
 {
     return [_object description];
@@ -194,6 +193,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 @synthLazyWithNull(NSNumber, rating, self.content, @"rating")
 @synthLazyWithNull(NSNumber, eventId, _object, @"event")
 @synthLazyWithNull(NSArray, vote, self.content, @"vote")
+@synthLazyWithNull(NSArray, attachments, self.content, @"attachments")
 
 #pragma mark -
 @synthesize firstOembed = _firstOembed;
@@ -217,6 +217,15 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
                         }
                     }
                 }
+            }
+        }
+        else if (self.attachments != nil && self.attachments.count > 0) {
+            LFSOembed *oembed = [[LFSOembed alloc] initWithObject:[self.attachments objectAtIndex:0u]];
+            LFSOembedType oembedType = oembed.oembedType;
+            if (oembedType == LFSOembedTypePhoto ||
+                oembedType == LFSOembedTypeVideo ||
+                oembedType == LFSOembedTypeRich) {
+                _firstOembed = oembed;
             }
         }
     }

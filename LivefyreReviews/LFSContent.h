@@ -65,6 +65,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, assign) NSInteger nodeCount;
 
 @property (nonatomic, copy) LFSOembed *firstOembed;
+@property (nonatomic, copy) NSArray *attachments;
 
 -(NSUInteger)nodeCountSumOfChildren;
 -(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;

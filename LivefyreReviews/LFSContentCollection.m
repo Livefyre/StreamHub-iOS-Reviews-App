@@ -591,14 +591,119 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return _authors;
 }
 
--(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors withAnnotations:(NSDictionary*)annotations
 {
     [self beginUpdating];
     [self.authors addEntriesFromDictionary:authors];
+    [self updateAnnotations:annotations];
     [self addObjectsFromArray:content];
     [self endUpdating];
 }
+-(void)updateAnnotations:(NSDictionary*)annotations{
+    NSArray *updatesArray=[[NSArray alloc]initWithArray:[annotations allKeys]];
+    for (NSString *idString in updatesArray ) {
+        LFSContent *content= [_mapping objectForKey:idString];
+        NSDictionary *singleAnnotation=[annotations objectForKey:idString];
+//        content.eventId=[NSNumber numberWithInteger: [maxEventId integerValue]];
 
+//        [self updateLastEventWithContent:content];
+        
+        NSDictionary *added=[singleAnnotation objectForKey:@"added"];
+        NSDictionary *removed=[singleAnnotation objectForKey:@"removed"];
+        NSDictionary *updated=[singleAnnotation objectForKey:@"updated"];
+        
+        if (content.index) {
+            if([added allKeys].count>0){
+                [self addAnnotationsForContent:content :added ];
+                
+            }
+            if([removed allKeys].count>0){
+                [self removeAnnotationsForContent:content :removed ];
+                
+            }
+            if([updated allKeys].count>0){
+                [self addAnnotationsForContent:content :updated ];
+                
+            }
+        }
+        [self.updateSet addObject:content];
+
+    }
+    
+}
+
+-(void)addAnnotationsForContent:(LFSContent *)content :(NSDictionary*)added{
+
+    if ([added objectForKey:@"featuredmessage"]!=nil) {
+        if([content.annotations objectForKey:@"featuredmessage"]==nil){
+            NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithDictionary:content.annotations];
+            [dict setObject:[added objectForKey:@"featuredmessage"] forKey:@"featuredmessage"];
+            content.annotations=dict;
+        }
+    }
+    
+    if ([added objectForKey:@"vote"]!=nil) {
+        if([content.annotations objectForKey:@"vote"]==nil){
+            NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithDictionary:content.annotations];
+            [dict setObject:[added objectForKey:@"vote"] forKey:@"vote"];
+            content.annotations=dict;
+
+        }else{
+            NSMutableDictionary *annotations=[[NSMutableDictionary alloc]initWithDictionary:content.annotations];
+            NSMutableArray *votes= [[NSMutableArray alloc]initWithArray: [annotations valueForKey:@"vote"]];
+            
+            
+            for (NSDictionary *vote in [added objectForKey:@"vote"]){
+                for (int i=0;i<votes.count;i++){
+                    NSDictionary *old=[votes objectAtIndex:i];
+                    
+                    if ([[old valueForKey:@"author"] isEqualToString:[vote valueForKey:@"author"]]) {
+                        [votes removeObject:old];
+                    }
+                }
+            }
+            [votes addObjectsFromArray:[added objectForKey:@"vote"]];
+            [annotations setObject:votes forKey:@"vote"];
+            content.annotations=annotations;
+        }
+    }
+}
+-(void)removeAnnotationsForContent:(LFSContent *)content :(NSDictionary*)removed{
+    
+    if ([removed objectForKey:@"featuredmessage"]!=nil) {
+        if([content.annotations objectForKey:@"featuredmessage"]!=nil){
+            NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithDictionary:content.annotations];
+            [dict removeObjectForKey:@"featuredmessage"];
+            content.annotations=dict;
+        }
+    }
+    
+    if ([removed objectForKey:@"vote"]!=nil) {
+        if([content.annotations objectForKey:@"vote"]==nil){
+                //Nothing to remove if votes in annotations is nil
+        
+        }else{
+            NSMutableDictionary *annotations=[[NSMutableDictionary alloc]initWithDictionary:content.annotations];
+            NSMutableArray *votes= [[NSMutableArray alloc]initWithArray: [annotations valueForKey:@"vote"]];
+            
+            
+            for (NSDictionary *vote in [removed objectForKey:@"vote"]){
+                for (int i=0;i<votes.count;i++){
+                    NSDictionary *old=[votes objectAtIndex:i];
+                    
+                    if ([[old valueForKey:@"author"] isEqualToString:[vote valueForKey:@"author"]]) {
+                        [votes removeObject:old];
+                    }
+                }
+            }
+            
+            [annotations setObject:votes forKey:@"vote"];
+            content.annotations=annotations;
+        }
+    }
+    
+    
+}
 -(void)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility
 {
     [self beginUpdating];
@@ -658,10 +763,14 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         NSUInteger i = 0u, imax = [self.deleteStack count];
         for (LFSContent *ins in self.insertStack) {
             // count how many deletions are before a given index of inserted object
+            
+            
             for (LFSContent *rem = [self.deleteStack objectAtIndex:i];
                  i < imax && rem.index < ins.index;
                  rem = [self.deleteStack objectAtIndex:i], i++)
-            { }
+            {
+            
+            }
             ins.index -= i;
         }
         
