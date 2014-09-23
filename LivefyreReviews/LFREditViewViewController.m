@@ -25,6 +25,7 @@
 
 @implementation LFREditViewViewController
 @synthesize writeClient = _writeClient;
+@synthesize description = _description;
 static const UIEdgeInsets kPostContentInset = {
     .top=130.f, .left=7.f, .bottom=20.f, .right=5.f
 };
