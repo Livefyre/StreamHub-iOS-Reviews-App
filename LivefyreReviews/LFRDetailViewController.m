@@ -842,11 +842,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                  parameters:parameters
                                   onSuccess:^(NSOperation *operation, id responseObject)
                {
-                   NSLog(@"success posting opine %u", action);
+                   NSLog(@"success posting opine %lu", action);
                }
                                   onFailure:^(NSOperation *operation, NSError *error)
                {
-                   NSLog(@"failed posting opine %u", action);
+                   NSLog(@"failed posting opine %lu", action);
                }];
               
           }

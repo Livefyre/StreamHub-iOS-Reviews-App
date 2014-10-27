@@ -774,7 +774,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     }else if (_content.nodeCount-1 ==1){
         replyString=@"1 Reply";
     }else{
-        replyString=[NSString stringWithFormat:@"%d Replies",_content.nodeCount-1];
+        replyString=[NSString stringWithFormat:@"%ld Replies",_content.nodeCount-1];
     }
      
     [self.footerLeftView setText:[NSString stringWithFormat:@"%d of %ld found helpful",count,(unsigned long)[[_content.annotations objectForKey:@"vote" ] count]]];
