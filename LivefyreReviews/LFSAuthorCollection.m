@@ -14,7 +14,12 @@
 
 - (id)init
 {
-	return [self initWithCapacity:0u];
+    self = [super init];
+    if (self != nil) {
+        _dictionary = [[NSMutableDictionary alloc]
+                       initWithCapacity:0u];
+    }
+    return self;
 }
 
 - (id)copy
