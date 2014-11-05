@@ -2,22 +2,16 @@ StreamHub-iOS-Reviews-App
 =========================
 
 
-First clone the repo:
+If you haven't already, please install CocoaPods first [[2]]. You can do this
+simply by running `gem install cocoapods` and `pod setup`. Once installed,
+do the following (assuming you keep your projects in `~/dev` directory):
 
     cd ~/dev
     git clone https://github.com/Livefyre/StreamHub-iOS-Reviews-App.git
     cd StreamHub-iOS-Reviews-App
-
-If you don't have CocoaPods installed, install CocoaPods:
-
-    sudo gem install cocoapods
-    pod setup
-
-Make sure to set up our custom CocoaPod repo
-
-    pod repo add escherba https://github.com/escherba/Specs.git
-
-Finally:
-
     pod install
-    open CommentStream.xcworkspace
+    open LivefyreReviews.xcworkspace
+
+Note that the `pod install` step above can take a minute or two. When done
+installing, use `LivefyreReviews.xcworkspace` to open the project instead of the
+`LivefyreReviews.xcproject` file.
