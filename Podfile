@@ -1,4 +1,4 @@
-source 'git@github.com:Livefyre/cocoapods.git'
+source 'https://github.com/Livefyre/cocoapods.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
 # Uncomment this line to define a global platform for your project
