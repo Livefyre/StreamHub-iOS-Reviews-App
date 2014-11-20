@@ -163,11 +163,11 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     CGFloat bodyTitleWidth = width - kCellPadding.left - kCellContentPaddingRight;
     CGSize bodyTitleSize = [attributedText sizeConstrainedToSize:CGSizeMake(bodyTitleWidth, CGFLOAT_MAX)];
     
-//    CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
-//    return (hasAttachment
-//            ? MAX(bodyTitleSize.height, 0) + deadHeight
-//            : bodyTitleSize.height);
-    return bodyTitleSize.height;
+    CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+    return (hasAttachment
+            ? MAX(bodyTitleSize.height, 0) + deadHeight
+            : bodyTitleSize.height);
+//    return bodyTitleSize.height;
     
    }
 
