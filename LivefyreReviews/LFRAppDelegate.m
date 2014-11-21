@@ -10,7 +10,7 @@
 #import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import "LFSAttributedTextCell.h"
-
+#import <FPPicker/FPPicker.h>
 typedef NS_ENUM(NSUInteger, kTwitterAppState) {
     kTwitterAppStateUnknown = 0u,
     kTwitterAppStateTwitter,
@@ -108,6 +108,12 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
     
     return urlString;
 }
+
++ (void)initialize
+{
+    [FPConfig sharedInstance].APIKey = @"AYNlO8P2PT6qnCfo9eCw2z" ;
+}
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
