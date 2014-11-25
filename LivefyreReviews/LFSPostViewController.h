@@ -17,7 +17,7 @@
 
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController<DYRateViewDelegate,LFSWriteCommentViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FPPickerDelegate,FPSaveDelegate>
+@interface LFSPostViewController : UIViewController<DYRateViewDelegate,LFSWriteCommentViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FPPickerControllerDelegate, FPSaveControllerDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;

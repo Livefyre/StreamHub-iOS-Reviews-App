@@ -757,17 +757,19 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 #pragma mark - FPPickerController Delegate Methods
 
-- (void)FPPickerController:(FPPickerController *)pickerController didFinishPickingMediaWithInfo:(NSDictionary *)info
+- (void)FPPickerController:(FPPickerController *)pickerController didFinishPickingMediaWithInfo:(FPMediaInfo *)info
 {
     // Handle accordingly
 //        UIImage *originalImage = [info objectForKey:@"FPPickerControllerRemoteURL"];
-    NSURL *urlString=[info objectForKey:@"FPPickerControllerRemoteURL"];
+    NSURL *urlString=info.remoteURL;
 //    NSURL *url=[NSURL URLWithString:urlString];
          [self.writeCommentView setAttachmentImageWithURL:urlString];
     if(pickerController){
         [pickerController dismissViewControllerAnimated:YES completion:nil];
     }
     [self.writeCommentView.textView becomeFirstResponder];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+
 
 }
 
@@ -776,6 +778,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     // Handle accordingly
     [pickerController dismissViewControllerAnimated:YES completion:nil];
     [self.writeCommentView.textView becomeFirstResponder];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
 
 }
 
