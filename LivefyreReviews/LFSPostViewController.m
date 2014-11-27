@@ -138,6 +138,9 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     
     FPSaveController *saveController = [FPSaveController new];
     saveController.fpdelegate = self;
+    
+    oembedArray = [NSMutableArray array];
+
  }
 
 
@@ -369,16 +372,21 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
             collectionViewController = [self.delegate collectionViewController];
         }
-            NSMutableArray *oembedArray = [NSMutableArray array];
-            [_oembeds enumerateKeysAndObjectsUsingBlock:^(id key, APAsyncDictionary *obj, BOOL *stop) {
-                // Clone all oembed objects into regular dictionaries because our
-                // thread-safe dictionary object does not support JSONKit serialization
-                [oembedArray addObject:[obj underlyingDictionary]];
-            }];
+            
+            
+//            [_oembeds enumerateKeysAndObjectsUsingBlock:^(id key, APAsyncDictionary *obj, BOOL *stop) {
+//                // Clone all oembed objects into regular dictionaries because our
+//                // thread-safe dictionary object does not support JSONKit serialization
+//                [oembedArray addObject:[obj underlyingDictionary]];
+//            }];
+//            
+            
+            
             
             NSData *jsonData1 = [NSJSONSerialization dataWithJSONObject:oembedArray options:0 error:NULL];
             NSString *oembedArrayjson = [[NSString alloc] initWithData:jsonData1 encoding:NSUTF8StringEncoding];
             
+//            [{"thumbnail_url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","type":"photo","url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","provider_name":"LivefyreFilePicker","link":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg"}
             
             NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey,oembedArrayjson,@"attachments", nil ];
             
@@ -770,6 +778,21 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     [self.writeCommentView.textView becomeFirstResponder];
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
 
+//    [{"thumbnail_url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","type":"photo","url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","provider_name":"LivefyreFilePicker","link":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg"}
+    
+   
+    NSString *thumbnail_url=[NSString stringWithFormat:@"%@",info.remoteURL];
+    NSString *type=@"photo";
+    NSString *provider_name=@"LivefyreFilePicker";
+    NSString *url=[NSString stringWithFormat:@"%@",info.remoteURL];
+   
+    NSDictionary *oemdedDict=[[NSDictionary alloc]initWithObjectsAndKeys:thumbnail_url,@"thumbnail_url",type,@"type",provider_name,@"provider_name",url,@"url", nil];
+    
+    oembedArray=[[NSMutableArray alloc]initWithObjects:oemdedDict, nil];
+   
+
+
+    
 
 }
 
