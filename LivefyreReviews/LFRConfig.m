@@ -29,7 +29,7 @@
                       @"client-solutions.fyre.co",
                       @"360354",
                       @"custom-1402701825509",
-                      @"eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAiY2xpZW50LXNvbHV0aW9ucy5meXJlLmNvIiwgImV4cGlyZXMiOiAxNDA4MTY1Mzc4Ljc3NTAzNSwgInVzZXJfaWQiOiAic3lzdGVtIn0.wSxRB_kaZNr-kXsCgh6-4qjjrp1r7qmbbucP1jHnGVI",
+                      @"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkb21haW4iOiJjbGllbnQtc29sdXRpb25zLmZ5cmUuY28iLCJ1c2VyX2lkIjoic3lzdGVtIiwiZGlzcGxheV9uYW1lIjoic3lzdGVtIiwiZXhwaXJlcyI6Mjg0Mjk3NDg0MS41MTl9.5VeF5nR9D8u2KCIDwiFWUc08Xfvk1NhAqJipFb4umAs",
                       @"84194121",
                       nil];
     NSArray *keys=[[NSArray alloc]initWithObjects:@"_name",
