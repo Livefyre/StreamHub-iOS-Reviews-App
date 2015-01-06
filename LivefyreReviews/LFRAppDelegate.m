@@ -111,7 +111,9 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
 
 + (void)initialize
 {
-    [FPConfig sharedInstance].APIKey = @"FILEPICKER_API_KEY" ;
+//    [FPConfig sharedInstance].APIKey = @"FILEPICKER_API_KEY" ;
+    [FPConfig sharedInstance].APIKey=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"Filepicker API Key"];
+    
 }
 
 
