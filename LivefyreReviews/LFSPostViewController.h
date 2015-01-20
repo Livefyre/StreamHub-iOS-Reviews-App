@@ -17,7 +17,7 @@
 
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController<DYRateViewDelegate,LFSWriteCommentViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FPPickerControllerDelegate, FPSaveControllerDelegate>{
+@interface LFSPostViewController : UIViewController<DYRateViewDelegate,LFSWriteCommentViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FPPickerControllerDelegate>{
       NSMutableArray *oembedArray;
     
 }

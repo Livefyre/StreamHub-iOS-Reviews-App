@@ -286,7 +286,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         // initialize
         _headerTitleLable = [[UILabel alloc] initWithFrame:frame];
-        
+        _headerTitleLable.text=@"Title";
         // configure
 //        [_headerTitleLable
 //         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
@@ -335,8 +335,9 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     return _titleTextField;
 }
 @synthesize starView =_starView;
--(DLStarRatingControl*)starView
-{   _ratingPost=0;
+-(DLStarRatingControl*)starView{
+    if(_starView==nil){
+    _ratingPost=0;
     CGFloat leftColumnWidth =kStarViewLeftBorder;
     CGFloat rightColumnWidth = kStarViewLeftBorder;
     CGSize viewSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kStarViewHeight);
@@ -353,8 +354,9 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 
     _starView  = [[DLStarRatingControl alloc] initWithFrame:CGRectMake(0, 70, 320, 60) andStars:5 isFractional:NO];
     _starView.rating=0;
-//   self.starView.delegate=self;
-    [self.textView addSubview:_starView];
+    _starView.delegate=self;
+        [self.textView addSubview:_starView];
+    }
     return _starView;
 }
 
@@ -544,7 +546,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     //
     // Note: preciese layout depends on whether we have subtitle field
     // (i.e. twitter handle)
-    
+
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
@@ -662,7 +664,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         [self.headerSubtitleView resizeVerticalCenterRightTrim];
     }
     else if (headerTitle && !headerSubtitle && !headerAccessory){
-        [self.headerTitleLable setText:headerTitle];
+//        [self.headerTitleLable setText:headerTitle];
         [self.headerTitleLable resizeVerticalCenterRightTrim];
         self.headerTitleLable.backgroundColor=[UIColor whiteColor];
             self.titleTextField.placeholder=@"Enter Title Here";
@@ -674,8 +676,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         
         self.prosTextField.placeholder=@"Enter Pros Here";
         [self.starView setBackgroundColor:[UIColor clearColor]];
-        self.starView.delegate=self;
-        
+
         [self.consTitleLable setText:@"Cons"];
         [self.consTitleLable resizeVerticalCenterRightTrim];
         

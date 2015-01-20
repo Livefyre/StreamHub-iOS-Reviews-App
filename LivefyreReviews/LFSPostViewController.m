@@ -9,7 +9,7 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSPostViewController.h"
 #import <AssetsLibrary/ALAssetsLibrary.h>
-#import <LFAsyncDictionary/APAsyncDictionary.h>
+//#import <LFAsyncDictionary/APAsyncDictionary.h>
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
 #import "LFRConfig.h"
@@ -135,9 +135,6 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
   _oembeds = [[NSMutableDictionary alloc] init];
     FPPickerController *pickerController = [FPPickerController new];
     pickerController.fpdelegate = self;
-    
-    FPSaveController *saveController = [FPSaveController new];
-    saveController.fpdelegate = self;
     
     oembedArray = [NSMutableArray array];
 
@@ -372,23 +369,8 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
             collectionViewController = [self.delegate collectionViewController];
         }
-            
-            
-//            [_oembeds enumerateKeysAndObjectsUsingBlock:^(id key, APAsyncDictionary *obj, BOOL *stop) {
-//                // Clone all oembed objects into regular dictionaries because our
-//                // thread-safe dictionary object does not support JSONKit serialization
-//                [oembedArray addObject:[obj underlyingDictionary]];
-//            }];
-//            
-            
-            
-            
-            NSData *jsonData1 = [NSJSONSerialization dataWithJSONObject:oembedArray options:0 error:NULL];
-            NSString *oembedArrayjson = [[NSString alloc] initWithData:jsonData1 encoding:NSUTF8StringEncoding];
-            
-//            [{"thumbnail_url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","type":"photo","url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","provider_name":"LivefyreFilePicker","link":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg"}
-            
-            NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey,oembedArrayjson,@"attachments", nil ];
+            NSString *jsonString = [oembedArray JSONString];
+            NSMutableDictionary *dict=[[NSMutableDictionary alloc]initWithObjectsAndKeys:ratingjsonString, LFSCollectionPostRatingKey,bodyofReview,LFSCollectionPostBodyKey,userToken,LFSCollectionPostUserTokenKey,title,LFSCollectionPostTitleKey,jsonString,@"attachments", nil ];
             
             
         [self.writeClient postContentType:2 forCollection:self.collectionId parameters:dict
@@ -398,10 +380,10 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                                self.writeCommentView.prosTextField.text=@"";
                                self.writeCommentView.consTextField.text=@"";
                                self.writeCommentView.attachmentImage=nil;
-                               self.writeCommentView.starView.rating=0.0f;
+                               self.writeCommentView.starView.rating=0.01f;
                                if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
                                {
-                                                                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
+                                   [collectionViewController didPostContentWithOperation:operation response:responseObject];
                                 }
                            } onFailure:^(NSOperation *operation, NSError *error) {
                                [[[UIAlertView alloc]
@@ -434,19 +416,11 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 -(void)didClickAddPhotoButton
 {
     FPPickerController *pickerController = [FPPickerController new];
-    
-    // Set the delegate
-    
     pickerController.fpdelegate = self;
-    
-    // Ask for specific data types. (Optional) Default is all files
-    
     pickerController.dataTypes = @[
                                    @"image/*"
                                    ];
     
-//    // Select and order the sources (Optional) Default is all sources
-//    
 //    pickerController.sourceNames = @[
 //                                     FPSourceImagesearch,
 //                                     FPSourceDropbox
@@ -469,308 +443,13 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     [self presentViewController:pickerController
                        animated:YES
                      completion:nil];
-//    [self.actionSheet showInView:self.view];
 }
-
-
-//#pragma mark -
-//@synthesize actionSheet = _actionSheet;
-//-(UIActionSheet*)actionSheet
-//{
-//    if (_actionSheet == nil) {
-//        _actionSheet = [[UIActionSheet alloc]
-//                        initWithTitle:nil
-//                        delegate:self
-//                        cancelButtonTitle:@"Cancel"
-//                        destructiveButtonTitle:nil
-//                        otherButtonTitles:
-//                        kPhotoActionsArray[kAddPhotoTakePhoto],
-//                        kPhotoActionsArray[kAddPhotoChooseExisting],
-//                        kPhotoActionsArray[kAddPhotoSocialSource],
-//                        nil];
-//    }
-//    return _actionSheet;
-//}
-//#pragma mark - UIActionSheetDelegate
-//
-//-(void)startOembed
-//{
-//    NSUInteger count = [_oembeds count];
-//    [self setCurrentOembedKey:[NSString stringWithFormat:@"key%lu",
-//                               (unsigned long)count]];
-//    [_oembeds setObject:[[APAsyncDictionary alloc] init]
-//                 forKey:self.currentOembedKey];
-//}
-//
-//-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-//{
-//    // TODO: this method is incomplete
-//    
-//    // Get the name of the button pressed
-//    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
-//    
-//    if (actionSheet == self.actionSheet) {
-//        if ([action isEqualToString:kPhotoActionsArray[kAddPhotoTakePhoto]])
-//        {
-//            // Camera (ImagePicker)
-//            [self startOembed];
-//            [self presentImagePickerWithSourceType:UIImagePickerControllerSourceTypeCamera];
-//        }
-//        else if ([action isEqualToString:kPhotoActionsArray[kAddPhotoChooseExisting]])
-//        {
-//            // Photo Album (ImagePicker)
-//            [self startOembed];
-//            [self presentImagePickerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-//        }
-//        else if ([action isEqualToString:kPhotoActionsArray[kAddPhotoSocialSource]])
-//        {
-//            // Social source (FilePicker control)
-//            [self startOembed];
-//            [self presentSocialPicker];
-//        }
-//        else {
-//            // do nothing
-//        }
-//    }
-//}
-//
-//- (void)presentImagePickerWithSourceType:(UIImagePickerControllerSourceType)sourceType
-//{
-//    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-//    [picker setDelegate:self];
-//    @try {
-//        [picker setSourceType:sourceType];
-//    }
-//    @catch (NSException *e) {
-//        if ([e name] == NSInvalidArgumentException) {
-//            return; // source type not available (on iOS simulator)
-//        } else {
-//            @throw e;
-//        }
-//    }
-//    [self presentViewController:picker animated:YES completion:nil];
-//}
-//
-//- (void)presentSocialPicker
-//{
-//    FPPickerController *picker = [[FPPickerController alloc] init];
-//    [picker setFpdelegate:self];
-//    [picker setDataTypes:[NSArray arrayWithObjects:@"image/*", nil]];
-//    [picker setSourceNames:[[NSArray alloc]
-//                            initWithObjects: FPSourceImagesearch, FPSourceFacebook, FPSourceInstagram, FPSourceFlickr, FPSourcePicasa, FPSourceBox, FPSourceDropbox, FPSourceGoogleDrive, nil]];
-//    
-//    [picker setSelectMultiple:NO];
-//    [self presentViewController:picker animated:YES completion:nil];
-//}
-
-//#pragma mark - UIImagePickerControllerDelegate
-//
-//-(void)uploadAssetAtURL:(NSURL*)referenceURL
-//{
-//    // Upload from album
-//    //
-//    ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-//    [assetslibrary assetForURL:referenceURL resultBlock:^(ALAsset *asset)
-//     {
-//         FPMBProgressHUD __block *hud;
-//         dispatch_async(dispatch_get_main_queue(),^{
-//             hud = [FPMBProgressHUD showHUDAddedTo:self.view animated:YES];
-//             hud.labelText = @"Uploading file";
-//             hud.mode = FPMBProgressHUDModeDeterminate;
-//         });
-//         
-//         // Upload full-size image
-//         ALAssetRepresentation *representation = [asset defaultRepresentation];
-//         UIImage *image = [UIImage imageWithCGImage:[representation fullScreenImage]];
-//         [FPLibrary uploadAsset:asset withOptions:nil shouldUpload:YES
-//                        success:^(id JSON, NSURL *localurl)
-//          {
-//              NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, image, localurl);
-//              [self addOembedMainInfo:dictionary];
-//              [FPMBProgressHUD hideAllHUDsForView:self.view animated:YES];
-//              _pauseKeyboard = NO;
-//              [self.writeCommentView.textView becomeFirstResponder];
-//          }
-//                        failure:^(NSError *error, id JSON, NSURL *localurl)
-//          {
-//              //NSDictionary *dictionary = FPDictionaryFromJSONInfoPhotoFailure(image, localurl, nil);
-//              [FPMBProgressHUD hideAllHUDsForView:self.view animated:YES];
-//              _pauseKeyboard = NO;
-//              [self.writeCommentView.textView becomeFirstResponder];
-//          }
-//                       progress:^(float progress)
-//          {
-//              hud.progress = progress;
-//          }];
-//         
-//         // Upload the thumbnail
-//         UIImage *thumbnail = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
-//         if (thumbnail) {
-//             [self addAndUploadThumbnail:thumbnail scale:1.f];
-//         }
-//         
-//     } failureBlock:nil];
-//}
-//
-//-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
-//{
-//    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
-//    if (![mediaType isEqualToString:(__bridge NSString *)kUTTypeImage])
-//    {
-//        // only accept @"public.image" types -- ignore video
-//        [self dismissViewControllerAnimated:NO completion:^{
-//            [self.writeCommentView.textView becomeFirstResponder];
-//        }];
-//        return;
-//    }
-//    
-//    UIImage *originalImage = [info objectForKey:UIImagePickerControllerOriginalImage];
-//    NSURL *referenceURL = [info objectForKeyedSubscript:UIImagePickerControllerReferenceURL];
-//    
-//    if (referenceURL != nil) {
-//        // Upload from photo album
-//        //
-//        [self uploadAssetAtURL:referenceURL];
-//        _pauseKeyboard = YES;
-//        [self.writeCommentView.textView resignFirstResponder];
-//    }
-//    else if (originalImage != nil) {
-//        // Upload from camera
-//        //
-//        FPMBProgressHUD __block *hud = [FPMBProgressHUD showHUDAddedTo:self.view animated:YES];
-//        hud.labelText = @"Uploading file";
-//        hud.mode = FPMBProgressHUDModeDeterminate;
-//        
-//        ALAssetsLibrary *library = [ALAssetsLibrary new];
-//        [library writeImageToSavedPhotosAlbum:[originalImage CGImage]
-//                                  orientation:(ALAssetOrientation)[originalImage imageOrientation]
-//                              completionBlock:^(NSURL *assetURL, NSError *error)
-//         {
-//             if (error) {
-//                 // TODO: handle error writing image to disk
-//                 return;
-//             }
-//             [self uploadAssetAtURL:assetURL];
-//         }];
-//        
-//        _pauseKeyboard = YES;
-//        [self.writeCommentView.textView resignFirstResponder];
-//    }
-//    else {
-//        _pauseKeyboard = NO;
-//        [self.writeCommentView.textView becomeFirstResponder];
-//    }
-//    
-//    [self dismissViewControllerAnimated:NO completion:nil];
-//}
-//
-//-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-//{
-//    [self dismissViewControllerAnimated:NO completion:^{
-//        [self.writeCommentView.textView becomeFirstResponder];
-//    }];
-//}
-//
-//#pragma mark - FPPickerDelegate
-//
-//-(void)addOembedThumbnailInfo:(NSDictionary*)info
-//{
-//    NSString *urlString;
-//    NSString *imageKey = [info objectForKey:FPPickerControllerKey];
-//    if (imageKey != nil) {
-//        urlString = [@"http://media.fyre.co/" stringByAppendingString:imageKey];
-//    } else {
-//        urlString = [info objectForKey:FPPickerControllerRemoteURL];
-//    }
-//    
-//    // Add to oembed dictionary
-//    APAsyncDictionary *oembed = [_oembeds objectForKey:self.currentOembedKey];
-//    [oembed setObjectsAndKeysFromDictionary:@{@"thumbnail_url": urlString}];
-//}
-//
-//-(void)addOembedMainInfo:(NSDictionary*)info
-//{
-//    NSString *urlString;
-//    NSString *imageKey = [info objectForKey:FPPickerControllerKey];
-//    if (imageKey != nil) {
-//        urlString = [@"http://media.fyre.co/" stringByAppendingString:imageKey];
-//    } else {
-//        urlString = [info objectForKey:FPPickerControllerRemoteURL];
-//    }
-//    
-//    LFSOembedType oembedType = attachmentCodeFromUTType([info objectForKey:FPPickerControllerMediaType]);
-//    
-//    // Add to oembed dictionary
-//    NSParameterAssert(oembedType < LFS_OEMBED_TYPES_LENGTH);
-//    APAsyncDictionary *oembed = [_oembeds objectForKey:self.currentOembedKey];
-//    [oembed setObjectsAndKeysFromDictionary:@{@"url": urlString,
-//                                              @"link": urlString,
-//                                              @"provider_name": @"LivefyreFilePicker",
-//                                              @"type": LFSOembedTypes[oembedType]}];
-//    
-//    UIImage *originalImage = [info objectForKey:FPPickerControllerOriginalImage];
-//    if (originalImage != nil) {
-//     [self.writeCommentView setAttachmentImage:originalImage];
-//    } else {
-//     [self.writeCommentView setAttachmentImageWithURL:[NSURL URLWithString:urlString]];
-//    }
-//}
-//
-//-(void)addAndUploadThumbnail:(UIImage*)thumbnail scale:(CGFloat)scale
-//{
-//    APAsyncDictionary *oembed = [_oembeds objectForKey:self.currentOembedKey];
-//    [oembed setObjectsAndKeysFromDictionary:@{
-//                                              @"thumbnail_width": [NSNumber numberWithUnsignedInteger:(NSUInteger)(scale * thumbnail.size.width)],
-//                                              @"thumbnail_height": [NSNumber numberWithUnsignedInteger:(NSUInteger)(scale * thumbnail.size.height)]}];
-//    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 0.01 * NSEC_PER_SEC);
-//    dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
-//                   ^(void)
-//                   {
-//                       [FPLibrary uploadImage:thumbnail
-//                                   ofMimetype:@"image/jpeg"
-//                                  withOptions:nil
-//                                 shouldUpload:YES
-//                                      success:^(id JSON, NSURL *localurl)
-//                        {
-//                            NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, thumbnail, localurl);
-//                            [self addOembedThumbnailInfo:dictionary];
-//                        }
-//                                      failure:nil
-//                                     progress:nil];
-//                   });
-//}
-//
-//-(void)FPPickerController:(FPPickerController *)picker didPickMediaWithInfo:(NSDictionary *)info
-//{
-//    UIImage *thumbnail = [info objectForKey:FPPickerControllerThumbnailImage];
-//    if (thumbnail) {
-//        [self addAndUploadThumbnail:thumbnail scale:2.f];
-//    }
-//}
-//
-//-(void)FPPickerController:(FPPickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
-//{
-//    [self addOembedMainInfo:info];
-//    [self dismissViewControllerAnimated:NO completion:^{
-//        [self.writeCommentView.textView becomeFirstResponder];
-//    }];
-//}
-//
-//-(void)FPPickerControllerDidCancel:(FPPickerController *)picker
-//{
-//    [self dismissViewControllerAnimated:NO completion:^{
-//        [self.writeCommentView.textView becomeFirstResponder];
-//    }];
-//}
 
 #pragma mark - FPPickerController Delegate Methods
 
 - (void)FPPickerController:(FPPickerController *)pickerController didFinishPickingMediaWithInfo:(FPMediaInfo *)info
 {
-    // Handle accordingly
-//        UIImage *originalImage = [info objectForKey:@"FPPickerControllerRemoteURL"];
     NSURL *urlString=info.remoteURL;
-//    NSURL *url=[NSURL URLWithString:urlString];
          [self.writeCommentView setAttachmentImageWithURL:urlString];
     if(pickerController){
         [pickerController dismissViewControllerAnimated:YES completion:nil];
@@ -778,9 +457,6 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     [self.writeCommentView.textView becomeFirstResponder];
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
 
-//    [{"thumbnail_url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","type":"photo","url":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg","provider_name":"LivefyreFilePicker","link":"https:\/\/www.filepicker.io\/api\/file\/lYmoiVmDRGtkBW7FaMdg"}
-    
-   
     NSString *thumbnail_url=[NSString stringWithFormat:@"%@",info.remoteURL];
     NSString *type=@"photo";
     NSString *provider_name=@"LivefyreFilePicker";
@@ -789,15 +465,10 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     NSDictionary *oemdedDict=[[NSDictionary alloc]initWithObjectsAndKeys:thumbnail_url,@"thumbnail_url",type,@"type",provider_name,@"provider_name",url,@"url", nil];
     
     oembedArray=[[NSMutableArray alloc]initWithObjects:oemdedDict, nil];
-   
-
-
-    
 
 }
 
-- (void)FPPickerControllerDidCancel:(FPPickerController *)pickerController
-{
+- (void)FPPickerControllerDidCancel:(FPPickerController *)pickerController{
     // Handle accordingly
     [pickerController dismissViewControllerAnimated:YES completion:nil];
     [self.writeCommentView.textView becomeFirstResponder];
@@ -805,16 +476,5 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 }
 
-#pragma mark - FPSaveController Delegate Methods
-
-- (void)FPSaveController:(FPSaveController *)saveController didFinishSavingMediaWithInfo:(NSDictionary *)info
-{
-    // Handle accordingly
-}
-
-- (void)FPSaveControllerDidCancel:(FPSaveController *)saveController
-{
-    // Handle accordingly
-}
 
 @end
