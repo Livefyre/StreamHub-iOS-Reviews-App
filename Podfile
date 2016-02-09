@@ -7,8 +7,8 @@ pod 'AFHTTPRequestOperationLogger', '~> 2.0.0'
 pod 'OHAttributedLabel', '~> 3.5.3'
 #pod 'StreamHub-iOS-SDK', '~> 0.3.7'
 pod 'StreamHub-iOS-SDK', :git => 'https://github.com/Livefyre/StreamHub-iOS-SDK.git'
-#pod 'StreamHub-iOS-SDK', :path => '../../'
-pod 'SDWebImage', '~> 3.7.0'
+#pod 'StreamHub-iOS-SDK', :path => '../StreamHub-iOS-SDK/‘
+pod 'SDWebImage', '~>3.7'
 pod 'FilepickerSDK', '~> 2.7.3'
 pod 'LFAsyncDictionary', '~> 0.1.0a'
 #pod "Reveal-iOS-SDK"
