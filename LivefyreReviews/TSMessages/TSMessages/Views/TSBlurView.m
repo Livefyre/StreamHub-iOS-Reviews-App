@@ -25,7 +25,7 @@
         _toolbar.userInteractionEnabled = NO;
         _toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 70000
-        [_toolbar setBackgroundImage:nil forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault]; // remove background set through the appearence proxy
+        [_toolbar setBackgroundImage:nil forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault]; // remove background set through the appearance proxy
 #endif
         [self addSubview:_toolbar];
     }

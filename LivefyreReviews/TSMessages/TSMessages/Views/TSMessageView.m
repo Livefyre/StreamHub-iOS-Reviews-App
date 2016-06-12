@@ -281,7 +281,7 @@ canBeDismissedByUser:(BOOL)dismissingEnabled
             self.textSpaceRight = self.button.frame.size.width + TSMessageViewPadding;
         }
         
-        // Add a border on the bottom (or on the top, depending on the view's postion)
+        // Add a border on the bottom (or on the top, depending on the view's position)
         if (![TSMessage iOS7StyleEnabled])
         {
             _borderView = [[UIView alloc] initWithFrame:CGRectMake(0.0,
