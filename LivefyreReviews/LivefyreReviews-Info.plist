@@ -2,12 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-    <key>CFBundleDevelopmentRegion</key>
+	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>${PRODUCT_NAME}</string>
@@ -27,10 +22,40 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>Filepicker API Key</key>
+	<string>SET_FILEPICKER.IO_APIKEY_HERE</string>
+	<key>Filepicker Parameters</key>
+	<dict>
+		<key>maxSize</key>
+		<integer>4194304</integer>
+		<key>metadata</key>
+		<true/>
+		<key>mimetypes</key>
+		<array>
+			<string>image/*</string>
+		</array>
+		<key>persist</key>
+		<false/>
+		<key>storeAccess</key>
+		<string>public</string>
+		<key>storeLocation</key>
+		<string>S3</string>
+		<key>version</key>
+		<string>v1</string>
+	</dict>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>Media Cache URL</key>
+	<string>https://d2kmm3vx031a1h.cloudfront.net</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>UILaunchStoryboardName</key>
+	<string>Main</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -43,28 +68,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>Filepicker API Key</key>
-	<string>SET_FILEPICKER.IO_APIKEY_HERE</string>
-	<key>Media Cache URL</key>
-	<string>https://d2kmm3vx031a1h.cloudfront.net</string>
-	<key>Filepicker Parameters</key>
-	<dict>
-		<key>metadata</key>
-		<true/>
-		<key>maxSize</key>
-		<integer>4194304</integer>
-		<key>storeLocation</key>
-		<string>S3</string>
-		<key>storeAccess</key>
-		<string>public</string>
-		<key>persist</key>
-		<false/>
-		<key>version</key>
-		<string>v1</string>
-		<key>mimetypes</key>
-		<array>
-			<string>image/*</string>
-		</array>
-	</dict>
 </dict>
 </plist>
