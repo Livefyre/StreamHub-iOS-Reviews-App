@@ -21,6 +21,7 @@
 		220F5C1D19444C8B0067B251 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 220F5C1B19444C8B0067B251 /* InfoPlist.strings */; };
 		220F5C1F19444C8B0067B251 /* LivefyreReviewsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 220F5C1E19444C8B0067B251 /* LivefyreReviewsTests.m */; };
 		29A79765091647C0A32AF3EF /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB20CC4C259548EB82144512 /* libPods.a */; };
+		2CCD873FCBA7218DE614282D /* libPods-LivefyreReviews.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 413D0AC2215A8A30F352C29A /* libPods-LivefyreReviews.a */; };
 		6D60508F1970338A0068C4CC /* LFRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D60508E1970338A0068C4CC /* LFRViewController.m */; };
 		6D605093197033A80068C4CC /* LFREditViewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D605092197033A80068C4CC /* LFREditViewViewController.m */; };
 		6DA120E11945E1AE009084EC /* LFSPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA120E01945E1AE009084EC /* LFSPostViewController.m */; };
@@ -115,6 +116,8 @@
 		220F5C1A19444C8B0067B251 /* LivefyreReviewsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "LivefyreReviewsTests-Info.plist"; sourceTree = "<group>"; };
 		220F5C1C19444C8B0067B251 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		220F5C1E19444C8B0067B251 /* LivefyreReviewsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LivefyreReviewsTests.m; sourceTree = "<group>"; };
+		2397254CE5B74B46BC7366DC /* Pods-LivefyreReviews.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LivefyreReviews.release.xcconfig"; path = "Pods/Target Support Files/Pods-LivefyreReviews/Pods-LivefyreReviews.release.xcconfig"; sourceTree = "<group>"; };
+		413D0AC2215A8A30F352C29A /* libPods-LivefyreReviews.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LivefyreReviews.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D60508E1970338A0068C4CC /* LFRViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRViewController.m; sourceTree = "<group>"; };
 		6D605092197033A80068C4CC /* LFREditViewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFREditViewViewController.m; sourceTree = "<group>"; };
 		6DA120DF1945E1AE009084EC /* LFSPostViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSPostViewController.h; sourceTree = "<group>"; };
@@ -217,6 +220,7 @@
 		76911AA2197FF64E00680689 /* LFRDetailTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRDetailTableViewCell.m; sourceTree = "<group>"; };
 		76911AA3197FF64E00680689 /* LFRDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFRDetailViewController.h; sourceTree = "<group>"; };
 		76911AA4197FF64E00680689 /* LFRDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFRDetailViewController.m; sourceTree = "<group>"; };
+		8D498C459C8015AF00A68D50 /* Pods-LivefyreReviews.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LivefyreReviews.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LivefyreReviews/Pods-LivefyreReviews.debug.xcconfig"; sourceTree = "<group>"; };
 		D3BF0E53599989921A675DF3 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		FB20CC4C259548EB82144512 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -231,6 +235,7 @@
 				220F5BF819444C8B0067B251 /* UIKit.framework in Frameworks */,
 				220F5BF419444C8B0067B251 /* Foundation.framework in Frameworks */,
 				29A79765091647C0A32AF3EF /* libPods.a in Frameworks */,
+				2CCD873FCBA7218DE614282D /* libPods-LivefyreReviews.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +281,7 @@
 				220F5BF719444C8B0067B251 /* UIKit.framework */,
 				220F5C1219444C8B0067B251 /* XCTest.framework */,
 				FB20CC4C259548EB82144512 /* libPods.a */,
+				413D0AC2215A8A30F352C29A /* libPods-LivefyreReviews.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -540,6 +546,8 @@
 			children = (
 				0EE14389B92E8E36A2FE9D7D /* Pods.debug.xcconfig */,
 				D3BF0E53599989921A675DF3 /* Pods.release.xcconfig */,
+				8D498C459C8015AF00A68D50 /* Pods-LivefyreReviews.debug.xcconfig */,
+				2397254CE5B74B46BC7366DC /* Pods-LivefyreReviews.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -551,12 +559,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 220F5C2219444C8B0067B251 /* Build configuration list for PBXNativeTarget "LivefyreReviews" */;
 			buildPhases = (
-				0C9B924054014962B747424D /* Check Pods Manifest.lock */,
+				0C9B924054014962B747424D /* [CP] Check Pods Manifest.lock */,
 				220F5BEC19444C8A0067B251 /* Sources */,
 				220F5BED19444C8A0067B251 /* Frameworks */,
 				220F5BEE19444C8A0067B251 /* Resources */,
-				A54730C6A26747EDA1661CA3 /* Copy Pods Resources */,
-				1A25CC5FB36FFB921F1804B2 /* Embed Pods Frameworks */,
+				A54730C6A26747EDA1661CA3 /* [CP] Copy Pods Resources */,
+				1A25CC5FB36FFB921F1804B2 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -662,49 +670,49 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0C9B924054014962B747424D /* Check Pods Manifest.lock */ = {
+		0C9B924054014962B747424D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		1A25CC5FB36FFB921F1804B2 /* Embed Pods Frameworks */ = {
+		1A25CC5FB36FFB921F1804B2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LivefyreReviews/Pods-LivefyreReviews-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A54730C6A26747EDA1661CA3 /* Copy Pods Resources */ = {
+		A54730C6A26747EDA1661CA3 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LivefyreReviews/Pods-LivefyreReviews-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -878,13 +886,15 @@
 		};
 		220F5C2319444C8B0067B251 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE14389B92E8E36A2FE9D7D /* Pods.debug.xcconfig */;
+			baseConfigurationReference = 8D498C459C8015AF00A68D50 /* Pods-LivefyreReviews.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LivefyreReviews/LivefyreReviews-Prefix.pch";
 				INFOPLIST_FILE = "LivefyreReviews/LivefyreReviews-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -892,13 +902,15 @@
 		};
 		220F5C2419444C8B0067B251 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D3BF0E53599989921A675DF3 /* Pods.release.xcconfig */;
+			baseConfigurationReference = 2397254CE5B74B46BC7366DC /* Pods-LivefyreReviews.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LivefyreReviews/LivefyreReviews-Prefix.pch";
 				INFOPLIST_FILE = "LivefyreReviews/LivefyreReviews-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
