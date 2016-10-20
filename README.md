@@ -26,7 +26,7 @@ StreamHub-SDK starting from v0.2 requires Xcode 5 and iOS 6.0 or later.
 License
 -------
 
-Copyright (c) 2015 Livefyre, Inc.
+Copyright (c) 2016 Livefyre, Inc.
 
 Licensed under the MIT License
 
